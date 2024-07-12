@@ -1,0 +1,239 @@
+\begin{center}\begin{minipage}{.48\textwidth}\centering\adjustbox{scale=.9}{
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2,0) ellipse (1 and 2);
+	\draw[thick] ( 2,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2, 2.25) {$\B\times\B$};
+	\node at ( 2, 2.25) {$\B$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.25, 2.25) -- (1.5,2.25) node[midway, above] {$\land$};
+	
+	\node at (-2,  1.05) {$(\false,\false)$};
+	\node at (-2,   .35) {$(\false,\true)$};
+	\node at (-2, - .35) {$(\true,\false)$};
+	\node at (-2, -1.05) {$(\true,\true)$};
+	\draw[fill] (-1.35, 1.05) circle (.05);
+	\draw[fill] (-1.35,  .35) circle (.05);
+	\draw[fill] (-1.35, -.35) circle (.05);
+	\draw[fill] (-1.35,-1.05) circle (.05);
+	
+	\node at (2,  .75) {$\false$};
+	\node at (2, -.75) {$\true$};
+	\draw[fill] (1.75, .75) circle (.05);
+	\draw[fill] (1.75,-.75) circle (.05);
+	
+	\draw[-Stealth, thick] (-1.35, 1.05) -- (1.75, .75);
+	\draw[-Stealth, thick] (-1.35, .35) -- (1.75, .75);
+	\draw[-Stealth, thick] (-1.35, -.35) -- (1.75, .75);
+	\draw[-Stealth, thick] (-1.35, -1.05) -- (1.75, -.75);
+\end{tikzpicture}}\\
+\end{minipage}\begin{minipage}{.48\textwidth}\centering\adjustbox{scale=.9}{
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2,0) ellipse (1 and 2);
+	\draw[thick] ( 2,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2, 2.25) {$\B$};
+	\node at ( 2, 2.25) {$\B^{\B}$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.5, 2.25) -- (1.5,2.25) node[midway, above] {$\land$};
+	
+	\node at (-2, .75) {$\false$};
+	\node at (-2, -.75) {$\true$};
+	\draw[fill] (-1.75,.75) circle (.05);
+	\draw[fill] (-1.75,-.75) circle (.05);
+	
+	\node at (2, .75) {$\bot$};
+	\node at (2, -.75) {$\id_Q$};
+	\draw[fill] (1.5,.75) circle (.05);
+	\draw[fill] (1.5,-.75) circle (.05);
+	
+	\draw[-Stealth, thick] (-1.75, .75) -- (1.5, .75);
+	\draw[-Stealth, thick] (-1.75, -.75) -- (1.5, -.75);
+\end{tikzpicture}}\\
+\end{minipage}\end{center}
+
+\begin{center}\begin{minipage}{.48\textwidth}\centering\adjustbox{scale=.9}{
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2,0) ellipse (1 and 2);
+	\draw[thick] ( 2,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2, 2.25) {$\B\times\B$};
+	\node at ( 2, 2.25) {$\B$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.25, 2.25) -- (1.5,2.25) node[midway, above] {$\lor$};
+	
+	\node at (-2,  1.05) {$(\false,\false)$};
+	\node at (-2,   .35) {$(\false,\true)$};
+	\node at (-2, - .35) {$(\true,\false)$};
+	\node at (-2, -1.05) {$(\true,\true)$};
+	\draw[fill] (-1.35, 1.05) circle (.05);
+	\draw[fill] (-1.35,  .35) circle (.05);
+	\draw[fill] (-1.35, -.35) circle (.05);
+	\draw[fill] (-1.35,-1.05) circle (.05);
+	
+	\node at (2,  .75) {$\false$};
+	\node at (2, -.75) {$\true$};
+	\draw[fill] (1.75, .75) circle (.05);
+	\draw[fill] (1.75,-.75) circle (.05);
+	
+	\draw[-Stealth, thick] (-1.35, 1.05) -- (1.75, .75);
+	\draw[-Stealth, thick] (-1.35, .35) -- (1.75, -.75);
+	\draw[-Stealth, thick] (-1.35, -.35) -- (1.75, -.75);
+	\draw[-Stealth, thick] (-1.35, -1.05) -- (1.75, -.75);
+\end{tikzpicture}}\\
+\end{minipage}\begin{minipage}{.48\textwidth}\centering\adjustbox{scale=.9}{
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2,0) ellipse (1 and 2);
+	\draw[thick] ( 2,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2, 2.25) {$\B$};
+	\node at ( 2, 2.25) {$\B^{\B}$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.5, 2.25) -- (1.5,2.25) node[midway, above] {$\land$};
+	
+	\node at (-2, .75) {$\false$};
+	\node at (-2, -.75) {$\true$};
+	\draw[fill] (-1.75,.75) circle (.05);
+	\draw[fill] (-1.75,-.75) circle (.05);
+	
+	\node at (2, .75) {$\id_Q$};
+	\node at (2, -.75) {$\top$};
+	\draw[fill] (1.5,.75) circle (.05);
+	\draw[fill] (1.5,-.75) circle (.05);
+	
+	\draw[-Stealth, thick] (-1.75, .75) -- (1.5, .75);
+	\draw[-Stealth, thick] (-1.75, -.75) -- (1.5, -.75);
+\end{tikzpicture}}\\
+\end{minipage}\end{center}
+
+\begin{center}\begin{minipage}{.48\textwidth}\centering\adjustbox{scale=.9}{
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2,0) ellipse (1 and 2);
+	\draw[thick] ( 2,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2, 2.25) {$\B\times\B$};
+	\node at ( 2, 2.25) {$\B$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.25, 2.25) -- (1.5,2.25) node[midway, above] {$\to$};
+	
+	\node at (-2,  1.05) {$(\false,\false)$};
+	\node at (-2,   .35) {$(\false,\true)$};
+	\node at (-2, - .35) {$(\true,\false)$};
+	\node at (-2, -1.05) {$(\true,\true)$};
+	\draw[fill] (-1.35, 1.05) circle (.05);
+	\draw[fill] (-1.35,  .35) circle (.05);
+	\draw[fill] (-1.35, -.35) circle (.05);
+	\draw[fill] (-1.35,-1.05) circle (.05);
+	
+	\node at (2,  .75) {$\false$};
+	\node at (2, -.75) {$\true$};
+	\draw[fill] (1.75, .75) circle (.05);
+	\draw[fill] (1.75,-.75) circle (.05);
+	
+	\draw[-Stealth, thick] (-1.35, 1.05) -- (1.75, -.75);
+	\draw[-Stealth, thick] (-1.35, .35) -- (1.75, -.75);
+	\draw[-Stealth, thick] (-1.35, -.35) -- (1.75, .75);
+	\draw[-Stealth, thick] (-1.35, -1.05) -- (1.75, -.75);
+\end{tikzpicture}}\\
+\end{minipage}\begin{minipage}{.48\textwidth}\centering\adjustbox{scale=.9}{
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2,0) ellipse (1 and 2);
+	\draw[thick] ( 2,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2, 2.25) {$\B$};
+	\node at ( 2, 2.25) {$\B^{\B}$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.5, 2.25) -- (1.5,2.25) node[midway, above] {$\to$};
+	
+	\node at (-2, .75) {$\false$};
+	\node at (-2, -.75) {$\true$};
+	\draw[fill] (-1.75,.75) circle (.05);
+	\draw[fill] (-1.75,-.75) circle (.05);
+	
+	\node at (2, .75) {$\top$};
+	\node at (2, -.75) {$\id_Q$};
+	\draw[fill] (1.5,.75) circle (.05);
+	\draw[fill] (1.5,-.75) circle (.05);
+	
+	\draw[-Stealth, thick] (-1.75, .75) -- (1.5, .75);
+	\draw[-Stealth, thick] (-1.75, -.75) -- (1.5, -.75);
+\end{tikzpicture}}\\
+\end{minipage}\end{center}
+
+\begin{center}\begin{minipage}{.48\textwidth}\centering\adjustbox{scale=.9}{
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2,0) ellipse (1 and 2);
+	\draw[thick] ( 2,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2, 2.25) {$\B\times\B$};
+	\node at ( 2, 2.25) {$\B$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.25, 2.25) -- (1.5,2.25) node[midway, above] {$\leftrightarrow$};
+	
+	\node at (-2,  1.05) {$(\false,\false)$};
+	\node at (-2,   .35) {$(\false,\true)$};
+	\node at (-2, - .35) {$(\true,\false)$};
+	\node at (-2, -1.05) {$(\true,\true)$};
+	\draw[fill] (-1.35, 1.05) circle (.05);
+	\draw[fill] (-1.35,  .35) circle (.05);
+	\draw[fill] (-1.35, -.35) circle (.05);
+	\draw[fill] (-1.35,-1.05) circle (.05);
+	
+	\node at (2,  .75) {$\false$};
+	\node at (2, -.75) {$\true$};
+	\draw[fill] (1.75, .75) circle (.05);
+	\draw[fill] (1.75,-.75) circle (.05);
+	
+	\draw[-Stealth, thick] (-1.35, 1.05) -- (1.75, -.75);
+	\draw[-Stealth, thick] (-1.35, .35) -- (1.75, .75);
+	\draw[-Stealth, thick] (-1.35, -.35) -- (1.75, .75);
+	\draw[-Stealth, thick] (-1.35, -1.05) -- (1.75, -.75);
+\end{tikzpicture}}\\
+\end{minipage}\begin{minipage}{.48\textwidth}\centering\adjustbox{scale=.9}{
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2,0) ellipse (1 and 2);
+	\draw[thick] ( 2,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2, 2.25) {$\B$};
+	\node at ( 2, 2.25) {$\B^{\B}$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.5, 2.25) -- (1.5,2.25) node[midway, above] {$\leftrightarrow$};
+	
+	\node at (-2, .75) {$\false$};
+	\node at (-2, -.75) {$\true$};
+	\draw[fill] (-1.75,.75) circle (.05);
+	\draw[fill] (-1.75,-.75) circle (.05);
+	
+	\node at (2, .75) {$\lnot$};
+	\node at (2, -.75) {$\id_Q$};
+	\draw[fill] (1.5,.75) circle (.05);
+	\draw[fill] (1.5,-.75) circle (.05);
+	
+	\draw[-Stealth, thick] (-1.75, .75) -- (1.5, .75);
+	\draw[-Stealth, thick] (-1.75, -.75) -- (1.5, -.75);
+\end{tikzpicture}}\\
+\end{minipage}\end{center}

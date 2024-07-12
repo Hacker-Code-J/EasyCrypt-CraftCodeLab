@@ -1,0 +1,38 @@
+\begin{tikzpicture}
+	% Draw the sets A and B
+	\draw[thick] (-2.5,0) ellipse (1.75 and 2.5);
+	\draw[thick] (2.5,0) ellipse (1.75 and 2.5);
+%	\draw[dotted, thick] (2.5,0) ellipse (1 and 2);
+	
+	% Labels for sets
+	\node at (-2.5, 2.75) {$\sub{F}$};
+	\node at (2.5, 2.75) {$\range(\sigma)$};
+	
+	% Draw the arrows representing the function
+	\draw[-Stealth, thick] (-1.5, 2.75) -- (1.5,2.75) node[midway, above] {$\sigma$};
+%	\draw[dotted, thick] (-2.5, 2.5) -- (2.5,2);
+%	\draw[dotted, thick] (-2.5, -2.5) -- (2.5,-2);
+	
+%	\node at (-3, 1.75) {$F$};
+%	\node at (-3, .75) {$P\land Q$};
+%	\node at (-3, -.35) {$P\lor\lnot Q$};
+%	\node at (-3, -1.75) {$F_n$};
+	\draw[fill] (-2.5,1.5) circle (.05) node[left] {$F$};
+	\draw[fill] (-2.5, .9) circle (.05) node[left] {$P\land Q$};
+	\draw[fill] (-2.5, .3) circle (.05) node[left] {$P\lor\lnot Q$};
+	\draw[fill] (-2.5, -.3) circle (.05) node[left] {$\lnot Q$};
+	\draw[fill] (-2.5, -.9) circle (.05) node[left] {$P$};
+	\draw[fill] (-2.5, -1.5) circle (.05) node[left] {$Q$};
+%	
+%	\node at (3, 1.15) {$G_1$};
+%	\node at (3, .45) {$G_2$};
+%	\node at (3, -.2) {$\vdots$};
+%	\node at (3, -1.05) {$G_n$};
+%	\draw[fill] (2.5,1.15) circle (.05);
+%	\draw[fill] (2.5,.45) circle (.05);
+%	\draw[fill] (2.5,-1.05) circle (.05);
+%	
+%	\draw[-Stealth, thick] (-2.5, 1.75) -- (2.5, 1.15);
+%	\draw[-Stealth, thick] (-2.5, .75) -- (2.5, .45);
+%	\draw[-Stealth, thick] (-2.5, -1.75) -- (2.5, -1.05);
+\end{tikzpicture}

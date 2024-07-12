@@ -1,0 +1,83 @@
+\begin{center}\begin{minipage}{.45\textwidth}\centering\adjustbox{scale=.8}{
+%\begin{tikzpicture}[
+%%	sibling distance=8cm,
+%%	level distance=2cm,
+%	every node/.style = {shape=rectangle, rounded corners, draw, align=center},
+%	level 1/.style = {sibling distance=2cm, level distance=1cm},
+%	level 2/.style = {sibling distance=1cm, level distance=1cm},
+%	level 3/.style = {sibling distance=1cm, level distance=1cm}
+%%	edge from parent/.style = {draw, -{Latex}, thick},
+%%	edge from parent path = {(\tikzparentnode.south) -- ++(0,-1.5em) -| (\tikzchildnode.north)}
+%	]
+%	\node {$(P\land Q)\to(P\lor\lnot Q)$}
+%	child { node {$P\land Q$}
+%		child { node {$P$} }
+%		child { node {$Q$} }
+%	}
+%	child { node {$P\lor\lnot Q$}
+%		child { node {$P$}
+%		}
+%		child { node {$\lnot Q$} 
+%			child { node {$Q$} } 
+%		}
+%	};
+%\end{tikzpicture}
+\begin{tikzcd}
+	& (P\land Q)\to(P\lor\lnot Q) \arrow[ld, no head] \arrow[rd, no head] &                                                      \\
+	P\land Q \arrow[dd, no head] \arrow[rdd, no head] &                                                                     & P\lor\lnot Q \arrow[d, no head] \arrow[ldd, no head] \\
+	&                                                                     & \lnot Q                                              \\
+	Q                                                 & P                                                                   &          
+\end{tikzcd}
+}
+\end{minipage}
+\begin{minipage}{.45\textwidth}\centering\adjustbox{scale=.8}{
+\begin{tikzcd}
+	P \arrow[ddd, no head] \arrow[rrddd, no head] &                          & Q \arrow[d, no head] \arrow[llddd, no head] \\
+	&                          & \lnot Q \arrow[dd, no head]                 \\
+	&                          &                                             \\
+	P\land Q \arrow[rdd, no head]                 &                          & P\lor\lnot Q \arrow[ldd, no head]           \\
+	&                          &                                             \\
+	& P\land Q\to P\lor\lnot Q &                                            
+\end{tikzcd}}
+\end{minipage}	
+%\begin{minipage}{.48\textwidth}\adjustbox{scale=.5}{
+%		\begin{tikzpicture}[
+%			edge from parent/.style={draw, -latex},
+%			sibling distance=4cm,
+%			level distance=2cm,
+%			every node/.style={draw, shape=rectangle, rounded corners, align=center}
+%			]
+%			
+%			% Unary and Binary Nodes
+%			\node {Boolean Logic}
+%			child {node {Unary}
+%				child {node {Atom}}
+%				child {node {Literal}}
+%				child {node {Formula}}
+%			}
+%			child {node {Binary}
+%				child {node {Atom}}
+%				child {node {Literal}}
+%				child {node {Formula}}
+%			};
+%			
+%			% Atom, Literal, and Formula Nodes
+%			\node (atom) [below=4cm of Boolean-1-1] {Atom}
+%			child {node {$\bot$}}
+%			child {node {$\top$}};
+%			\node (literal) [below=4cm of Boolean-1-2] {Literal}
+%			child {node {$\neg \alpha$}};
+%			\node (formula) [below=4cm of Boolean-1-3] {Formula}
+%			child {node {$F$}}
+%			child {node {$\neg F$}};
+%			
+%			% Connections to common nodes
+%			\draw[-] (Boolean-1-1) -- (atom);
+%			\draw[-] (Boolean-2-1) -- (atom);
+%			\draw[-] (Boolean-1-2) -- (literal);
+%			\draw[-] (Boolean-2-2) -- (literal);
+%			\draw[-] (Boolean-1-3) -- (formula);
+%			\draw[-] (Boolean-2-3) -- (formula);
+%	\end{tikzpicture}
+%\end{minipage}
+\end{center}

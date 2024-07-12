@@ -1,0 +1,20 @@
+\begin{tikzpicture}[
+	every node/.style={font=\large, node distance=3cm},
+	process/.style={rectangle, draw, text width=3.5cm, align=center, minimum height=1.5cm},
+	arrow/.style={thick, ->, >=Stealth}
+	]
+	
+	% Nodes
+	\node[process, fill=blue!20] (syntax) {Syntax \\ (Formal Rules)};
+	\node[process, fill=orange!20, right=of syntax] (interpretation) {Interpretation \\ (Model)};
+	\node[process, fill=green!20, right=of interpretation] (semantics) {Semantics \\ (Meaning)};
+	
+	% Arrows
+	\draw[arrow] (syntax) -- node[above, align=center] {Provides} node[below, align=center] {Structure} (interpretation);
+	\draw[arrow] (interpretation) -- node[above, align=center] {Gives} node[below, align=center] {Meaning} (semantics);
+	
+	% Labels
+	\node[below=1cm of syntax, align=center] {Set of \\ Formal Symbols};
+	\node[below=1cm of interpretation, align=center] {Model \\ (Structure)};
+	\node[below=1cm of semantics, align=center] {Rules of \\ Interpretation};
+\end{tikzpicture}

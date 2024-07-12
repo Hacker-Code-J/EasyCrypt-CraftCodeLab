@@ -1,0 +1,21 @@
+\begin{tikzpicture}[
+	node distance=1cm and 2cm,
+	process/.style={rectangle, rounded corners, draw, minimum width=3cm, minimum height=1cm, text centered, font=\sffamily},
+	arrow/.style={-Stealth, thick},
+	pastelgreen/.style={fill=green!20},
+	pastelblue/.style={fill=blue!20},
+	pastelpink/.style={fill=pink!30},
+	pastelpurple/.style={fill=purple!20}
+	]
+	
+	% Nodes
+	\node (F) [process, pastelgreen] {$F$};
+	\node (SATsolver) [process, pastelblue, right=of F] {SAT Solver};
+	\node (SAT) [process, pastelpink, below right=of SATsolver] {SAT};
+	\node (UNSAT) [process, pastelpurple, above right=of SATsolver] {UNSAT};
+	
+	% Arrows
+	\draw[arrow] (F) -- (SATsolver);
+	\draw[arrow] (SATsolver) -- node[below left] {} (SAT);
+	\draw[arrow] (SATsolver) -- node[above left] {} (UNSAT);
+\end{tikzpicture}

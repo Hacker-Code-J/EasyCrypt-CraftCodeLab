@@ -1,0 +1,30 @@
+% pdflatex -shell-escape software-analysis-main.tex
+\documentclass[12pt,openany]{book}
+
+\input{preamble/package}
+\input{preamble/theorem}
+\input{preamble/layout}
+\input{preamble/tcolorbox}
+\input{preamble/tikz}
+\input{preamble/algorithm}
+\input{preamble/listing}
+\input{preamble/ec-commands}
+
+\begin{document}
+	
+	\input{ec-titlepage}
+	\tableofcontents
+	\newpage
+	\input{ec-symbols}
+	\newpage
+	\chapter{Installing EasyCrypt}
+	\input{chapter/ec-chap1}
+		
+	\newpage
+	\appendix
+	\chapter{Boolean Functions}
+%	\input{appendix/sv-appendix-A}
+	
+	\bibliographystyle{plain}
+	\bibliography{ec-references}	
+\end{document}
