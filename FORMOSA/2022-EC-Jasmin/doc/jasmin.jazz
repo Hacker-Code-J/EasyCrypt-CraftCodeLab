@@ -1,0 +1,176 @@
+/* A Jasmin program must fit in a single file.
+  It is common to use a pre-processor (cpp, gpp, m4, …). */
+
+/* A Jasmin program is a collection of functions.
+  Each function is either:
+    - export: to be called from programs written in other languages
+    - inline: disappear during the compilation process
+  The compiler ensures that export functions
+  1. comply with standard calling conventions (passing of arguments and return values, callee-save registers)
+  2. have properly aligned stack frames (if any).
+*/
+
+// A local “identity” function
+inline fn id64(reg u64 x) -> reg u64 { return x; }
+
+/* The body of a function is a sequence of instructions, followed by an optional return statement. */
+inline
+fn dag(reg u64 x) -> reg u64, reg u64 {
+  x = x + 1; // Assignment
+  x <<= 2; // Compound assignment and operator
+  x = id64(x); // Function call
+  _, _, x = #ROL(x, 3); // Intrinsic operation
+  if x == 0 {
+    x = 1;
+  } else {
+    x = 0;
+  }
+  return x, x;
+}
+
+/* There are two kind of loops: for (unrolled) & while (preserved) */
+inline
+fn loops(inline int i j) -> reg u64 {
+  reg u64 a;
+  a = 0;
+  // increasing
+  for i = 0 to j {
+    a += j;
+  }
+  // decreasing
+  for i = 4 downto 2 {
+    a += i;
+  }
+  // Usual while
+  while (a >s 0) {
+    a -= 1;
+  }
+  // Do-while
+  while {
+    a = id64(a);
+  } (a != a) // Caveat: no semi-column
+  // Two-body while loop
+  while {
+    a += 1;
+  } (a >=u 0) {
+    a -= 1;
+  }
+  return a;
+}
+
+/* Parameters are named constant values that can be used at compile-time,
+  in particular in types (e.g., array sizes). */
+param int N = 4;
+
+/* Globals are named constant values that are stored in memory
+  (accessed using PC-relative addressing). */
+u32 java = 0xcafebabe;
+
+/* Each variable (including function arguments and return value) has a type:
+  - int: mathematical (unbounded) integer; compile-time only
+  - bool
+  - machine word: u8, u16, u32, u64, u128, u256
+  - array of words, whose number of elements is statically known
+
+  Each local variable is also annotated with one of the following:
+  - reg: after compilation, the variable is held in registers
+  - stack: after compilation, the variable is held in stack memory
+  - inline: after compilation, the variable has disappeared
+*/
+
+/* int values must be inline (or parameters) and usually occur as
+  - array sizes or indices
+  - for loop counters and bounds
+  - immediate arguments for some operators */
+inline
+fn sum(reg u64[N] array) -> reg u64 {
+  inline int i;
+  reg u64 s;
+  s = 0;
+  for i = 0 to N {
+    s += array[i];
+  }
+  return s;
+}
+
+/* bool values mainly appear in
+  - branching instructions (if, while)
+  - conditional moves
+  - carries */
+export
+fn bools(reg u64 x y) -> reg u64 {
+  reg bool c;
+  reg u64 z;
+  c, z = x + y; // Addition returning a carry
+  c, z = z + y + c; // Full addition with carry
+  y = z if c; // Conditional move
+  z = y;
+  return z;
+}
+
+/* Most values are machine-words; they can be stored in registers as well as in (stack) memory.
+  Copying a value from register to stack is knows as “spilling”. */
+export
+fn spill(reg u64 x) -> reg u64 {
+  stack u64 s;
+  reg u64[14] tab;
+  reg u64 y;
+  inline int i;
+  s = x;
+  for i = 0 to 14 { tab[i] = i; }
+  x = 0;
+  for i = 0 to 14 { x += tab[i]; }
+  y = s;
+  x += y;
+  return x;
+}
+
+/* Memory accesses occur (implicitly) when using stack variables or explicitly through pointers.
+  Jasmin functions cannot forge pointers and must get them as arguments. */
+export
+fn memcpy(reg u64 src dst n) {
+  reg u8 d;
+  while (n > 0) {
+    n -= 1;
+    d = (u8)[src + n]; // Memory read
+    (u8)[dst + n] = d; // Memory write
+  }
+}
+
+/* Wide words (128-bit and 256-bit) are natively supported. */
+inline
+fn vectors(reg u128 x y) -> reg u128 {
+  reg u128 z;
+  global u128 g; // Constant value with local scope
+  g = (4u32)[1, 2, 3, 4]; // Vector literal
+  z = x ^ g; // 128-bit operator
+  z + 2u64 = y; // Parallel additions
+  return z;
+}
+
+/* For better compatibility, functions with wide arguments/results can be wrapped to pass values through memory. */
+export
+fn vectors_mem(reg u64 xp yp zp) {
+  reg u128 x y z;
+  x = (u128)[xp];
+  y = (u128)[yp];
+  z = vectors(x, y);
+  (u128)[zp] = z;
+}
+
+/* The identity function must do a copy to comply with calling conventions. */
+export
+fn id(reg u64 x) -> reg u64 {
+  reg u64 y;
+  y = x;
+  return y;
+}
+
+/* Non-sensical function to ensure that some of the above examples can be compiled. */
+export
+fn test() -> reg u64 {
+  reg u64 y;
+  y = loops(1, 2);
+  y, y = dag(y);
+  return y;
+}

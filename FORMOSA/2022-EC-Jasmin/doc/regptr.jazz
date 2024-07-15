@@ -1,0 +1,169 @@
+
+
+// local function 1 that needs 128 bytes of 'local' stack
+param int P1 = 16;
+
+u64[P1] GLOB = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+
+// copies contents of p to 'local' stack array, then xor everything
+fn _xor1(reg ptr u64[P1] p) -> reg u64
+{
+  stack u64[P1] x;
+  reg u64 i t;
+
+  i = 0;
+  while(i<P1)
+  { t  = p[(int)i];
+    x[(int) i] = t;
+    i += 1;
+  }
+
+  t = 0;
+  i = 0;
+  while(i<P1)
+  { t ^= x[(int)i];
+    i += 1;
+  }
+
+  return t;
+}
+
+// same as _xor1 (note P1*2)
+fn _xor2(reg ptr u64[P1*2] p) -> reg u64
+{
+  stack u64[P1*2] x;
+  reg u64 i t;
+
+  i = 0;
+  while(i<(P1*2))
+  { t  = p[(int)i];
+    x[(int) i] = t;
+    i += 1;
+  }
+
+  t = 0;
+  i = 0;
+  while(i<(P1*2))
+  { t ^= x[(int)i];
+    i += 1;
+  }
+
+  return t;
+}
+
+//
+export fn export1() -> reg u64
+{
+  stack u64[P1] x;
+  reg u64 i r;
+
+  // initializes stack array
+  i = 0;
+  while(i<P1)
+  { x[(int) i] = i;
+    i += 1;
+  }
+
+  // there is an implicit move here:
+  // - same as reg ptr u64[P1] xp; xp = x; r = _xor1(x);
+  r = _xor1(x);
+  r = r; // return of exported function is in rax
+         // this is to allow 'r' to swap register
+         // otherwise it will cause problems with export2 or 3 (shown next); the compiler usually removes some of these copies (dead code elimination)
+         // for this particular case, it actually removes it, and _xor1 returns directly in rax; check export2 and export3 to understand why.
+  return r;
+}
+
+// 
+export fn export2() -> reg u64
+{
+  stack u64[P1*2] x;
+  reg u64 i r;
+
+  i = 0;
+  while(i<(P1*2))
+  { x[(int) i] = i;
+    i += 1;
+  }
+
+  // also implicit move
+  r = _xor2(x);
+  r = r;
+  return r;
+}
+
+
+// 
+export fn export3() -> reg u64
+{
+  stack u64[P1] x;
+  stack u64[P1*2] y;
+  reg u64 i r1 r2;
+
+  i = 0;
+  while(i<P1)
+  { x[(int) i] = i;
+    i += 1;
+  }
+
+  i = 0;
+  while(i<P1*2)
+  { y[(int) i] = i;
+    i += 1;
+  }
+
+  r1 = _xor1(x);
+  r2 = _xor2(y);
+  r1 ^= r2;
+  return r1;
+}
+
+// 
+export fn export4() -> reg u64
+{
+  stack u64[P1*2] x;
+  reg u64 i r1 r2;
+
+  i = 0;
+  while(i<(P1*2))
+  { x[(int) i] = i;
+    i += 1;
+  }
+
+  r1 = _xor1(x[P1:P1]);
+  r2 = _xor2(x);
+  r1 ^= r2;
+  return r1;
+}
+
+//
+export fn export5() -> reg u64
+{
+  reg ptr u64[P1] p;
+  reg u64 r;
+
+  p = GLOB;
+
+  r = _xor1(p);
+  r = r;
+  return r;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

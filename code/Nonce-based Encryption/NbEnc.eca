@@ -1,0 +1,124 @@
+(* Syntax and Security for Nonce-based Symmetric Encryption *)
+
+require import AllCore Distr List.
+
+type key.
+type nonce.
+type pt. (* plaintext *)
+type ct. (* ciphertext *)
+
+(* The ideal scheme samples ciphertexts uniformly at random *)
+op dct : ct distr.
+
+(* The maximum number of queries to the encryption oracle *)
+op q : int.
+
+(* An operator that check if a nonce has been already used Intutively:
+   used_nonce n nonces = n \in nonces *)
+op used_nonce : nonce -> nonce list -> bool.
+
+(* We need a default ciphertext *)
+op dflt : ct.
+
+(* Syntax and Correctness *)
+module type Scheme_T = {
+   proc kg() : key
+   proc enc(k:key, n:nonce, p:pt) : ct
+   proc dec(k:key, n:nonce, c:ct) : pt
+}.
+
+module Correctness(Scheme : Scheme_T) = {
+   proc main(k : key, n : nonce, p : pt) : bool = {
+      var c, p';
+      c <@ Scheme.enc(k,n,p);
+      p' <@ Scheme.dec(k,n,c);
+      return p' = p;
+   }
+}.
+
+(* Security *)
+
+(* The adversarial orcale interface *)
+module type OrclCPA = {
+   proc enc(n:nonce, p:pt) : ct
+}.
+
+(* Extension to allow main game to initialize oracles *)
+module type OrclCPAi = {
+   proc init() : unit
+   include OrclCPA
+}.
+
+(* The type of adversaries *)
+module type AdvCPA (O:OrclCPA) = {
+   proc main() : bool
+}.
+
+(* The real-world orcale uses a concrete scheme *)
+module type CPAScheme = {
+   include Scheme_T [-dec]
+}.
+
+module RealScheme(Scheme : CPAScheme) : OrclCPAi = {
+   var k : key
+   
+   proc init() = {
+      k <@ Scheme.kg();
+   }
+
+   proc enc(n:nonce, p:pt) = {
+      var c;
+      c <@ Scheme.enc(k,n,p);
+      return c;
+   }
+}.
+
+module IdealScheme = {
+   proc init() = {}
+   proc enc(n:nonce, p:pt) = {
+      var c;
+      c <$ dct;
+      return c;
+   }
+}.
+
+(* We define a wrapper that that log the queries to 0.
+   We ensure that the adversary will be nonce-respecting and
+   make at most q queries.
+   It refuses to call the actual encryption oracle
+   if the nonce is repeated. *)
+
+module WO(O : OrclCPAi) : OrclCPAi = {
+   var nonces : nonce list
+
+   proc init() = {
+      O.init();
+      nonces <- [];
+   }
+
+   proc enc(n:nonce, p:pt) = {
+      var c;
+      c <- dflt;
+      if (! used_nonce n nonces /\ size nonces < q) {
+         c <@ O.enc(n,p);
+         nonces <- n::nonces;
+      }
+      return c;
+   }
+}.
+
+(* The security game only calls oracles if nocnes do not repeat.
+   It is parametrised by one of the real or ideal schemes. *)
+module CPA (A:AdvCPA) (O:OrclCPAi) = {
+   proc main() = {
+      var b;
+      WO(O).init();
+      b <@ A(WO(O)).main();
+      return b;
+   }
+}.
+
+(* In this case advantage is of the form.
+`| Pr[CPA(A, RealScheme(Scheme)).main() @ &m : res ] -
+   Pr[CPA(A, IdealScheme).main() @ &m : res ] |
+*)

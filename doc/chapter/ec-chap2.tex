@@ -1,0 +1,54 @@
+\section{Attacker Type}
+\begin{itemize}
+	\item $\coa$; Ciphertext-Only Attack
+	\item $\kpa$; Known-Plaintext Attack
+	\item $\cpa$; Chosen-Plaintext Attack
+	\item $\cca$; Chosen-Ciphertext Attack
+	\item $\acca$; Adaptive Chosen-Ciphertext Attack
+\end{itemize}
+\begin{tikzpicture}[auto, node distance=2cm, >=latex']
+	
+	% Nodes
+	\node [draw, rectangle, rounded corners, text centered, minimum height=2em, minimum width=6em] (easycrypt) {EasyCrypt};
+	\node [draw, rectangle, rounded corners, below of=easycrypt, node distance=2cm, text centered, minimum height=2em, minimum width=6em] (why3) {Why3};
+	\node [draw, rectangle, rounded corners, below left of=why3, node distance=2.5cm and 1.5cm, text centered, minimum height=2em, minimum width=6em] (altergo) {Alt-Ergo};
+	\node [draw, rectangle, rounded corners, below right of=why3, node distance=2.5cm and 1.5cm, text centered, minimum height=2em, minimum width=6em] (z3) {Z3};
+	
+	% Arrows
+	\draw [->] (easycrypt) -- (why3);
+	\draw [->] (why3) -- (altergo);
+	\draw [->] (why3) -- (z3);
+	
+	% Labels
+	\node [below of=altergo, node distance=1.2cm] (label1) {};
+	\node [below of=z3, node distance=1.2cm] (label2) {};
+	\node [text width=10cm] at (label1 -| label2) {Integration of Why3, Alt-Ergo, and Z3 within EasyCrypt};
+	
+\end{tikzpicture}\\
+
+\begin{tikzpicture}[auto, node distance=2cm, >=latex']
+	
+	% Nodes
+	\node [draw, rectangle, rounded corners, text centered, minimum height=2em, minimum width=8em] (easycrypt) {EasyCrypt};
+	\node [draw, rectangle, rounded corners, below of=easycrypt, node distance=2cm, text centered, minimum height=2em, minimum width=8em] (proofgeneral) {Proof General};
+	\node [draw, rectangle, rounded corners, below of=proofgeneral, node distance=2cm, text centered, minimum height=2em, minimum width=8em] (coq) {Coq};
+	
+	% Arrows
+	\draw [->] (easycrypt) -- (proofgeneral);
+	\draw [->] (proofgeneral) -- (coq);
+	
+	% Labels
+	\node [below of=coq, node distance=1.2cm] (label) {};
+	\node [text width=10cm] at (label) {Integration of Proof General within EasyCrypt};
+	
+\end{tikzpicture}
+%현대 암호학에서는 공격자의 능력치에 따라 공격 유형을 다음과 같이 분류한다.
+%1. 암호문 단독 공격()
+%− 1개 이상의 암호문이 주어진 상황에서, 각 암호문에 대한 평문을 복원하는 공격
+%2. 기지 평문 공격()
+%− 동일한 키로 암호화한 평문/암호문 쌍이 1쌍 이상 주어진 상황에서, 동일한 키로 암호화한 새로운 암호문에 대한 평문을
+%복원하는 공격
+%3. 선택 평문 공격()
+%− 공격자가 1개 이상의 원하는 평문에 대한 암호문을 얻은 후, 새롭게 주어진 암호문에 대한 평문을 복원하는 공격
+%4. 선택 암호문 공격()12
+%− 공격자가 1개 이상의 원하는 암호문에 대한 평문을 얻은 후, 새롭게 주어진 암호문에 대한 평문을 복원하는 공격

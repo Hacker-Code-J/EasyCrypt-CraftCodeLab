@@ -1,0 +1,325 @@
+require import AllCore SmtMap List Distr.
+require (****) PRFth NbEnc.
+
+(* Will work for arbitrary types *)
+
+clone include NbEnc with
+  type ciphertext = plaintext,
+  op used_nonce = (fun n (nonces:nonce list) => n \in nonces).
+
+(* We get the syntax and security definitions for nonce-based
+   encryption by copying all the definitions in NbEnc with
+   some renamings.
+*)
+
+(* print CPA. *)
+
+clone include PRFth with
+  type key    <- key,
+  type input  <- nonce,
+  type output <- ciphertext,
+  op doutput  <- dciphertext,
+  op q <- q.
+
+(*
+print f.
+print RF.
+*)
+
+(* We need some axioms on the distribution *)
+axiom dciphertext_ll: is_lossless dciphertext.
+axiom dciphertext_uni: is_uniform dciphertext.
+axiom dciphertext_full: is_full dciphertext.
+
+(* XOR operator over plaintexts with minimal properties *)
+op (^) : plaintext -> plaintext -> plaintext.
+axiom xor_idempotent1 x y : (x ^ y) ^ y = x.
+axiom xor_idempotent2 x y : y ^ ( y ^ x) = x.
+
+(* Encryption and decryption operators *)
+op enc k n p = f k n ^ p.
+op dec k n c = f k n ^ c.
+
+(* We prove that decryption recovers an encrypted
+   message using the core logic. This lemma can
+   then be used to prove that the scheme is correct. *)
+lemma enc_dec_correct k n p :
+  dec k n (enc k n p) = p.
+proof. by rewrite /enc /dec xor_idempotent2. qed.
+
+(* The encryption scheme in the correct syntax. *)
+module Scheme : Scheme_T = {
+
+  proc kg () = {
+    var k;
+    k <$ dkey;
+    return k;
+  }
+
+  proc enc(k:key, n:nonce, p:plaintext) = {
+    var mask, c;
+    mask <- f k n;
+    c <- mask ^ p;
+    return c;
+  }
+
+  proc dec(k:key, n:nonce, c:ciphertext) = {
+    var mask, p;
+    mask <- f k n;
+    p <- mask ^ c;
+    return p;
+  }
+}.
+
+(*************************************************************)
+(*                      CORRECTNESS                          *)
+(*************************************************************)
+
+
+(* We prove partial correctness with respect to the functional
+   operators. I.e., correct if terminates.  *)
+lemma correct_enc_h k n p :
+  hoare [ Scheme.enc : arg = (k,n,p) ==> res = enc k n p]
+   by proc; wp; skip; move => /> *; rewrite /enc.
+
+(* Encryption always terminates *)
+lemma correct_enc_ll : islossless Scheme.enc.
+proof. by islossless. qed.
+
+(* Total correctness as a corollary.
+   This means we can always lift any call to
+   the enc procedure to a logical operation over its
+   inputs *)
+lemma correct_enc k n p :
+  phoare [ Scheme.enc : arg = (k,n,p) ==> res = enc k n p] = 1%r.
+proof. by conseq correct_enc_ll (correct_enc_h k n p). qed.
+
+(* We do the same for decryption *)
+lemma correct_dec_h k n c :
+  hoare [ Scheme.dec : arg = (k,n,c) ==> res = dec k n c].
+proof. by proc; wp; skip; move => /> *; rewrite /dec. qed.
+
+lemma correct_dec_ll : islossless Scheme.dec.
+proof. by islossless. qed.
+
+lemma correct_dec k n c :
+  phoare [ Scheme.dec : arg = (k,n,c) ==> res = dec k n c] = 1%r
+  by conseq correct_dec_ll (correct_dec_h k n c).
+
+(* We can apply the above lemmas when we prove that the
+   construction is correct as a nonce-based encryption scheme:
+   lift encryption and decryption to logical operations and
+   then use the fact that the logical operators cancel as
+   proved in enc_dec_correct. *)
+lemma correctness &m _k _n _p:
+  Pr[ Correctness(Scheme).main(_k,_n,_p) @ &m : res ] = 1%r.
+byphoare (_: arg = (_k,_n,_p) ==> _) => //.
+have lossless: islossless Correctness(Scheme).main; first by islossless.
+have correct : hoare [ Correctness(Scheme).main : arg = (_k, _n, _p) ==> res ].
++ proc.
+  ecall (correct_dec_h _k _n c).
+  ecall (correct_enc_h _k _n p).
+  by skip => />; rewrite enc_dec_correct.
+by conseq lossless correct.
+qed.
+
+(*************************************************************)
+(*                          SECURITY                         *)
+(*************************************************************)
+
+(* B is a reduction that breaks PRF if A breaks encryption scheme  *)
+
+module (B(A:AdvCPA):Adv) (O:Orcl) = {
+
+  module OCPA = {
+    proc init() = { }
+
+    proc enc (n:nonce, p:plaintext) = {
+      var r;
+      r <@ O.f(n);
+      return (r ^ p);
+    }
+  }
+
+  proc guess = CPA(A, OCPA).main
+
+}.
+
+section PROOF.
+
+(*  Declaring an adversary in a section quantifies  universally
+    over A for all results in the section. The names in brackets
+    indicate that A cannot touch the internal states of these
+    modules. Otherwise the proof fails (e.g., A could just get
+    the PRF key! *)
+declare module A <: AdvCPA {-RealScheme, -RealPRF, -RF, -WO, -Count}.
+
+(* We prove equivalences between games using pRHL, which then
+   allow us to derive probability results as a consequence.
+   These equivalences talk about how events occurring in
+   one game relate to events occurring in the other game. *)
+
+(* If PRF game is uses PRF then we are using the real scheme.
+   There is a syntactic identity between the games modulo
+   renamings.
+   If A starts from the same state, then both games output
+   the same result res and the global counter has the same
+   value, so B makes same queries as A. *)
+lemma Real_CPA_PRF :
+  equiv [ CPA(A, RealScheme(Scheme)).main ~ PRF(B(A), RealPRF).main :
+            ={glob A} ==> ={res} ].
+proof.
+proc; inline *; wp.
+call (: ={WO.nonces} /\ RealScheme.k{1} = RealPRF.k{2} /\ (size WO.nonces = Count.c){2}).
++ proc; inline *; auto => /> /#.
+by auto => />.
+qed.
+
+lemma pr_Real_CPA_PRF &m :
+  Pr[ CPA(A, RealScheme(Scheme)).main() @ &m : res] =
+  Pr[ PRF(B(A), RealPRF).main() @ &m : res].
+proof. byequiv  Real_CPA_PRF => //. qed.
+
+(* If PRF game uses RF then we are using the ideal scheme.
+   We need to argue that xor acts as a one time pad to get the
+   equivalence.  *)
+lemma Ideal_CPA_PRF :
+  equiv [ CPA(A, IdealScheme).main ~ PRF(B(A), RF).main :
+            ={glob A} ==> ={res} ].
+proof.
+proc; inline *; wp.
+call (: ={WO.nonces} /\ (size WO.nonces = Count.c){2} /\
+            (forall n, n \in WO.nonces = n \in RF.m){2}).
++ proc; inline *.
+  sp; if; 1, 3: by auto => /#.
+  rcondt{2} ^if; 1: by auto => /#.
+  rcondt{2} ^if; 1: by auto => /#.
+  sp; wp => /=.
+  conseq (: c0{1} = (r1 ^ p0){2}) => />; 1: smt(get_setE).
+  rnd (fun r => r ^ p{2}).
+  auto => />; smt (get_setE xor_idempotent1 dciphertext_uni  dciphertext_full).
+by auto => /> *; rewrite mem_empty.
+qed.
+
+lemma pr_Ideal_CPA_PRF &m :
+  Pr[ CPA(A, IdealScheme).main() @ &m : res] =
+  Pr[ PRF(B(A), RF).main() @ &m : res].
+proof. byequiv  Ideal_CPA_PRF => //. qed.
+
+lemma indcpa_security &m :
+   (* Advantages match *)
+  `| Pr[CPA(A,RealScheme(Scheme)).main() @ &m : res] -
+       Pr[CPA(A,IdealScheme).main() @ &m : res]| =
+  `| Pr[PRF(B(A), RealPRF).main() @ &m : res] -
+       Pr[PRF(B(A), RF).main() @ &m : res] |.
+proof. by rewrite pr_Real_CPA_PRF -pr_Ideal_CPA_PRF. qed.
+
+end section PROOF.
+
+(* print indcpa_security. *)
+
+(* The hopping technique above can be extended to make explicit
+   the PRF-PRP bound if f is a permutation.
+
+   First modify the scheme to use a RP (rather than directly
+   an RF) and prove that any difference in the CPA game can be
+   used to win the PRP game against f. This will be the new
+   computational assumption in the final bound.
+
+   Then use generic RP-RF switching lemma to hop to the
+   modified scheme that uses the RF and proceed as above.
+   The EC library already includes the switching lemma. *)
+
+
+(* ------------------------------------------------------------------------ *)
+(* We can use the previous result and combine it with the general reduction
+   from  INDCPA to leaky INDCPA and show that any leaky version of the 
+   scheme is secure down to PRF security, under the assumption 
+   that the leaky scheme is constant time and functionally correct. *)
+
+section.
+
+declare module LSc <: LCPAScheme {-RealScheme, -WO, -BL, -RF, -RealPRF, -Count}.   (* A scheme with  leakage *)
+
+
+(* A simulator just runs the leaky scheme on arbitrary values. *)
+module SimLeak(LScheme : LCPAScheme) : Simulator  = {
+  proc enc () = {
+    var cl;
+    cl <@  LScheme.enc(witness,witness,witness);
+    return (cl.`2);
+  }
+}.
+
+(* We require that the leaky scheme is functionally correct in the sense 
+  that it generates keys correctly and computes the encryption operator: 
+   this is functional correctness *)
+declare axiom LSc_kg_fc : equiv [LSc.kg ~ Scheme.kg : true ==> ={res}].
+
+declare axiom LSc_enc_fc  _k _n _p : 
+        phoare [ LSc.enc : arg = (_k,_n,_p) ==> res.`1 = enc _k _n _p ] = 1%r.
+
+(* The above implies that enc computes the operator every time it 
+   terminates *)
+local lemma LSc_enc_fc_h  _k _n _p : 
+        hoare [ LSc.enc : arg = (_k,_n,_p) ==> res.`1 = enc _k _n _p ].
+bypr  => &m H. 
+rewrite Pr[mu_not]. 
+(* Note this amounts to proving that the probability of terminating
+   is 1%r and the probability of getting the operator is 1%r, which
+   are both implied by the phoare above *)
+have -> : Pr[LSc.enc(k{m}, n{m}, p{m}) @ &m : true]  = 1%r.
++ byphoare  (_: arg = (_k,_n,_p) ==> true) => //; 2: by smt().
+  by proc*; call (LSc_enc_fc _k _n _p) => //.
+have -> : Pr[LSc.enc(k{m}, n{m}, p{m}) @ &m : res.`1 = enc _k _n _p]  = 1%r.
++ byphoare (_: arg = (_k,_n,_p) ==> res.`1 = enc _k _n _p) => //; 2: by smt(). 
+  by proc*; call (LSc_enc_fc _k _n _p) => //. 
+done.
+qed.
+
+(* We require that the leaky schdeme is constant-time in the sense of non-interference *)
+declare axiom LSc_ct : equiv [ LSc.enc ~ LSc.enc : true ==> res{1}.`2 = res{2}.`2  ].
+
+(* The two results above permit deriving the following equiv, which will allow
+   us to prove that our simulator is good. *)
+equiv eq_leak_ok _k _n _p :
+   LSc.enc ~ LSc.enc :
+     (arg = (_k,_n,_p)){1} ==>
+     (res.`1 = enc _k _n _p){1} /\ res{1}.`2 = res{2}.`2.
+proof. conseq LSc_ct (LSc_enc_fc_h _k _n _p) =>//. qed.
+
+module BBL(A:AdvLCPA) (Si:Simulator) = B(BL(A,Si)).
+module Si = SimLeak(LSc).
+
+declare module A   <: AdvLCPA { -RealScheme, -WO, -BL, -Scheme, -SimLeak, -LSc, -RF, -RealPRF, -Count}.
+
+lemma indlcpa_security &m :
+  `|Pr[LCPA(A, RealLScheme(LSc)).main() @ &m : res] -
+      Pr[LCPA(A, IdealLScheme(Si)).main() @ &m : res]| =
+  `|Pr[PRF(BBL(A, Si), RealPRF).main() @ &m : res] -
+      Pr[PRF(BBL(A, Si), RF).main() @ &m : res]|.
+proof. 
+  (* We have defined in NbEnc the sufficient conditions for leaky
+     cpa to follow from ind-cpa *)
+  rewrite (lcpa_cpa Scheme LSc Si A LSc_kg_fc _ _ _ &m).
+  (* This is where we prove that the simulator is good by using the
+     equiv above. *)
++ proc*; inline RSim(Scheme,Si).enc Si.enc; wp.
+  (* The equiv allows us to conclude that leakages are ok and put
+     in the post-condition that c{2} just needs to match enc operator. *)
+  ecall (eq_leak_ok k{1} n{1} p{1}); wp.
+  (* But now we just need to apply encryption correctness *)
+  ecall{2} (correct_enc k{2} n{2} p{2}).
+  by auto => /> /#.  
+  (* It remains to prove that our operator based scheme is stateless
+     and similarly for the simulator. Note that the latter is also
+     a consequence of the constant-time assumption. *)
++ by proc; sim. 
++ by proc; call (LSc_ct).
+
+(* Now this is just ind cpa security *)
+by apply (indcpa_security (BL(A,Si)) &m).
+qed.
+
+end section.
+

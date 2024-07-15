@@ -1,0 +1,106 @@
+require import AllCore SmtMap List Distr.
+require (****) PRFth NbEnc.
+
+clone include NbEnc with
+   type ct = pt,
+   op used_nonce = (fun n (nonces:nonce list) => n \in nonces).
+
+(* We get the syntax and security definitions for nonce-based
+   encryption by copying all the defiinitoins in NbEnc with
+   some renamings. *)
+
+(* print CPA. *)
+
+clone include PRFth with
+   type key     <- key,
+   type input   <- nonce,
+   type output  <- ct,
+   op   doutput <- dct,
+   op   q       <- q.
+
+(* print f. *)
+(* print RF. *)
+
+(* We need so axiom on the distribution *)
+axiom dct_ll : is_lossless dct.
+axiom dct_uni : is_uniform dct.
+axiom dct_full : is_full dct.
+
+(* XOR operator over plaintexts with minimal properties *)
+op (^) : pt -> pt -> pt.
+axiom xor_id1 x y : (x ^ y) ^ y = x.
+axiom xor_id2 x y : y ^ ( y ^ x) = x.
+
+(* Encryption and Decryption Operators *)
+op enc k n p = f k n ^ p.
+op dec k n c = f k n ^ c.
+
+(* We prove that decryption recovers an encrypted
+  message using the core logic. This lemma can
+  then be used to prove that the scheme is correct. *)
+lemma enc_dec_correct k n p :
+    dec k n (enc k n p) = p.
+proof. by rewrite /enc /dec xor_id2. qed.
+
+(* The encryption scheme in the correct syntax. *)
+module Scheme : Scheme_T = {
+
+  proc kg () = {
+    var k;
+    k <$ dkey;
+    return k;
+  }
+
+  proc enc(k:key, n:nonce, p:pt) = {
+    var mask, c;
+    c <- mask ^ p;
+    return c;
+  }
+
+  proc dec(k:key, n:nonce, c:ct) = {
+    var mask, p;
+    mask <- f k n;
+    p <- mask ^ c;
+    return p;
+  }
+}.
+
+(************************************************)
+(*                   Security                   *)
+(************************************************)
+
+module (B(A:AdvCPA):Adv) (O:Orcl) = {
+
+  module OCPA = {
+    proc init() = { }
+
+    proc enc (n:nonce, p:pt) = {
+      var r;
+      r <@ O.f(n);
+      return (r ^ p);
+    }
+  }
+
+  proc guess = CPA(A, OCPA).main
+}.
+
+section PROOF.
+
+(* Declaring an adversary in a section quantifiers universally
+  over A for all reusults in the section. The names in brackets
+  indicate that A cannot touch the internal states of these modules.
+  Otherwise the proof fails (e.g., A could just get the PRF key! *)
+ (* declare module A:AdvCPA.
+
+lemma Real_CPA_PRF :
+    equiv [ CPA(A, RealScheme(Scheme)).main ~ PRF(B(A), RealPRF).main :
+      ={glob A} ==> ={res} ].
+proof. *)
+
+prover quorum=2 ["Alt-Ergo" "Z3"].
+
+lemma foo (x y : int) :
+    x < y => x + 1 < y + 1.
+proof.
+smt().
+qed.

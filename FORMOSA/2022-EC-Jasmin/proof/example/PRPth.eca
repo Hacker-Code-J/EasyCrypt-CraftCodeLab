@@ -1,0 +1,109 @@
+(*  
+    Formalization of Pseudorandom Permutation
+    and their relation.
+
+    Syntax and security.
+*)
+
+require import AllCore Int Distr FSet SmtMap Real.
+(* This library has a number of results and definitions which
+   are more general than this example, but we will use it to
+   derive what we need without much explanation. *)
+require (****) PRP.
+
+require (****) PRFth RPth.
+
+(* Syntax of the PRP *)
+clone include RPth.
+
+clone export PRFth as PRFth_ with
+  type input   <- input,
+  type output  <- output,
+  op   doutput <- doutput.
+
+(*************************************************************)
+(* PRF/PRP switching lemma using the core EC libraries       *)
+(*************************************************************)
+
+(* Maximal number of queries done by the adversary *)
+axiom ge0_q : 0 <= q.
+axiom doutput_ll  : is_lossless doutput.
+axiom doutput_fu  : is_full doutput.
+axiom doutput_uni : is_uniform doutput.
+
+hint solve 0 random : doutput_ll doutput_fu doutput_uni.
+
+section.
+declare module A <: Adv {-RF, -RP, -Count}.
+
+declare axiom A_ll (O<:Orcl{-A}): islossless O.f => islossless A(O).guess.
+
+local clone import PRP as PRPt with
+  type D <- output
+  proof *.
+
+local clone PRPt.RP as RPt with 
+  op dD <- doutput
+  proof *.
+realize dD_ll by apply doutput_ll.
+
+local clone import RPt.RP_RF as RP_RFt with 
+  op q <- q
+  proof *.
+realize ge0_q by apply ge0_q.
+realize dD_funi.
+proof. 
+  apply is_full_funiform.
+  + by apply doutput_fu.
+  by apply doutput_uni.
+qed.
+import PRFi.
+
+local module D(O:Orcl) = {
+   module O' = {
+     proc init () = {}
+     proc f = O.f
+   }
+
+   proc distinguish() = {
+     var b;
+     Count(O').init(); 
+     b <@ A(Count(O')).guess();
+     return b;
+   }
+}.
+
+(* This  is  the PRF/PRP switching  lemma in our setting. If the
+   adversary makes a  bounded number of queries, then the distinguishing
+   advantage is bounded by a  birthday bound. The core lirary lemma we
+   use is called RP_RFt.Conclusion.
+  ` mu1 doutput witness` is the probability of a type inhabitant, which
+    is the case for all such inhabitants as we assume that it is uniform. *)
+lemma prp_prf &m:
+  `| Pr[ PRF(A, RP).main() @ &m : res] - Pr[PRF(A, RF).main() @ &m : res] | 
+      <= (q * (q - 1))%r / 2%r * mu1 doutput witness.
+proof.
+have := RP_RFt.Conclusion D _ _ &m.
++ move => O O_ll; proc. islossless.
+  apply (A_ll (<:Count(D(O).O')) _).
+  by islossless.
++ proc.
+  call (: card (fdom PRFi.m) <= Count.c /\ Count.c <= q).
+  + proc; inline *; sp; if => //.
+    by sp; if; auto => />; smt(@SmtMap @FSet).
+  by inline *; auto => />; smt(@SmtMap @FSet ge0_q).
+
+have -> : Pr[PRFt.IND(RPt.RP, D).main() @ &m : res] = 
+          Pr[PRF(A,RP).main() @ &m : res].
++ byequiv => //.
+  by proc; inline *; sim (_: RPt.RP.m{1} = RP.m{2}).
+have -> // : Pr[PRFt.IND(PRFi, D).main() @ &m : res] = 
+             Pr[PRF(A, RF).main() @ &m : res].
+byequiv => //.
+proc; inline *; wp.
+call (_: PRFi.m{1} = RF.m{2} /\ ={Count.c}); last by auto.
+proc; inline *; sp; if => //.
+by sp; if{1};auto => />. 
+qed.
+
+end section.

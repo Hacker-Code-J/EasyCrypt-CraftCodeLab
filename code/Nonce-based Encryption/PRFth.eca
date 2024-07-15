@@ -1,0 +1,140 @@
+(*  
+    Formalization of Pseudorandom Function
+    and their relation.
+
+    Syntax and security.
+*)
+
+require import AllCore Int Distr FSet SmtMap Real.
+
+(* Abstract theories are templates for concrete theories, so each
+   development should create its own copy of the definitions by
+   cloning and, if needed, refinement. *)
+
+type input.
+type output.
+
+(* We need to sample from the output type whatever it is *)
+op doutput : output distr.
+
+(* Orcl : define the adversary view of a PRF *)
+module type Orcl = {
+  proc f(i:input) : output
+}.
+
+(* Orcl_i : is used to define the main game *)
+module type Orcl_i = {
+  proc init() : unit
+  include Orcl
+}.
+
+(* A truly random function can be lazily sampled as follows. *)
+module RF : Orcl_i = {
+  var m : (input, output) fmap
+
+  proc init() = { 
+    m <- empty;
+  } 
+
+  proc f(i:input) = {
+    var r;
+    r <$ doutput;
+    if (i \notin m) m.[i] <- r;
+    return oget m.[i];
+  }
+}.
+
+(* Syntax of the PRF *)
+type key.
+
+(* The following are the mimimum properties we require on
+   the distribution over keys for proofs to go through. *)
+
+(* We need to sample keys from some arbitrary distribution *)
+op dkey : key distr.
+
+(* This function will be assumed to be a PRF. 
+   Cloning this theory and replacing f with an arbitrary
+   operator gives us the assumption that that operator
+   is a PRF. *)
+op f : key -> input -> output.
+
+(* Real-world oracle: PRF is used on random key *)
+module RealPRF : Orcl_i = {
+  var k : key
+
+  proc init () = {
+    k <$ dkey;
+  }
+
+  proc f(i:input) : output = {
+    return f k i;
+  } 
+}.
+
+(* Maximal number of allowed queries *)
+op q : int.
+
+(* Count is a wrapper that ensures that the maximum number of queries made 
+   by the advesary is bounded by q *)
+module Count (O:Orcl_i) : Orcl_i = {
+  var c : int
+
+  proc init() = {
+    O.init();
+    c <- 0;
+  }
+
+  proc f(i:input) : output = {
+    var r;
+    r <- witness;
+    if (c < q) { 
+      r <@ O.f(i);
+      c <- c + 1;
+    }
+    return r;
+  }
+}.
+
+(* Definition of the PRF security game  *)
+
+(* The type of adversaries *)
+module type Adv (O:Orcl) = {
+  proc guess() : bool
+}.
+
+(* The game: parametric on oracle and adversary *)
+module PRF(A:Adv, O:Orcl_i) = {
+
+  proc main() = {
+    var b;
+    Count(O).init();
+
+    b <@ A(Count(O)).guess();
+    return b;
+  }
+}.
+
+(* 
+ EasyCrypt does not currently give us a way to define 
+ advantage as a function over the reals. 
+ Instead we explicitly write claims as expressions over 
+ probabilities:
+
+ `| Pr[PRF(A, RealPRF).main() @ &m : res ] - 
+       Pr[PRF(A, RF).main() @ &m : res ] |.
+*)
+
+section.
+
+declare module A <: Adv {-Count}.
+ 
+lemma foo : hoare [ PRF(A, RealPRF).main : true ==> 0 <= Count.c ].
+proof.
+proc; inline *.
+call(_:  0 <= Count.c).
++ by proc; inline *; auto => /#.
+by wp; rnd; skip.
+qed.
+
+end section.

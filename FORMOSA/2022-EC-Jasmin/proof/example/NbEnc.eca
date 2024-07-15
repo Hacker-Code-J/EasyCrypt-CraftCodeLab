@@ -1,0 +1,367 @@
+(* Syntax and security for Nonce-based Symmetric Encryption *)
+
+require import AllCore Distr List.
+
+type key.
+type nonce.
+type plaintext.
+type ciphertext.
+
+(* The ideal scheme samples ciphertexts uniformly at random.  *)
+op dciphertext : ciphertext distr.
+
+(* The maximum number of queries to the encryption oracle *)
+op q : int.
+
+(* An operator that checks if a nonce has been already used.
+   This is relevant if only a part of the nonce should be
+   checked for uniqueness (exercises). 
+   Intuitively:                                            
+   used_nonce n nonces = n \in nonces
+*)
+op used_nonce : nonce -> nonce list -> bool.
+
+(* We need a default ciphertext to return to the attacker
+   whenever it makes an invalid query. *)
+
+op dflt : ciphertext.
+ 
+(* Syntax and correctness *)
+
+module type Scheme_T = {
+  proc kg () : key
+  proc enc(k:key, n:nonce, p:plaintext) : ciphertext
+  proc dec(k:key, n:nonce, c:ciphertext) : plaintext
+}.
+
+module Correctness(Scheme : Scheme_T) = {
+   proc main(k : key, n : nonce, p : plaintext) : bool = {
+      var c,p';
+      c <@ Scheme.enc(k,n,p);
+      p' <@ Scheme.dec(k,n,c);
+      return p' = p;
+   }
+}.
+
+(* Security *)
+
+(* The adversarial oracle interface *)
+module type OrclCPA = {
+  proc enc(n:nonce, p:plaintext) : ciphertext
+}.
+
+(* Extension to allow main game to initialize oracles *)
+module type OrclCPAi = {
+  proc init() : unit
+  include OrclCPA
+}.
+
+(* The type of adversaries *)
+module type AdvCPA (O:OrclCPA) = {
+   proc main() : bool
+}.
+
+(* The real-world oracle uses a concrete scheme *)
+module type CPAScheme = {
+  include Scheme_T [-dec]
+}.
+
+module RealScheme(Scheme : CPAScheme) : OrclCPAi = {
+  var k : key
+
+  proc init() = {
+    k <@ Scheme.kg();
+  }
+
+  proc enc(n:nonce, p:plaintext) = {
+    var c;
+    c <@ Scheme.enc(k,n,p);
+    return c;
+  }
+}.
+
+module IdealScheme = {
+  proc init() = {}
+  proc enc(n:nonce, p:plaintext) = {
+    var c;
+    c <$ dciphertext;
+    return c;
+  }
+}.
+
+
+    
+(* We define a wrapper that logs the queries to O. 
+   We ensure that the adversary will be nonce-respecting and 
+   make at most q queries.
+   It refuses to call the actual encryption oracle
+   if the nonce is repeated.
+ *)
+
+module WO(O : OrclCPAi) : OrclCPAi = {
+  var nonces : nonce list
+
+  proc init() = {
+    O.init();
+    nonces <- [];
+  }
+
+  proc enc(n:nonce, p:plaintext) = {
+    var c;
+    c <- dflt;
+    if (! used_nonce n nonces /\ size nonces < q) {
+      c <@ O.enc(n,p);
+      nonces <- n::nonces;
+    }
+    return c;
+  }
+}.
+
+(* The security game only calls oracles if nonces do not
+   repeat. It is parametrised by one of the real or ideal
+   schemes.  *)
+module CPA (A:AdvCPA) (O:OrclCPAi) = {
+
+  proc main() = {
+    var b;
+    WO(O).init();
+    b <@ A(WO(O)).main();
+    return b;
+  }
+}.
+
+(* 
+In this case advantage is of the form.
+`| Pr[CPA(A, RealScheme(Scheme)).main() @ &m : res ] - 
+   Pr[CPA(A, IdealScheme).main() @ &m : res ]|
+*)
+
+
+(* ----------------------------------------------------------------------- *)
+(* The same with leakage                                                   *)
+
+type leakages.
+op dfltl : leakages.
+
+module type LScheme_T = {
+  proc kg () : key
+  proc enc(k:key, n:nonce, p:plaintext) : ciphertext * leakages
+  proc dec(k:key, n:nonce, c:ciphertext) : plaintext * leakages
+}.
+
+(* Security *)
+
+(* The adversarial oracle interface *)
+module type OrclLCPA = {
+  proc enc(n:nonce, p:plaintext) : ciphertext * leakages
+}.
+
+(* Extension to allow main game to initialize oracles *)
+module type OrclLCPAi = {
+  proc init() : unit
+  include OrclLCPA
+}.
+
+(* The type of adversaries *)
+module type AdvLCPA (O:OrclLCPA) = {
+   proc main() : bool
+}.
+
+(* The real-world oracle uses a concrete scheme *)
+module type LCPAScheme = {
+  include LScheme_T [-dec]
+}.
+
+module RealLScheme(Scheme : LCPAScheme) : OrclLCPAi = {
+  import var RealScheme
+
+  proc init() = {
+    k <@ Scheme.kg();
+  }
+
+  proc enc(n:nonce, p:plaintext) = {
+    var cl;
+    cl <@ Scheme.enc(k,n,p);
+    return cl;
+  }
+}.
+
+(* The ideal world now requires the existence of a leakage
+   simulator that can match the real-world leakage and thereby
+   show that the leakage is independent of secret data *)
+
+module type Simulator = {
+  proc enc() : leakages
+}.
+
+module IdealLScheme(Si:Simulator) = {
+  proc init() = {}
+  proc enc(n:nonce, p:plaintext) = {
+    var c, l;
+    c <$ dciphertext;
+    l <@ Si.enc();
+    return (c,l);
+  }
+}.
+
+(* We define a wrapper that logs the queries to O. 
+   We ensure that the adversary will be nonce-respecting and 
+   makes at most q queries.
+   The wrapper refuses to call the actual encryption oracle
+   if the nonce is repeated.
+ *)
+
+module LWO(O : OrclLCPAi) : OrclLCPAi = {
+  import var WO
+
+  proc init() = {
+    O.init();
+    nonces <- [];
+  }
+
+  proc enc(n:nonce, p:plaintext) = {
+    var cl;
+    cl <- (dflt,dfltl);
+    if (! used_nonce n nonces /\ size nonces < q) {
+      cl <@ O.enc(n,p);
+      nonces <- n::nonces;
+    }
+    return cl;
+  }
+}.
+
+(* The security game only calls oracles if nonces do not
+   repeat. It is parametrised by one of the real or ideal
+   schemes.  *)
+module LCPA (A:AdvLCPA) (O:OrclLCPAi) = {
+
+  proc main() = {
+    var b;
+    LWO(O).init();
+    b <@ A(LWO(O)).main();
+    return b;
+  }
+}.
+
+(* In this case advantage is of the form
+ `| Pr[LCPA(A, RealLScheme(LSc)).main() @ &m : res ] - 
+    Pr[LCPA(A, IdealLScheme(Si)).main() @ &m : res ]|
+*)
+
+section.
+
+(* We will show a sufficient set of conditions that a simulator
+   and a scheme must satisfy for CPA security to imply security
+   wrt an adversary that can observe the leakage. *)
+
+(* We define a context in which a simulator must provide good leakage. *)
+module RSim (O: CPAScheme) (S:Simulator) = {
+  proc enc(k:key, n:nonce, p:plaintext) = {
+    var c, l;
+    c <@ O.enc(k, n, p);
+    l <@ S.enc();
+    return (c,l);
+  }
+}.
+
+(* This is a reduction from security with leakage to
+   security without leakage that uses the simulator *)
+
+module (BL (A:AdvLCPA) (Si:Simulator): AdvCPA) (O:OrclCPA) = {
+  var nonces : nonce list
+
+  module CSim : OrclLCPA = {
+    proc init() = {
+      nonces <- [];
+    }
+
+    proc enc(n:nonce, p:plaintext) = {
+      var c, l;
+      (c,l) <- (dflt,dfltl);
+      if (! used_nonce n nonces /\ size nonces < q) {
+        c <@ O.enc(n,p);
+        l <@ Si.enc();
+        nonces <- n::nonces;
+      }
+      return (c,l);
+    }
+  }
+  proc main () = {
+    var b;
+    nonces <- [];
+    b <@ A(CSim).main();
+    return b;
+  }
+
+}.
+
+declare module Sc  <: CPAScheme  {-RealScheme, -WO, -BL }.  (* The scheme without leakage *)
+declare module LSc <: LCPAScheme {-RealScheme, -WO}.        (* The scheme with    leakage *)
+declare module Si  <: Simulator  {-RealScheme, -WO, -BL}.   (* The simulator              *)
+
+declare module A   <: AdvLCPA {-RealScheme, -WO, -Sc, -LSc, -Si, -BL}.
+
+(* Key generation does not leak by assumption, so we only require a standard equivalence *)
+declare axiom equiv_kg      : equiv [LSc.kg ~ Sc.kg : true ==> ={res}].
+
+(* This is the property that the simulator must satisfy: the joint distribution
+   output/leakage produced by the leaky scheme should be matched by
+   the simulator when running in parallel with a leakless scheme. *)
+declare axiom equiv_enc_sim : equiv [LSc.enc ~ RSim(Sc, Si).enc : ={arg} ==> ={res}].
+
+(* This says enc is stateless: note that there is no reference to the
+   state of Sc in the statement below. *)
+declare axiom equiv_enc_sc  : equiv [Sc.enc ~ Sc.enc : ={arg} ==> ={res}].
+
+(* This imposes that simulator is stateless: same as above. *)
+declare axiom equiv_enc_si  : equiv [Si.enc ~ Si.enc : true ==> ={res}].
+
+lemma lcpa_cpa &m : 
+  `| Pr[LCPA(A,RealLScheme(LSc)).main() @ &m : res] - 
+     Pr[LCPA(A, IdealLScheme(Si)).main() @ &m : res]| =
+  `| Pr[CPA(BL(A,Si), RealScheme(Sc)).main() @ &m : res] - 
+     Pr[CPA(BL(A,Si), IdealScheme).main() @ &m : res]|.
+proof.
+do 2! congr; 2: congr; byequiv => //.
+(* We need to prove that the reduction works on both sides. The hard one
+   is the real world, where we must argue that the simulator is actually
+   providing leakage that is indistinguishable from the real leakage *)
++ proc; inline *; wp.
+  call (_: ={RealScheme.k, WO.nonces} /\ (WO.nonces = BL.nonces){2}).
+  + proc; inline *. 
+    sp; if; 1,3: by auto => /> /#.
+    rcondt{2} ^if; 1: by auto.
+    swap{2} 10 -3.
+    sp; wp.
+    conseq />.
+    (* As expected, we need to prove that the simulator provides the
+       correct distribution. We use transitivity to modify the right-hand
+       side game and use RSim instead. Then we can apply the assumption
+       we made. *)
+    transitivity{2} { (c1, l) <@ RSim(Sc,Si).enc(RealScheme.k, n1, p1); }
+      ( ={RealScheme.k} /\ n0{1} = n1{2} /\ p0{1} = p1{2} 
+         ==> cl0{1} = (c1{2}, l{2}))
+      ( ={RealScheme.k, n1, p1} ==> ={c1,l}) => //; 1:smt(). 
+    + by call equiv_enc_sim; auto => /> []. (* Apply assumption *)
+    (* It remains to show that the transitivity hop was sound *)
+    inline *; wp.
+    (* Note that this all works, provided that there is no dependence
+       on the current state of encryption scheme module and sim module. *)
+    by call equiv_enc_si; call equiv_enc_sc; auto.
+  by wp; call equiv_kg; auto => />.
+(* In the ideal world we are already using random ciphertexts and the simulator
+   so the games match modulo some control-flow technicalitites. *)
+proc; inline *; wp.
+call (_: ={WO.nonces, glob Si} /\ (WO.nonces = BL.nonces){2}); 2: by auto.
+proc; inline *. 
+sp; if; 1,3: by auto => /#.
+rcondt{2} ^if; 1: by auto.
+by wp; call(:true); auto.
+qed.
+
+end section.
+
+
+
+
+

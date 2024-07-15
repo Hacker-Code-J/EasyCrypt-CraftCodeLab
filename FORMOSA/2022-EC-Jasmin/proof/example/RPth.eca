@@ -1,0 +1,33 @@
+(*  
+    Formalization of a lazily sampled random permutation 
+    as an EasyCrypt module that can be used in arbitrary
+    games.
+
+    It is very similar in structure to RFth.
+*)
+
+require import AllCore Distr SmtMap Dexcepted.
+
+type input.
+type output = input.
+
+(* We need to sample from the output type whatever it is *)
+op doutput : output distr.
+
+module RP = {
+  var m : (input, output) fmap
+
+  proc init() = { 
+    m <- empty;
+  } 
+
+  proc f(x : input) = {
+    var r;
+    if (x \notin m) {
+      r <$ doutput \ rng m;
+      m.[x] <- r;
+    }
+    return oget m.[x];
+  } 
+}.
+
