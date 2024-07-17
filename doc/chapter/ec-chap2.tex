@@ -26,22 +26,21 @@
 	
 \end{tikzpicture}\\
 
-\begin{tikzpicture}[auto, node distance=2cm, >=latex']
-	
-	% Nodes
-	\node [draw, rectangle, rounded corners, text centered, minimum height=2em, minimum width=8em] (easycrypt) {EasyCrypt};
-	\node [draw, rectangle, rounded corners, below of=easycrypt, node distance=2cm, text centered, minimum height=2em, minimum width=8em] (proofgeneral) {Proof General};
-	\node [draw, rectangle, rounded corners, below of=proofgeneral, node distance=2cm, text centered, minimum height=2em, minimum width=8em] (coq) {Coq};
-	
-	% Arrows
-	\draw [->] (easycrypt) -- (proofgeneral);
-	\draw [->] (proofgeneral) -- (coq);
-	
-	% Labels
-	\node [below of=coq, node distance=1.2cm] (label) {};
-	\node [text width=10cm] at (label) {Integration of Proof General within EasyCrypt};
-	
-\end{tikzpicture}
+
+\begin{itemize}
+	\item $\mathcal{K}$: key space
+	\item $\mathcal{N}$: nonce space
+	\item $\mathcal{P}$: plaintext space
+	\item $\mathcal{C}$: ciphertext space
+\end{itemize}
+\[
+\texttt{used\_once}(n, \mathcal{N}) = n\in\mathcal{N}.
+\]\[
+\fullfunction{\texttt{used\_once}}{\mathcal{N}\times\set{\mathcal{N}}}{\set{0,1}}{(n,\mathcal{N})}{n\in\mathcal{N}}\]
+
+\[
+\texttt{used\_once}:\mathcal{N}\to[\set{\mathcal{N}}\to\set{0,1}]
+\]
 %현대 암호학에서는 공격자의 능력치에 따라 공격 유형을 다음과 같이 분류한다.
 %1. 암호문 단독 공격()
 %− 1개 이상의 암호문이 주어진 상황에서, 각 암호문에 대한 평문을 복원하는 공격
