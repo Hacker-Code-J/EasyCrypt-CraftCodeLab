@@ -1,0 +1,19 @@
+(* Types for keys, plaintexts, nonces, respectively *)
+type key, ptxt, nonce.
+
+(* Type for ciphertexts *)
+type ctxt = ptxt.
+
+(* Binary infix operator on plaintexts *)
+op (+) : ptxt -> ptxt -> ptxt.
+
+(* Family of functions from nonces to plaintexts, indexed by keys *)
+op f : key -> nonce -> ptxt.
+
+(* Subdistribution over keys *)
+op dkey : key distr.
+
+(* Associativity, commutativity, and "self-inverse" property of the binary operator, respectively *)
+axiom addpA (x y z : ptxt) : x + y + z = x + (y + z).
+axiom addpC (x y : ptxt) : x + y = y + x.
+axiom addKp (x y : ptxt) : x + x + y = y.

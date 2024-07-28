@@ -1,0 +1,44 @@
+% Ambient Logic
+
+\begin{note}[Logics]
+\EasyCrypt has four logics:
+
+\begin{itemize}
+	\item a \textbf{Probabilistic Relational Hoare Logic (pRHL)} for proving relations between pairs of procedures
+	\item a \textbf{Probabilistic Hoare Logic (pHL)} for proving probabilistic facts about single procedures
+	\item an \textbf{Ordinary Hoare Logic (HL)}
+	\item an \textbf{Ambient Higher-order Logic} for proving mathematical facts and connecting judgements from the other logics
+	\begin{itemize}
+		\item[*] Based on higher order classical logic
+	\end{itemize}
+\end{itemize}
+\end{note}
+
+\begin{note}[Proofs and Theories]
+\ \begin{itemize}
+	\item Proofs are structured as sequences of lemmas
+	\item Lemmas are proved using tactics, as in Coq
+	\begin{itemize}
+		\item[*] Simple ambient logic goals can be proved using SMT solvers 
+	\end{itemize}
+	\item \EasyCrypt theories may be used to group definitions, modules and lemmas together
+	\item Theories may be specialized via cloning
+	\begin{itemize}
+		\item[*] Any axioms must then be proved
+	\end{itemize}
+\end{itemize}
+\end{note}
+
+\newpage
+\section{Types}
+\EasyCrypt's types include basic types like \begin{itemize}
+	\item \texttt{unit} (which only has the single element \texttt{()}),
+	\item \texttt{int},
+	\item \texttt{bool} and
+	\item \texttt{real},
+\end{itemize} as well as \begin{itemize}
+\item $\texttt{t}_1*\texttt{t}_2\cdots*\texttt{t}_n$ and
+\item function types $\texttt{t}_1\to\texttt{t}_2$.
+\end{itemize} `$*$' has higher precedence than $\to$, and $\to$ is right associative. Thus \[
+\texttt{t}_1*\texttt{t}_2\to\texttt{t}_3\to\texttt{t}_4
+\] means $(\texttt{t}_1*\texttt{t}_2)\to(\texttt{t}_3\to\texttt{t}_4)$. A value of this type is a function that takes in a pair $\texttt{(x,y)}$, where $\texttt{x}$ has type $\texttt{t}_1$ and $\texttt{y}$ has type $\texttt{t}_2$, and returns a function that takes in a value $\texttt{z}$ of type $\texttt{t}_3$, and returns a result of type $\texttt{t}_4$.

@@ -51,3 +51,42 @@
 %− 공격자가 1개 이상의 원하는 평문에 대한 암호문을 얻은 후, 새롭게 주어진 암호문에 대한 평문을 복원하는 공격
 %4. 선택 암호문 공격()12
 %− 공격자가 1개 이상의 원하는 암호문에 대한 평문을 얻은 후, 새롭게 주어진 암호문에 대한 평문을 복원하는 공격
+
+\newpage
+\section{Initial Vectors}
+
+\begin{itemize}
+	\item $\mathcal{K}$: key space
+	\item $\mathcal{N}$: nonce space
+	\item $\mathcal{P}$: plaintext space
+	\item $\mathcal{C}$: ciphertext space
+\end{itemize}
+
+
+\paragraph{Random IV}
+Let $p\in\mathcal{P}$ and $k\in\mathcal{K}$. %The probability distribution of $E_k(p,IV)$ over the choice of $IV$ must approximate the uniform distribution over the $\mathcal{C}$, ensuring that:
+\[
+\Pr\left[E_k(p,IV)=c\right]\approx\frac{1}{\abs{\mathcal{C}}}\quad\text{for all}\ c\in\mathcal{C}.
+\]
+
+\paragraph{Nonce IV}
+Let $p,q\in\mathcal{P}$ and $n,m\in\mathcal{N}$. \[
+\Pr\left[E_k(p,n)=c=E_k(q,m)\right]=0\quad\text{if}\ p\neq q, n\neq m.
+\]
+
+\[
+\lnot(a\lor b)\iff\lnot a \land \lnot b
+\]
+
+\begin{table}[h!]\centering\ttfamily\begin{tabular}{lc}
+		split. & $\lnot(a\lor b)\Rightarrow \lnot a \land \lnot b$ \\
+		move => not\_or. & $\lnot a \land\lnot b$ \\
+		split. & $\lnot a$ \\
+		case a. & $a\Rightarrow\lnot\top$ \\
+		move => a\_true. & $\lnot\top$ \\
+		$\vdots$ & $\vdots$
+	\end{tabular}\end{table}
+\begin{enumerate}
+	\item $\lnot(a\lor b)\Rightarrow\lnot(a\land b)$
+	\item $\lnot(a\lor b)\Rightarrow\lnot(a\land b)$
+\end{enumerate}
