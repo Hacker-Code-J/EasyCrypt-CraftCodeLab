@@ -32,5 +32,6 @@ pub fn main() {
     let msg: u128 = 0x2f0e0d0c0b0a09080706050403020100;
     let ciphertext = encrypt(key, nonce, msg);
     let result = decrypt(key, nonce, ciphertext);
+    println!("Good!");
     assert_eq!(msg, result)
 }

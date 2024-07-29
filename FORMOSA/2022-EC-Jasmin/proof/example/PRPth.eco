@@ -1,0 +1,232 @@
+{
+  "version": 3,
+  "echash": "r2024.01-59-ga9e31ff",
+  "root": { "kind": "eca", "digest": "596bf6e8a1108736ce4a7c1ac3f9df1d" },
+  "depends": {
+    "AlgTactic": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "e6afb591d5b17db178ff233f2ced34fb"
+    },
+    "AllCore": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "530d964738d9a6b9093986916c5225d1"
+    },
+    "Bigalg": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "656d4bc27fb7d3b082b25472119aae5f"
+    },
+    "Bigop": {
+      "direct": false,
+      "kind": "eca",
+      "digest": "cdb798eb62fbe8691b2dd0ce74b1f626"
+    },
+    "Binomial": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "1e23893cdbfac8da97b831166366c823"
+    },
+    "Birthday": {
+      "direct": false,
+      "kind": "eca",
+      "digest": "bf19f6c251b3a65e6e679f548e4d3a23"
+    },
+    "Bool": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "a586e1427c1d2461e9880f55cdab6196"
+    },
+    "Core": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "9beaab4f8980bff7dbbc5481f71f8049"
+    },
+    "CoreInt": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "301224e64ef6d0a3b1783dbb8ce7409e"
+    },
+    "CoreMap": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "4ca3e904f01727612fbbc929e0c74cf9"
+    },
+    "CoreReal": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "71a66b712b2595af8e02fada3eaa0c67"
+    },
+    "Dexcepted": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "e817d5e31ef440edaa1d6eb8216b3599"
+    },
+    "Discrete": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "156f156cc9706cae95261b404bbe1227"
+    },
+    "Distr": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "69af8117f2a69e344016379b32682c9c"
+    },
+    "FSet": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "c29298f9ed9f21d726ccffa62ce07867"
+    },
+    "FelTactic": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "5c7f086136439a486a1c9ca927517963"
+    },
+    "FinType": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "35da7c0f7bb9fe412bfb938cb1036abf"
+    },
+    "Finite": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "b97d32983e1fb562a4ce3233cef9e7b6"
+    },
+    "Int": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "9afc40601dbfcb543402bd2c8ce4a3e3"
+    },
+    "IntDiv": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "2de8c02f89944dc35df798f5aba679a9"
+    },
+    "IntMin": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "97531768a7b48bb19794aa783b39cb22"
+    },
+    "List": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "a5ad902a96d025fcaad8db70ecea831f"
+    },
+    "Logic": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "b09096679097c7fc18599d81c04ef8a7"
+    },
+    "Monoid": {
+      "direct": false,
+      "kind": "eca",
+      "digest": "e137ba3bc8dacd4374666a21fbb63724"
+    },
+    "Mu_mem": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "5903636a99a8c722aa9fccf8488f0651"
+    },
+    "Number": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "5feb29e2c236097a70d347d615d10876"
+    },
+    "PRF": {
+      "direct": false,
+      "kind": "eca",
+      "digest": "f182f2cd4d0b74c24ef9c692b2a7ed93"
+    },
+    "PRFth": {
+      "direct": true,
+      "kind": "eca",
+      "digest": "2e29601c93661298ba31b9a2ec5a63e4"
+    },
+    "PRP": {
+      "direct": true,
+      "kind": "eca",
+      "digest": "d8214847dd4da72c7f486e4cca174036"
+    },
+    "Pervasive": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "0f385a91ae1a1269de2ba2b7fad360d0"
+    },
+    "RPth": {
+      "direct": true,
+      "kind": "eca",
+      "digest": "414d9baf66205b413bc52eb3d9774ea7"
+    },
+    "Real": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "60e4174d5c39b108291a64e755d726fd"
+    },
+    "RealExp": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "be0d586ce7d4e0316f2ec2dd75dfddce"
+    },
+    "RealFLub": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "0257ecf71c2b08bece4f9fd5f067334b"
+    },
+    "RealFun": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "9c633549abd36af0f469377f85f554d4"
+    },
+    "RealLub": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "6f30b311534da000d3cdd25bf26344de"
+    },
+    "RealSeq": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "e9e86e10f7b3df8d9dfe9de0c4a2e36f"
+    },
+    "RealSeries": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "8f01cf7cda67e94a981168c73b35fec6"
+    },
+    "Ring": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "32e8d07df0e8c0a1c8cf59e4261e3f9f"
+    },
+    "SmtMap": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "71e0e3a1cc7607764f309c976afe9979"
+    },
+    "StdBigop": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "3bc8fe9a6be75f68faa96a1f029a04ca"
+    },
+    "StdOrder": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "82265e9586f68a8a961d27de80735728"
+    },
+    "StdRing": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "86d8efe5a5c553697e271a3bbbfa51a2"
+    },
+    "Tactics": {
+      "direct": true,
+      "kind": "ec",
+      "digest": "636a47e692aa516fc65775b561bbf08b"
+    },
+    "Xint": {
+      "direct": false,
+      "kind": "ec",
+      "digest": "f8cdbe78777b5164dc57262d577911a4"
+    }
+  }
+}
