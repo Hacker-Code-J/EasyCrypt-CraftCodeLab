@@ -1,0 +1,75 @@
+\textbf{Lemma} \\[5pt]
+For any boolean values \( a \) and \( b \):
+\[
+\neg (a \lor b) \Leftrightarrow (\neg a \land \neg b)
+\]
+
+\textbf{Proof.} \\[5pt]
+We need to show both directions of the equivalence:
+\[
+\neg (a \lor b) \Rightarrow (\neg a \land \neg b) \quad \text{and} \quad (\neg a \land \neg b) \Rightarrow \neg (a \lor b)
+\]
+
+\textbf{First Direction:} \( \neg (a \lor b) \Rightarrow (\neg a \land \neg b) \)
+
+1. Assume \( \neg (a \lor b) \).
+
+2. To show \( \neg a \):
+\begin{itemize}
+	\item \textbf{Case} \( a = \text{true} \):
+	\[
+	a = \text{true} \Rightarrow a \lor b = \text{true} \Rightarrow \text{contradiction with } \neg (a \lor b).
+	\]
+	\item Therefore, \( \neg a \).
+\end{itemize}
+
+3. To show \( \neg b \):
+\begin{itemize}
+	\item \textbf{Case} \( b = \text{true} \):
+	\[
+	b = \text{true} \Rightarrow a \lor b = \text{true} \Rightarrow \text{contradiction with } \neg (a \lor b).
+	\]
+	\item Therefore, \( \neg b \).
+\end{itemize}
+
+4. We conclude that \( \neg (a \lor b) \Rightarrow (\neg a \land \neg b) \).
+
+\textbf{Second Direction:} \( (\neg a \land \neg b) \Rightarrow \neg (a \lor b) \)
+
+1. Assume \( \neg a \land \neg b \).
+
+2. Consider \( a \lor b \):
+\begin{itemize}
+	\item \textbf{Case} \( a = \text{true} \): Contradicts \( \neg a \).
+	\item \textbf{Case} \( b = \text{true} \): Contradicts \( \neg b \).
+\end{itemize}
+
+3. Therefore, \( (\neg a \land \neg b) \Rightarrow \neg (a \lor b) \).
+
+\textbf{Conclusion:}
+\[
+\neg (a \lor b) \Leftrightarrow (\neg a \land \neg b)
+\]
+
+textbf{Lemma} \\[5pt]
+For any boolean values \( a \) and \( b \):
+\[
+\neg (a \lor b) \Leftrightarrow (\neg a \land \neg b)
+\]
+
+\textbf{Proof.} \\[5pt]
+\begin{align*}
+	&\text{1. To prove:} \quad \neg (a \lor b) \Rightarrow (\neg a \land \neg b) \\
+	&\quad \text{Assume:} \quad \neg (a \lor b) \\
+	&\quad \text{Then, we have:} \\
+	&\quad a = \text{true} \Rightarrow a \lor b = \text{true} \Rightarrow \bot \Rightarrow \neg a \\
+	&\quad b = \text{true} \Rightarrow a \lor b = \text{true} \Rightarrow \bot \Rightarrow \neg b \\
+	&\quad \therefore \neg a \land \neg b \\
+	\\
+	&\text{2. To prove:} \quad (\neg a \land \neg b) \Rightarrow \neg (a \lor b) \\
+	&\quad \text{Assume:} \quad \neg a \land \neg b \\
+	&\quad \text{Then,} \quad a \lor b = \text{true} \Rightarrow a = \text{true} \lor b = \text{true} \Rightarrow \bot \\
+	&\quad \therefore \neg (a \lor b) \\
+	\\
+	&\text{Conclusion:} \quad \neg (a \lor b) \Leftrightarrow (\neg a \land \neg b)
+\end{align*}
