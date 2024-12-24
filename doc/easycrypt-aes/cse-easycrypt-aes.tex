@@ -1,0 +1,120 @@
+\documentclass[11pt,openany]{article}
+
+\input{cselab-preamble}
+\input{tcolorbox}
+\input{listings}
+\input{theorem}
+\input{tikz}
+\input{cselab-commands}
+
+
+\usepackage{background}  % For setting background images
+%% Background settings for the title page
+%\backgroundsetup{
+%	scale=4,  % Scale the image to fit the page
+%	color=black,  % Keep the image colors unchanged
+%	opacity=.05,  % Fully opaque (1.0)
+%	angle=0,  % No rotation
+%%	position=current page.south,  % Position relative to the page
+%	vshift=0cm,  % Vertical shift
+%	hshift=0cm,  % Horizontal shift
+%	contents={\includegraphics[scale=1]{images/school-logo}} % Background image path
+%}
+% Background settings (only for the title page)
+\backgroundsetup{
+	scale=1,  % Scale the image to fit the page
+	color=black,  % Keep the image color as is
+	opacity=.1,  % Fully opaque background
+	angle=0,  % No rotation
+%	position=current page.south,  % Align to bottom of the page
+	vshift=1cm,  % Adjust vertical alignment if needed
+%	hshift=0cm,  % Adjust horizontal alignment if needed
+	contents={}
+}
+% Command to set background for title page
+\newcommand{\setPageBackground}{
+	\backgroundsetup{
+		contents={\includegraphics[scale=4]{images/school-logo}
+%		contents={\includegraphics[width=\paperwidth,height=\paperheight]{images/school-logo}
+		} % Replace with your image
+	}
+}
+
+\setstretch{1.25}
+\begin{document}
+\begin{titlepage}
+\setPageBackground  % Enable background image for title page
+\begin{center}
+	{\Huge{\textbf{Machine-Checked Proofs for AES: High-Assurance Security}}\par}
+	{\LARGE\textbf{\textbf{v 1.0}}\par}
+	\vspace{0.5in}
+	{\LARGE {\textbf{Ji, Yong-hyeon}\\ (\texttt{hacker3740@kookmin.ac.kr})}\par}
+%	\vspace{1.5in}
+%	\includegraphics[scale=.35]{images/school-logo-opa5}\par
+%	\vspace{.25in}
+	\vfill
+	{\Large\bf \textsf{Department of Information Security, Cryptology, and Mathematics}\par}
+	{\Large\textsf{College of Science and Technology}\par}
+	{\Large\textsf{Kookmin University}\par}
+	\vspace{.75in}
+	\includegraphics[scale=.35]{images/logo.png}\par
+	\vspace{.25in}
+	{\Large\textsf{\today}\par}
+\end{center}
+\end{titlepage}
+\newpage
+
+\subsection*{File Structure}
+\input{tikzs/tree.tex}
+
+\vfill
+\subsection*{Copyright}
+%\large
+\textcopyright~ 2024 Crypto and Security Engineering Lab
+All rights reserved.
+
+This document and its content are the intellectual property of ``Ji, Yong-hyeon''. No part of this document may be reproduced, distributed, or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of the author, except in the case of brief quotations embodied in critical reviews and certain other noncommercial uses permitted by copyright law. For permission requests, write to the author at the e-mail.
+
+\vfill
+\subsection*{Changelog}
+\large
+\begin{tabular}{@{} L{0.05\textwidth} L{0.2\textwidth} L{0.7\textwidth} @{}} % Column widths specified here, change as needed for your content
+	\toprule
+	v1.0 & 2024-12-24 & Initial release: \\%Implementation and benchmarks.\\
+	%		v1.1 & 20XX-02-27 & Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie.\\
+	%		v1.2 & 20XX-03-15 & Sed dictum nisl non aliquet porttitor.\\
+	\bottomrule
+\end{tabular}
+
+\newpage
+
+\pagenumbering{arabic}
+
+\tableofcontents
+\newpage
+\section{Block Cipher}
+\input{sections/block_cipher}
+%
+%\newpage
+%\section{Digital Signature Scheme: ALTEQ}
+%\input{sections/sec2.tex}
+%
+%\newpage
+%\section{Field Operations}
+%\input{sections/sec3.tex}
+
+%\newpage
+\vfill
+\begin{thebibliography}{9}\large
+%	\bibitem{alteq_signature_scheme}
+%	Bläser, Markus, Dung Hoang Duong, Anand Kumar Narayanan, Thomas Plantard, Youming Qiao, Arnaud Sipasseuth, and Gang Tang. \textit{The ALTEQ Signature Scheme: Algorithm Specifications and Supporting Documentation.} Version 1.1.2, March 2024. Saarland University, University of Technology Sydney, University of Wollongong, SandboxAQ, Nokia Bell Labs, and KDDI Research, Inc.
+%	\bibitem{crypto_theory_and_practice}
+%	Stinson, Douglas R., and Maura B. Paterson. \textit{Cryptography: Theory and Practice.} Fourth edition. Boca Raton: CRC Press, Taylor \& Francis Group, 2019.
+\end{thebibliography}
+
+\newpage
+\appendix
+%\input{appendices/memeory_allocation.tex}
+%\input{appendices/mesure_cycle.tex}
+
+\end{document}

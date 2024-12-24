@@ -1,0 +1,69 @@
+\usepackage{listings}
+\definecolor{keyword}{HTML}{8e4e9e}
+\definecolor{myblue}{HTML}{3471d8}
+\definecolor{type}{HTML}{4EC9B0}
+% Change "Listing" to another name, e.g., "Code"
+\renewcommand{\lstlistingname}{Code}
+\lstdefinestyle{normal}{
+%	numbers=left, % Line numbers location
+%	numbersep=6pt, % Whitespace to the right of line numbers
+%	numberstyle=\tiny\it, % Line numbers font style
+	frame=single, % Border
+	basicstyle=\tt\small, % Code font style
+	breaklines=true, % Break long lines into multiple lines automatically
+	aboveskip=1.5\baselineskip, % Vertical whitespace before the listing
+	tabsize=3, % How many space to a tab
+}
+\lstdefinestyle{c}{
+	language=C,
+	basicstyle=\ttfamily\small,        % Basic font style
+	keywordstyle=\color{keyword}\bfseries,       % Keywords in bold blue
+	keywordstyle=[2]\color{myblue}\bfseries,
+	keywordstyle=[3]\color{magenta}\bfseries,
+	keywordstyle=[4]\color{purple}\bfseries,
+	stringstyle=\color{red!70},               % Strings in reddish color
+	commentstyle=\color{green!50!black}\itshape, % Comments in italic green-black
+	numberstyle=\tiny\color{gray},            % Line numbers in tiny gray font
+	numbers=left,                             % Line numbers on the left
+	stepnumber=1,                             % Number every line
+	numbersep=8pt,                            % Space between line numbers and code
+%	backgroundcolor=\color{gray!10},          % Light gray background
+	frame=single,                             % Single-line frame around the code
+	rulecolor=\color{gray},                   % Frame color
+	tabsize=4,                                % Tab space width
+	showstringspaces=false,                   % Don't show spaces in strings
+	breaklines=true,                          % Line breaking enabled
+	breakatwhitespace=true,                   % Break lines at whitespace
+	captionpos=b,                             % Caption below the code
+	escapeinside={\%*}{*)},                   % Allow LaTeX within code
+	morekeywords={printf, scanf, main, size_t, uint8_t, uint16_t, uint32_t, uint64_t},
+	morekeywords=[2]{randomSeed, hashArray,
+	expandChallenge, expandATF_vec_copy, expandColumns, expandSeeds,
+	invertingOnATF, actingOnATFS, columnsMatrix, columnsDecomposition,
+	multiplicationModuloP, addmul_P32_into_64, reductionModuloP,
+	reductionStrict, inversionModuloP},
+	morekeywords=[3]{crypto_sign_keypair, crypto_sign},
+	morekeywords=[4]{lu}
+}
+% Command to Include Rust Code
+\newcommand{\ccode}[2][]{%
+	\lstinputlisting[style=c,#1]{#2}
+}
+
+% Inline Code Highlighting
+\newcommand{\cinline}[1]{%
+	\lstinline[style=c]|#1|%
+}
+\lstdefinestyle{asm}{
+	%	language=[x86masm]Assembler,
+	language=C,
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue},
+	commentstyle=\color{gray!50},
+	stringstyle=\color{orange},
+	morekeywords={.data, .align, .asciz, .text, .global, .type, .size, .extern, stp, mov, adr, ldr, add, bl, ret, ldp, and,
+	movk, lsr, mul, sub, uxtw, cmp, blt, str, cbnz},
+	numbers=none,
+	frame=single,                             % Single-line frame around the code
+	rulecolor=\color{gray},                   % Frame color
+}

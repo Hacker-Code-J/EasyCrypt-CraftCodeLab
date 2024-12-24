@@ -1,0 +1,71 @@
+\begin{tikzpicture}[%
+	grow via three points={one child at (0.5,-0.7) and
+		two children at (0.5,-0.7) and (0.5,-1.4)},
+	edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+	\tikzstyle{every node}=[draw=black,thick,anchor=west]
+	\tikzstyle{selected}=[draw=red,fill=red!30]
+	\tikzstyle{optional}=[dashed,fill=gray!50]
+	\node {Machine-checked Proofs for AES}
+	child { node {build/}
+		child { node {aeslib/}}
+		child { node {example/}}
+	}	
+	child [missing] {}	
+	child [missing] {}	
+	child { node {extraction/}
+		child { node {aeslib/}}
+		child { node {example/}}
+	}
+	child [missing] {}	
+	child [missing] {}	
+	child { node[selected] {proof/}
+		child { node {aeslib/}
+			child { node {\texttt{AES\_ct\_proof.ec}} }
+			child { node {\texttt{AES\_proof.ec}} }
+			child { node {\texttt{AES\_spec.ec}} }
+		}
+		child [missing] {}
+		child [missing] {}
+		child [missing] {}
+		child { node {example/}
+			child { node {\texttt{NbAESEnc\_ct\_proof.ec}} }
+			child { node {\texttt{NbAESEnc\_mem\_ct\_proof.ec}} }
+			child { node {\texttt{NbAESEnc\_mem\_proof.ec}} }
+			child { node {\texttt{NbAESEnc\_proof.ec}} }
+			child { node {\texttt{NbAESEnc\_spec.ec}} }
+			child { node {$\cdots$} }
+		}
+	}
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child { node[selected] {src/}
+		child { node {aeslib/}
+			child { node {\texttt{aes.jazz}} }
+		}
+		child [missing] {}	
+		child { node {example/} 
+			child { node {\texttt{NbAESEnc.jazz}} }
+			child { node {\texttt{NbAESEnc\_mem.jazz}} }
+		}
+	}
+%	child { node {compress.c}}
+%	child { node {expand.c}}
+%	child { node[selected] {field.c}}
+%	child { node {matrix.c}}
+%	child { node {sign.c}};
+%	child { node [selected] {tex}
+%		child { node {generic}}
+%		child { node [optional] {latex}}
+%		child { node {plain}}
+%	};
+;
+\end{tikzpicture}

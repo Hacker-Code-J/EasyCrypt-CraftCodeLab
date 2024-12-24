@@ -1,0 +1,18 @@
+// Build AES Lib
+cpp -nostdinc -DEXPORT_TEST src/aeslib/aes.jazz \
+    | grep -v "^#" > build/aeslib/aes.japp
+jasminc  build/aeslib/aes.japp -o build/aeslib/aes.s
+
+// Extract AES Lib for Correctness / Security
+jasminc build/aeslib/aes.japp -ec aes -ec invaes -oec AES_jazz.ec
+mv AES_jazz.ec Array11.ec WArray176.ec extraction/aeslib
+
+// Extract AES Lib for Constant-time
+jasminc build/aeslib/aes.japp -CT -ec aes -ec invaes -oec AES_jazz_ct.ec
+mv AES_jazz_ct.ec Array11.ec WArray176.ec extraction/aeslib
+
+// Build NbAESEnc with register calling convension
+cpp -nostdinc src/example/NbAESEnc.jazz  \
+    | grep -v "^#" > build/example/NbAESEnc.japp
+
+jasminc build/example/NbAESEnc.japp -o build/example/NbAESEnc.s

@@ -1,0 +1,46 @@
+\subsection{Formal Definition}
+\defbox[Pseudo-Random Permutation ($\PRP$)]{
+\begin{definition}
+	Consider a mapping \[
+	f:\set{0,1}^m\times\set{0,1}^n\to\set{0,1}^n,\quad\ie,\quad f:\set{0,1}^m\to\text{Perm}(\set{0,1}^n).
+	\] Let \[
+	\mathcal{F}:=\set{f_k}_{k\in\set{0,1}^m}\ \text{where}\ f_k\in\text{Perm}(\set{0,1}^n)
+	\] be a family of permutations, where $n$ is the block length and $m$ is key length. The family $\mathcal{F}$ is said to be a \textbf{pseudo-random permutation} ($\PRP$) if it satisfies the following properties: \begin{enumerate}[(i)]
+		\item \textbf{Permutation Property}: For every $k\in\set{0,1}^m$, the function $f_k:\set{0,1}^n\to\set{0,1}^n$ is a bijection. That is, \[
+		f_k^{-1}(f_k(x))=x\quad\text{and}\quad f_k(f_k^{-1}(y))=y,\quad\forall x,y\in\set{0,1}^n.
+		\]
+		\item \textbf{Indistinguishability from Random Permutation}: Define the advantage of an adversary $\adversary$ as \[
+		\Adv_\mathcal{F}^{\PRP}(\adversary):=\abs{\Pr[\adversary^{f_k,f_k^{-1}}=1]-\Pr[\adversary^{P,P^{-1}}=1]},
+		\] where \begin{itemize}
+			\item $k\xleftarrow{\$}\set{0,1}^m$ (uniformly sampled)
+			\item $P\xleftarrow{\$}\text{Perm}\left(\set{0,1}^n\right)$ (a uniformly random permutation)
+			\item $\adversary^{f_k,f_k^{-1}}$ is the adversary $\adversary$ interacting with the oracle for $f_k$ and $f_k^{-1}$, while
+			\item $\adversary^{P,P^{-1}}$ is the adversary $\adversary$ interacting with the oracle for $P$ and $P^{-1}$.
+		\end{itemize}
+		\item \textbf{Efficiency}: The functions $f_k$ and $f_k^{-1}$ must be efficiently computable, meaning there exits deterministic algorithms that compute $f_k(x)$ and $f_k^{-1}(y)$ in time polynomial in $n$ and $m$.
+	\end{enumerate}
+\end{definition}}
+\begin{remark}[Secure PRP]
+	The family $\mathcal{F}$ is a \textbf{secure PRP} if, for all probabilistic polynomial-time (PPT) adversary $\adversary$, the advantage $\Adv_\mathcal{F}^{\PRP}(\adversary)$ is negligible in $m$, \ie, \[
+	\Adv_\mathcal{F}^{\PRP}(\adversary)\leq\negl(m).
+	\]
+\end{remark}
+
+\defbox[Block Cipher]{
+\begin{definition}
+	A \textbf{block cipher} is defined as a family of functions 
+	\[
+	\{ E_k : \{0,1\}^n \to \{0,1\}^n \}_{k \in \{0,1\}^k},
+	\]
+	where:
+	\begin{itemize}
+		\item Each function \( E_k \) is a bijection over \( \{0,1\}^n \), meaning there exists a corresponding decryption function \( D_k \) such that 
+		\[
+		D_k(E_k(x)) = x, \quad \forall x \in \{0,1\}^n.
+		\]
+		\item The family of functions satisfies the \textit{secure pseudo-random permutation (PRP)} property: for a uniformly chosen \( k \in \{0,1\}^k \), no computationally bounded adversary can distinguish \( E_k \) from a truly random permutation \( P : \{0,1\}^n \to \{0,1\}^n \) with non-negligible advantage.
+		\item The block cipher operates on fixed-length input blocks of size \( n \), and the key \( k \) is sampled uniformly from the key space \( \{0,1\}^k \).
+	\end{itemize}
+	
+	In summary, a block cipher is a deterministic, key-dependent, reversible function family over fixed-length input blocks, which achieves the properties of a secure pseudo-random permutation when the key is secret.
+\end{definition}}
