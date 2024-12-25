@@ -1,0 +1,114 @@
+\begin{center}
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{XOR} = [
+	line width=.25mm,
+	draw,
+	circle,
+	outer sep=2pt,
+	append after command={
+		[shorten >=2bp, shorten <=2bp]
+		(\tikzlastnode.north) edge[line width=.25mm] (\tikzlastnode.south)
+		(\tikzlastnode.east) edge[line width=.25mm] (\tikzlastnode.west)}
+	]
+	
+	\node[] (pt) {Plaintext};  
+	\node[XOR, right=1cm of pt] (xor) {};
+	\node[above=2.5cm of xor] (mask) {$k\uniform\keyspace$};
+	\node[right=1cm of xor] (ct) {Ciphertext};  
+	\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (2.25,2.75) -- ++(0,-.5) -- node[right] {mask} ++(0,-2);
+	
+%	\node [below=of xor, align=left] {$\enc(k,m)=m\oplus k$\\ $\dec(k,c)=c\oplus k$};
+\end{tikzpicture}\hfill
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{XOR} = [
+	line width=.25mm,
+	draw,
+	circle,
+	outer sep=2pt,
+	append after command={
+		[shorten >=2bp, shorten <=2bp]
+		(\tikzlastnode.north) edge[line width=.25mm] (\tikzlastnode.south)
+		(\tikzlastnode.east) edge[line width=.25mm] (\tikzlastnode.west)}
+	]
+	
+	\node[] (pt) {Plaintext};  
+	\node[XOR, right=1cm of pt] (xor) {};
+	\node[draw, rectangle, above=2cm of xor, align=center] (prf) {PRP};
+	\node[left=1cm of prf] (key) {Key};
+	\node[above=1cm of prf] (nonce) {Nonce};
+	\node[right=1cm of xor] (ct) {Ciphertext};  
+	\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (2.25,2.25) -- node[right] {mask} ++(0,-2);
+	\draw[-{Latex}] (key) to (prf);
+	\draw[-{Latex}] (nonce) to (prf);
+	
+%	\node [below=of xor, align=left] {$\enc(k, n, m)=m\oplus f_k(n)$\\ $\dec(k, n, c)=c\oplus f_k(n)$};
+\end{tikzpicture}
+\end{center}
+\begin{itemize}
+	\item The \textbf{one-time pad (OTP) encryption scheme} is a cryptographic construct that achieves perfect security. \[
+	\Pi_{\text{OTP}}=(\keygen,\enc,\dec),
+	\] where \begin{enumerate}[(i)]
+		\item $\keygen:\set{0,1}^n\to\set{0,1}^n,\quad k\sim\text{Uniform}(\set{0,1}^n)$;
+		\item \begin{align*}
+			&\fullfunction{\enc}{\keyspace\times\messagespace}{\ciphertext}{(k,m)}{c=k\oplus m}\\
+			&\fullfunction{\enc}{\keyspace}{\ciphertext^{\messagespace}}{k}{c=\enc_{k}(m)=k\oplus m}\ \text{where}\ \fullfunction{\enc_k}{\messagespace}{\ciphertext}{m}{c=k\oplus m}
+		\end{align*}
+	\end{enumerate}
+	\item A \textbf{nonce-based PRP encryption scheme} is a cryptographic construct where a nonce (number used once) is incorporated to ensure unique ciphertexts for the same plaintext under the same key. 
+	\[
+	\Pi_{\nonce-\text{PRP}}=(\keygen,\enc,\dec),
+	\] where \begin{enumerate}[(i)]
+		\item $\keygen:\set{0,1}^*\to\keyspace$;
+		\item \[
+		\fullfunction{\enc}{\keyspace\times\nonce\times\messagespace}{\ciphertext}{(k,m, m)}{c=\enc_k(n)\oplus m}
+		\]\begin{align*}
+			&\fullfunction{\enc}{\keyspace\times\nonce\times\messagespace}{\ciphertext}{(k,n,m)}{c=\enc_k(n)\oplus m}\\
+			&\fullfunction{\enc}{\keyspace\times\nonce}{\ciphertext^{\messagespace}}{(k,n)}{c=\text{Xor}(k,n)=k\oplus m}\ \text{where}\ \fullfunction{\enc_k}{\messagespace}{\ciphertext}{m}{c=k\oplus m}\\
+			&\fullfunction{\enc}{\keyspace}{[\nonce\to[\messagespace\to\ciphertext]]}{k}{c=\enc_k(n)\oplus m}\ \text{where}\ \fullfunction{\enc_k}{\nonce}{[\messagespace\to\ciphertext]}{m}{c=k\oplus m}
+		\end{align*}
+	\end{enumerate}
+\end{itemize}
+
+%\begin{tikzpicture}[
+%	node distance=2.5cm and 2cm,
+%	every node/.style={draw, align=center, rounded corners, font=\footnotesize, minimum width=1.5cm, minimum height=1cm},
+%	arrow/.style={-{Stealth}, thick},
+%	textnode/.style={draw=none, align=center}
+%	]
+%	
+%	% Nodes for the original function
+%	\node (input) {$(k, n, m)$};
+%	\node[right=of input] (original) {Enc$(k, n, m)$};
+%	\node[right=of original] (output) {$c = \text{Enc}(k, n, m)$};
+%	
+%	% Nodes for the curried function
+%	\node[below=3cm of input] (kinput) {$k$};
+%	\node[right=of kinput] (enc-k) {$\text{Enc}_k(n)$};
+%	\node[right=of enc-k] (xor) {$\text{Enc}_k(n) \oplus m$};
+%	\node[right=of xor] (final) {$c$};
+%	
+%	% Labels
+%	\node[textnode, above=0.5cm of original] (originallabel) {Original Function};
+%	\node[textnode, above=0.5cm of enc-k] (curriedlabel) {Curried Function};
+%	
+%	% Arrows for original function
+%	\draw[arrow] (input) -- (original);
+%	\draw[arrow] (original) -- (output);
+%	
+%	% Arrows for curried function
+%	\draw[arrow] (kinput) -- (enc-k) node[midway, above] {Partial application};
+%	\draw[arrow] (enc-k) -- (xor) node[midway, above] {$\oplus m$};
+%	\draw[arrow] (xor) -- (final);
+%	
+%	% Curved arrow to indicate transformation
+%	\draw[arrow, dashed, bend left=45] (output.east) to node[midway, right] {Transformation} (final.north);
+%	
+%\end{tikzpicture}

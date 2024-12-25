@@ -1,0 +1,126 @@
+%\documentclass[tikz,border=3mm]{standalone}
+%\usepackage{amsmath}
+%\usetikzlibrary{arrows.meta, positioning, decorations.pathmorphing}
+%
+%\begin{document}
+%	\begin{tikzpicture}[
+%		node distance=2.5cm and 2.5cm,
+%		box/.style={draw, rounded corners, minimum height=1cm, minimum width=2cm, align=center},
+%		arrow/.style={-Stealth, thick},
+%		sample/.style={dashed, -Stealth, thick},
+%		indist/.style={<->, thick, decorate, decoration={snake, amplitude=1mm, segment length=2mm}}
+%		]
+%		% Nodes
+%		\node[box] (dom1) {\(\{0,1\}^m\times\{0,1\}^n\)};
+%		\node[box, right=of dom1] (codom1) {\(\{0,1\}^n\)};
+%		\node[box, below=of dom1] (dom2) {\(\{0,1\}^m\)};
+%		\node[box, right=of dom2] (codom2) {\(\text{Perm}(\{0,1\}^n)\)};
+%		\node[box, below=of codom2] (perm) {\(\text{Perm}(\{0,1\}^n)\)};
+%		
+%		% Arrows
+%		\draw[arrow] (dom1) -- node[midway, above] {\(f\)} (codom1);
+%		\draw[arrow] (dom2) -- node[midway, above] {\(f\)} (codom2);
+%		
+%		% Sampling process
+%		\draw[sample] (codom2) -- ++(2, 0) node[right] {\(f_k\)};
+%		\draw[sample] (perm) -- ++(2, 0) node[right] {\(P\)};
+%		
+%		% Uniform sampling
+%		\node[left=1.5cm of dom2] (sample1) {\(k \xleftarrow{\$} \{0,1\}^m\)};
+%		\node[left=1.5cm of perm] (sample2) {\(P \xleftarrow{\$} \text{Perm}(\{0,1\}^n)\)};
+%		\draw[sample] (sample1) -- (dom2);
+%		\draw[sample] (sample2) -- (perm);
+%		
+%		% Indistinguishability
+%		\draw[indist] (perm) -- node[midway, right] {Indistinguishability} ++(0, 4.5) coordinate (top) -- ++(-5, 0) coordinate (left) -- ++(0, -4.5) -- (codom2);
+%		
+%	\end{tikzpicture}
+%\end{document}
+
+%\documentclass[tikz,border=3.14mm]{standalone}
+%\usepackage{amsmath}
+%\usetikzlibrary{positioning,arrows.meta,decorations.pathreplacing}
+%
+%\begin{document}
+%	\begin{tikzpicture}[
+%		node distance=1.5cm and 2cm,
+%		box/.style={draw, rectangle, minimum width=2.5cm, minimum height=1cm, align=center},
+%		arrow/.style={-{Latex}, thick},
+%		curly/.style={decorate, decoration={brace, amplitude=10pt, mirror}},
+%		perm/.style={draw, rectangle, minimum width=2.5cm, minimum height=1cm, align=center, dashed}
+%		]
+%		
+%		% Nodes
+%		\node[box] (cipher) {$f: \{0,1\}^m \times \{0,1\}^n \to \{0,1\}^n$};
+%		\node[box, below=of cipher] (currying) {$f: \{0,1\}^m \to \text{Perm}(\{0,1\}^n)$};
+%		\node[box, below=of currying] (samplek) {$k \xleftarrow{\$} \{0,1\}^m$};
+%		\node[perm, right=of samplek] (permk) {$f_k \in \text{Perm}(\{0,1\}^n)$};
+%		\node[perm, right=of permk] (randomperm) {$P \xleftarrow{\$} \text{Perm}(\{0,1\}^n)$};
+%		
+%		% Indistinguishability label
+%		\node[below right=1cm and 2.5cm of samplek] (indist) {
+%			Indistinguishability between $f_k$ and $P$
+%		};
+%		
+%		% Arrows
+%		\draw[{Latex}-{Latex}, thick] (cipher) -- (currying);
+%		\draw[arrow] (currying) -- (samplek);
+%		\draw[arrow] (samplek) -- (permk) node[midway, above, sloped] {Currying};
+%		\draw[arrow] (permk) -- (randomperm) node[midway, above, sloped] {Comparison};
+%		
+%		% Curly brace for permutation group
+%		\draw[curly] ([yshift=0.5cm] permk.north west) -- ([yshift=0.5cm] randomperm.north east)
+%		node[midway, above=10pt] {$\text{Perm}(\{0,1\}^n)$};
+%		
+%		% Highlight indistinguishability
+%		\draw[->, thick, dashed] (permk) to[bend left] (indist);
+%		\draw[->, thick, dashed] (randomperm) to[bend right] (indist);
+%		
+%	\end{tikzpicture}
+%\end{document}
+
+\documentclass[tikz,border=2mm]{standalone}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta, decorations.pathmorphing, positioning, calc}
+
+\begin{document}
+	\begin{tikzpicture}[
+		node distance=2cm and 3cm,
+		every node/.style={draw, rectangle, rounded corners, align=center},
+		arrow/.style={-{Stealth}, thick},
+		decoration={snake, amplitude=.5mm, segment length=3mm},
+		dashedarrow/.style={-{Stealth}, dashed, thick}]
+		
+		% Nodes for elements
+		\node[align=center] (blockcipher) {Block Cipher\\$f:\{0,1\}^m \times \{0,1\}^n \to \{0,1\}^n$};
+		\node[above right=1cm of blockcipher, align=center] (currying) {Family of Permutations\\ $f:\{0,1\}^m \to\text{Perm}(\{0,1\}^n)$};
+		
+		% Key sampling node
+		\node[below=2cm of currying] (keysampling) {Key Sampling\\$k \xleftarrow{\$} \{0,1\}^m$};
+		
+		\node[right=of keysampling] (fk) {Fixed Key Function\\$f_k \in \text{Perm}(\{0,1\}^n)$};
+		\node[right=of currying] (perm) {Uniform Permutation\\$P \xleftarrow{\$} \text{Perm}(\{0,1\}^n)$};
+		
+		% Indistinguishability node
+%		\node[right=of fk] (indistinguishability) {Indistinguishability\\$f_k \overset{?}{\sim} P$};
+		
+		
+		% Draw arrows
+		\draw[arrow, out=0, in=180] (blockcipher.east) to (currying.west);
+		\draw[arrow] (currying) -- (keysampling);
+		\draw[arrow] (keysampling) -- (fk);
+		\draw[arrow] (currying) -- (perm);
+		\draw[<->, thick, decorate, decoration={snake, amplitude=1mm, segment length=2mm}, out=90, in=-90] (fk.north) -- (perm.south) node[below right=.5cm] {$f_k\overset{?}{\sim} P$}; %([yshift=0.5cm] perm.north west) -- ([yshift=0.5cm] fk.north east);
+%		\draw[arrow] (keysampling) -- (indistinguishability);
+%		\draw[arrow] (fk) -- (indistinguishability);
+%		\draw[arrow] (perm) -- (indistinguishability);
+		
+		% Additional annotations
+%		\node[below=of perm] (note) {\textit{Indistinguishability between $f_k$ and $P$ under random key $k$}};
+		
+		% Group action effect representation (curried $f_k$ as action)
+		\node[below=1cm of fk] (groupaction) {$f_k(x)$ permutes $\{0,1\}^n$};
+		\draw[dashedarrow] (fk.south) -- (groupaction.north);
+		
+	\end{tikzpicture}
+\end{document}

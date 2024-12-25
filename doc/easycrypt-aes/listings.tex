@@ -2,12 +2,10 @@
 \definecolor{keyword}{HTML}{8e4e9e}
 \definecolor{myblue}{HTML}{3471d8}
 \definecolor{type}{HTML}{4EC9B0}
+
 % Change "Listing" to another name, e.g., "Code"
 \renewcommand{\lstlistingname}{Code}
 \lstdefinestyle{normal}{
-%	numbers=left, % Line numbers location
-%	numbersep=6pt, % Whitespace to the right of line numbers
-%	numberstyle=\tiny\it, % Line numbers font style
 	frame=single, % Border
 	basicstyle=\tt\small, % Code font style
 	breaklines=true, % Break long lines into multiple lines automatically
@@ -66,4 +64,42 @@
 	numbers=none,
 	frame=single,                             % Single-line frame around the code
 	rulecolor=\color{gray},                   % Frame color
+}
+
+\lstdefinestyle{jasmin}{
+	language=[x86masm]Assembler, % Closest to Jasmin syntax
+	basicstyle=\ttfamily\small, % Monospace font for code
+	keywordstyle=\color{blue}\bfseries, % Keywords in blue and bold
+	commentstyle=\color{green!60!black}, % Comments in green
+	stringstyle=\color{orange}, % Strings in orange
+	numbers=left, % Line numbers on the left
+	numberstyle=\tiny\color{gray}, % Line number style
+	stepnumber=1, % Show every line number
+	numbersep=5pt, % Space between numbers and code
+	frame=single, % Single frame around code
+	tabsize=4, % Tab width
+	showstringspaces=false, % Don't underline spaces in strings
+	breaklines=true, % Wrap long lines
+	captionpos=b, % Caption at the bottom
+	morekeywords={mov, add, sub, mul, xor, and, or, shl, shr, call, ret, lea}, % Add Jasmin-specific keywords
+	escapeinside={(*@}{@*)} % For embedding LaTeX inside code
+}
+
+\lstdefinestyle{easycrypt}{
+	language=ML, % EasyCrypt syntax is close to ML
+	basicstyle=\ttfamily\small, % Monospace font for code
+	keywordstyle=\color{purple}\bfseries, % Keywords in purple and bold
+	commentstyle=\color{green!60!black}, % Comments in green
+	stringstyle=\color{orange}, % Strings in orange
+	numbers=left, % Line numbers on the left
+	numberstyle=\tiny\color{gray}, % Line number style
+	stepnumber=1, % Show every line number
+	numbersep=5pt, % Space between numbers and code
+	frame=single, % Single frame around code
+	tabsize=4, % Tab width
+	showstringspaces=false, % Don't underline spaces in strings
+	breaklines=true, % Wrap long lines
+	captionpos=b, % Caption at the bottom
+	morekeywords={module, axiom, lemma, theorem, proof, qed, fun, let, in, forall, exists, if, then, else, return, assume, while, do, match, with}, % EasyCrypt-specific keywords
+	escapeinside={(*@}{@*)} % For embedding LaTeX inside code
 }
