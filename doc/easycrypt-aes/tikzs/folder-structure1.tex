@@ -1,0 +1,51 @@
+\begin{minipage}{.5\textwidth}
+\adjustbox{scale=.9}{\begin{tikzpicture}[%
+	grow via three points={one child at (0.5,-0.7) and
+		two children at (0.5,-0.7) and (0.5,-1.4)},
+	edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+	\tikzstyle{every node}=[draw=black,thick,anchor=west, 
+	minimum width=2.25cm, minimum height=.6cm]
+	\tikzstyle{selected}=[draw=red,fill=red!30]
+	\tikzstyle{optional}=[dashed,fill=gray!50]
+	\node {.}
+	child { node {build/}
+		child { node {aeslib/}
+		}
+	}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child { node {src/}
+		child { node {aeslib/}
+			child { node[selected] {\texttt{aes.jazz}} }
+		}
+	};
+\end{tikzpicture}}
+\end{minipage}\hfill
+\begin{minipage}{.5\textwidth}
+\adjustbox{scale=.9}{\begin{tikzpicture}[%
+	grow via three points={one child at (0.5,-0.7) and
+		two children at (0.5,-0.7) and (0.5,-1.4)},
+	edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+	\tikzstyle{every node}=[draw=black,thick,anchor=west, 
+	minimum width=2.25cm, minimum height=.6cm]
+	\tikzstyle{selected}=[draw=red,fill=red!30]
+	\tikzstyle{optional}=[dashed,fill=gray!50]
+	\tikzstyle{generate}=[draw=blue,dashed,fill=blue!20]
+	\node {.}
+	child { node {build/}
+		child { node {aeslib/}
+			child { node[generate] {\texttt{aes.japp}} }
+			child { node[generate] {\texttt{aes.s}} }
+		}
+	}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child { node {src/}
+		child { node {aeslib/}
+			child { node[selected] {\texttt{aes.jazz}} }
+		}
+	};
+\end{tikzpicture}}
+\end{minipage}

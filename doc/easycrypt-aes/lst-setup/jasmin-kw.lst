@@ -1,6 +1,0 @@
-
-\lstdefinelanguage{jasmin-kw}{
-  %morekeywords=[2]{fn,for,to,downto,if,else,do,while,return,param},
-  morekeywords=[3]{u256,u128,u64,u32,u16,u8,bool,int},
-  morekeywords=[1]{reg,stack,inline}
-}
