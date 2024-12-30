@@ -1,0 +1,49 @@
+\definecolor{OliveGreen}{rgb}{0.33, 0.5, 0.18}
+\definecolor{Blue}{rgb}{0.06, 0.2, 0.65}
+\definecolor{grey}{rgb}{0.43, 0.5, 0.5}
+
+% --------------------------------------------------------------------
+\newcommand{\dslash}{\mathbin{\mathsf{/\mkern-4mu/}}}
+\newcommand{\dslasheq}{\mathbin{\mathsf{/\mkern-4mu/\mkern-8mu=}}}
+\newcommand{\slasheq}{\mathbin{\mathsf{/\mkern-6mu=}}}
+
+% --------------------------------------------------------------------
+\lstdefinestyle{jasmin-default}{
+  mathescape=true,
+  columns=fullflexible,
+  keepspaces=true,
+  captionpos=b,
+  frame=tb,
+  xleftmargin=.1\textwidth,
+  xrightmargin=.1\textwidth,
+  rangebeginprefix={(**\ begin\ },
+  rangeendprefix={(**\ end\ },
+  rangesuffix={\ *)},
+  includerangemarker=false,
+  basicstyle=\small\sffamily,
+  identifierstyle={},
+  keywordstyle=[1]{\color{OliveGreen}},
+  keywordstyle=[2]{\bfseries},
+  keywordstyle=[3]{\color{Blue}},
+  keywordstyle=[4]{\bfseries\color{OliveGreen}},
+  keywordstyle=[5]{\color{Red}},
+  keywordstyle=[6]{\color{Red}},
+  alsoletter ={_},
+  literate=
+    {-}{-}{1}%
+    {->}{$\rightarrow$}{1}%
+    {4u64}{4u64}{1}%
+    {>>}{$\gg$}{1}%
+    {<<}{$\ll$}{1}%
+}[keywords,comments]
+
+% --------------------------------------------------------------------
+\input{lst-setup/jasmin-kw.lst}
+
+% --------------------------------------------------------------------
+\lstdefinelanguage{jasmin}{
+  style=jasmin-default,
+  language=jasmin-kw,
+  comment=[l][\color{grey}]{//},
+  morecomment=[s][\color{grey}]{/*}{*/},
+}

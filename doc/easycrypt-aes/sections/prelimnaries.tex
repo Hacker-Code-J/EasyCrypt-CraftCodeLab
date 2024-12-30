@@ -150,7 +150,7 @@ The one-time pad encryption scheme is perfect security. \begin{itemize}
 	
 	\draw[-{Latex}] (pt) to (xor);
 	\draw[-{Latex}] (xor) to (ct);
-	\draw[-{Latex}] (2.25,2.25) -- node[right] {mask} ++(0,-2);
+	\draw[-{Latex}] (mask) -- node[right] {mask} ++(0,-2.5);
 	\begin{scope}[xshift=8cm]
 	\node[draw, rectangle] (pt) {$\cdots$\texttt{10101010}};  
 	\node[XOR, right=1cm of pt] (xor) {};
@@ -159,7 +159,7 @@ The one-time pad encryption scheme is perfect security. \begin{itemize}
 	
 	\draw[-{Latex}] (pt) to (xor);
 	\draw[-{Latex}] (xor) to (ct);
-	\draw[-{Latex}] (2.25,2.25) -- node[right] {mask} ++(0,-2);
+	\draw[-{Latex}] (mask) -- node[right] {mask} ++(0,-2.5);
 	\end{scope}
 \end{tikzpicture}
 \end{center}

@@ -1,0 +1,92 @@
+% --------------------------------------------------------------------
+\newcommand{\dslash}{\mathbin{\mathsf{/\mkern-4mu/}}}
+\newcommand{\dslasheq}{\mathbin{\mathsf{/\mkern-4mu/\mkern-8mu=}}}
+\newcommand{\slasheq}{\mathbin{\mathsf{/\mkern-6mu=}}}
+\newcommand{\drarrow}{\raisebox{.07em}{$\mathbin{\scriptstyle\mathsf{-\mkern-3mu>}}$}}
+\newcommand{\dlarrow}{\raisebox{.07em}{$\mathbin{\scriptstyle\mathsf{<\mkern-3mu-}}$}}
+\newcommand{\drrarrow}{\raisebox{.07em}{$\mathbin{\scriptstyle\mathsf{-\mkern-3mu>\mkern-3mu>}}$}}
+\newcommand{\dllarrow}{\raisebox{.07em}{$\mathbin{\scriptstyle\mathsf{<\mkern-3mu<\mkern-3mu-}}$}}
+
+% --------------------------------------------------------------------
+\lstdefinestyle{easycrypt-default}{
+  upquote=true,
+  escapechar=\#,
+  mathescape=false,
+  columns=fullflexible,
+  keepspaces=true,
+  captionpos=b,
+  frame=tb,
+  xleftmargin=.1\textwidth,
+  xrightmargin=.1\textwidth,
+  rangebeginprefix={(**\ begin\ },
+  rangeendprefix={(**\ end\ },
+  rangesuffix={\ *)},
+  includerangemarker=false,
+  basicstyle=\small\ttfamily,
+  identifierstyle={},
+  keywordstyle=[1]{\bfseries\color{violet}},
+  keywordstyle=[2]{\bfseries\color{olive}},
+  keywordstyle=[3]{\bfseries\color{blue}},
+  keywordstyle=[4]{\bfseries\color{blue}},
+  keywordstyle=[5]{\bfseries\color{red}},
+  keywordstyle=[6]{\bfseries\color{violet}},
+}
+
+\lstdefinestyle{easycrypt-math}{
+  style=easycrypt-default,
+  mathescape=true,
+}
+
+\lstdefinestyle{easycrypt-math-nocolors}{
+  style=easycrypt-default,
+  mathescape=true,
+  keywordstyle=[1]{\bfseries},
+  keywordstyle=[2]{\bfseries},
+  keywordstyle=[3]{\bfseries},
+  keywordstyle=[4]{\bfseries},
+  keywordstyle=[5]{\bfseries},
+  keywordstyle=[6]{\bfseries},
+}
+
+% --------------------------------------------------------------------
+\input{easycrypt-kw.lst}
+
+\lstdefinelanguage{easycrypt-base}{
+  language=easycrypt-kw,
+  morekeywords=[1]{arg},
+  morecomment=[n][\itshape]{(*}{*)},
+  morecomment=[n][\bfseries]{(**}{*)},
+  literate=
+    {tau}{$\tau$}1
+    {sigma}{$\sigma$}1
+% note double "_" below
+% in actual EasyCrypt examples, do not use __
+% in specifications, these are rendered as subscripts
+    {__1}{${}_{\!1}$}1
+    {__2}{${}_{\!2}$}1
+    {__3}{${}_{\!3}$}1
+    {__n}{${}_{\!n}$}1
+    {__p}{${}_{\!p}$}1
+    {,,,}{$\mathrel{\ldots}$}1
+    {...}{$\mathrel{\cdots}$}1
+    {->}{$\drarrow$}1
+    {<-}{$\dlarrow$}1
+    {->>}{$\drrarrow$}2
+    {<<-}{$\dllarrow$}2
+}
+
+% --------------------------------------------------------------------
+\lstdefinelanguage{easycrypt}{
+  language=easycrypt-base,
+  style=easycrypt-default,
+}
+
+\lstdefinelanguage{easycrypt-math}{
+  language=easycrypt-base,
+  style=easycrypt-math,
+}
+
+\lstdefinelanguage{easycrypt-math-nocolors}{
+  language=easycrypt-base,
+  style=easycrypt-math-nocolors,
+}
