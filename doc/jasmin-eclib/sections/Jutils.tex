@@ -1,0 +1,96 @@
+%\subsection{JUtils}
+\easycryptcode[linerange={1-3}]{listings/JUtils.ec}
+
+\begin{table}[h!]
+\begin{tabular}{l}
+\url{https://github.com/EasyCrypt/easycrypt}\\
+easycrypt/theories/core/AllCore.ec\\
+easycrypt/theories/core/Bool.ec\\
+easycrypt/theories/algebra/IntDiv.ec\\
+easycrypt/theories/algebra/StdOrder.ec\\
+easycrypt/theories/datatypes/List.ec\\
+\end{tabular}
+\end{table}
+
+\subsubsection*{LEMMA:\quad \texttt{modz\_comp}}
+% modz_cmp
+\easycryptcode[linerange={6-7}]{listings/JUtils.ec}
+\begin{statement}
+	For two integers $m$ and $d>0$, the remainder of 
+	$m$ divided by $d$ satisfies:\[
+	0\leq m\bmod d< d.
+	\]
+\end{statement}
+\ \\
+\begin{analysis}
+	This property follows directly from the division algorithm: \[
+	m=q\cdot d+r,\quad 0\leq r<d
+	\] where $q=\floor*{m/d}$ and $r=m\bmod q$.
+\end{analysis}
+\ \\
+\begin{pftactics}
+	SMT solver with the pre-proved property \texttt{edivzP} (in \texttt{IntDiv}).
+\end{pftactics}
+
+\newpage
+\subsubsection*{LEMMA:\quad \texttt{divz\_cmp}}
+% divz_cmp
+\easycryptcode[linerange={9-12}]{listings/JUtils.ec}
+\begin{statement}
+	For integers $d,i,n$ where $d>0$ and $0\leq i< n\cdot d$, the integer division satisfies \[
+	0\leq \frac{i}{d}< n.
+	\]
+\end{statement}
+\ \\
+\begin{analysis}
+	TBA
+\end{analysis}
+\ \\
+\begin{pftactics}
+	TBA
+\end{pftactics}
+
+\subsubsection*{LEMMA:\quad \texttt{mulz\_cmp\_r}}
+% mulz_cmp_r
+\easycryptcode[linerange={14-18}]{listings/JUtils.ec}
+\begin{statement}
+	TBA
+\end{statement}
+\ \\
+\begin{analysis}
+	TBA
+\end{analysis}
+\ \\
+\begin{pftactics}
+	TBA
+\end{pftactics}
+
+\subsubsection*{LEMMA:\quad \texttt{cmpW}}
+% cmpW
+\easycryptcode[linerange={20-21}]{listings/JUtils.ec}
+\begin{statement}
+	TBA
+\end{statement}
+\ \\
+\begin{analysis}
+	TBA
+\end{analysis}
+\ \\
+\begin{pftactics}
+	TBA
+\end{pftactics}
+
+\subsubsection*{LEMMA:\quad \texttt{le\_modz}}
+% le_modz
+\easycryptcode[linerange={23-30}]{listings/JUtils.ec}
+\begin{statement}
+	TBA
+\end{statement}
+\ \\
+\begin{analysis}
+	TBA
+\end{analysis}
+\ \\
+\begin{pftactics}
+	TBA
+\end{pftactics}

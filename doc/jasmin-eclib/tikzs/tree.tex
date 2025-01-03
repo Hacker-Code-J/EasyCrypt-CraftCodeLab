@@ -1,0 +1,64 @@
+\begin{tikzpicture}[%
+	grow via three points={one child at (0.5,-0.7) and
+		two children at (0.5,-0.7) and (0.5,-1.4)},
+	edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+	\tikzstyle{every node}=[draw=black,thick,anchor=west, minimum width=1.5cm, minimum height=.5cm]
+	\tikzstyle{selected}=[draw=red,fill=red!30]
+	\tikzstyle{optional}=[dashed,fill=gray!50]
+	\node {jasmin}
+	child { node {compiler/} }	
+	child { node {eclib/}
+		child { node {\ttfamily AES.ec}}
+		child { node {\ttfamily JArray.ec}}
+		child { node {\ttfamily JLeakage.ec}}
+		child { node {\ttfamily JMemory.ec}}
+		child { node {\ttfamily JModel.ec}}
+		child { node {\ttfamily JModel\_common.ec}}
+		child { node {\ttfamily JModel\_m4.ec}}
+		child { node {\ttfamily JModel\_x86.ec}}
+		child { node {\ttfamily JUtils.ec}}
+		child { node {\ttfamily JWord.ec}}
+		child { node {\ttfamily JWord\_array.ec}}
+		child { node {\ttfamily Jslh.ec}}
+		child { node {\ttfamily Makefile}}
+		child { node {\ttfamily easycrypt.project}}
+		child { node {\ttfamily tests.config}}
+	}
+	child [missing] {}	
+	child [missing] {}
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+%	child { node {src/} }
+%	child { node {src/} }
+%		child { node {aeslib/}
+%			child { node {\texttt{aes.jazz}} }
+%		}
+%		child [missing] {}	
+%		child { node {example/} 
+%			child { node {\texttt{NbAESEnc.jazz}} }
+%			child { node {\texttt{NbAESEnc\_mem.jazz}} }
+%		}
+%	}
+%	child { node {compress.c}}
+%	child { node {expand.c}}
+%	child { node[selected] {field.c}}
+%	child { node {matrix.c}}
+%	child { node {sign.c}};
+%	child { node [selected] {tex}
+%		child { node {generic}}
+%		child { node [optional] {latex}}
+%		child { node {plain}}
+%	};
+;
+\end{tikzpicture}

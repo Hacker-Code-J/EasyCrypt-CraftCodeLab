@@ -1,0 +1,40 @@
+\subsection{AES Specification}
+\easycryptcode[linerange={1-3}]{listings/easycrypt/AES_spec.ec}
+\begin{itemize}
+	\item Imports the \easycryptinline{AllCore}\footnote{easycrypt/theories/core/Allcore.ec} and \easycryptinline{List}\footnote{easycrypt/theories/datatypes/List.ec} modules
+	
+	\url{https://github.com/EasyCrypt/easycrypt}
+	\item Imports specific modules (\easycryptinline{JWord}\footnote{jasmin/eclib/JWord.ec}, \easycryptinline{AES}\footnote{jasmin/eclib/AES.ec}, \easycryptinline{JModel}\footnote{jasmin/eclib/JModel.ec}) from the \easycryptinline{Jasmin} library.
+	
+	\url{https://github.com/jasmin-lang/jasmin}
+	\item Imports a module \easycryptinline{Array11}
+\end{itemize}
+
+\subsubsection{Functional Style}
+% comment
+\easycryptcode[linerange={5-6}]{listings/easycrypt/AES_spec.ec}
+
+% key_expand
+\easycryptcode[linerange={8-21}]{listings/easycrypt/AES_spec.ec}
+
+% rcon
+\easycryptcode[linerange={23-26}]{listings/easycrypt/AES_spec.ec}
+
+% key_i
+\easycryptcode[linerange={28-30}]{listings/easycrypt/AES_spec.ec}
+
+% aes
+\easycryptcode[linerange={32-36}]{listings/easycrypt/AES_spec.ec}
+
+% invaes
+\easycryptcode[linerange={38-42}]{listings/easycrypt/AES_spec.ec}
+
+% Correctness of the AES rounds
+\easycryptcode[linerange={44-67}]{listings/easycrypt/AES_spec.ec}
+
+\newpage
+\subsubsection{Pseudo Code Style}
+% comment
+\easycryptcode[linerange={69-70}]{listings/easycrypt/AES_spec.ec}
+
+\easycryptcode[linerange={72-125}]{listings/easycrypt/AES_spec.ec}

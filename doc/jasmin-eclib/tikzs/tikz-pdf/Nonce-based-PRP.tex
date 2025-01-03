@@ -1,0 +1,34 @@
+\documentclass[11pt, tikz]{standalone}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta, decorations.pathmorphing, positioning, calc}
+
+\begin{document}
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{XOR} = [
+	line width=.25mm,
+	draw,
+	circle,
+	outer sep=2pt,
+	append after command={
+		[shorten >=2bp, shorten <=2bp]
+		(\tikzlastnode.north) edge[line width=.25mm] (\tikzlastnode.south)
+		(\tikzlastnode.east) edge[line width=.25mm] (\tikzlastnode.west)}
+	]
+	
+	\node[] (pt) {Plaintext};  
+	\node[XOR, right=1cm of pt] (xor) {};
+	\node[draw, rectangle, above=2cm of xor, align=center] (prf) {PRP};
+	\node[left=1cm of prf] (key) {Key};
+	\node[above=1cm of prf] (nonce) {Nonce};
+	\node[right=1cm of xor] (ct) {Ciphertext};  
+	\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (2.075,2.25) -- node[right] {mask} ++(0,-2);
+	\draw[-{Latex}] (key) to (prf);
+	\draw[-{Latex}] (nonce) to (prf);
+	
+	%	\node [below=of xor, align=left] {$\enc(k, n, m)=m\oplus f_k(n)$\\ $\dec(k, n, c)=c\oplus f_k(n)$};
+\end{tikzpicture}
+\end{document}

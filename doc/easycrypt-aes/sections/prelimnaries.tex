@@ -1,11 +1,77 @@
 \subsection{Cryptosystem and Encryption Scheme}
+\begin{itemize}
+	\item A \textbf{cryptosystem} is the abstract formal definition encompassing all components necessary for secure communication.
+	\item An \textbf{encryption scheme} specifies the algorithms (or protocols) used to implement encryption and decryption within a cryptosystem.
+\end{itemize}
+\vfill
+\begin{figure}[h!]\centering
+\begin{tikzpicture}[
+	node distance=3cm and 4cm,
+	box/.style={draw, rounded corners, minimum width=3cm, minimum height=1cm, align=center},
+	arrow/.style={-Stealth, thick},
+	prob/.style={draw, circle, inner sep=1pt, minimum size=1cm, align=center}
+	]
+	
+	% Nodes
+	\node[box] (plaintext) {\textbf{Plaintext} \\($\mathcal{P}$)};
+	\node[box, below right=of plaintext, yshift=2cm] (encryption) {\textbf{Encryption} \\($\mathcal{E}$)};
+	\node[box, above right=of encryption, yshift=-2cm] (ciphertext) {\textbf{Ciphertext} \\($\mathcal{C}$)};
+	\node[box, above left=of ciphertext, yshift=-2cm] (decryption) {\textbf{Decryption} \\($\mathcal{D}$)};
+	\node[box, right=of plaintext] (keyspace) {\textbf{Keyspace} \\($\mathcal{K}$)};
+	
+	% Connections
+%	\draw[arrow, out=-90, in=180] (plaintext) to node[midway, above] {$p$} (encryption);
+%	\draw[arrow, out=0, in=-90] (encryption) to node[midway, above] {$c$} (ciphertext);
+%	\draw[arrow, out=90, in=0] (ciphertext) to node[midway, above] {$c$} (decryption);
+%	\draw[arrow, out=-45, in=45] (keyspace) to node[midway, right] {$k$} (encryption);
+%	\draw[arrow, out=135, in=225] (keyspace) to node[midway, left] {$k$} (decryption);
+%	\draw[arrow, out=180, in=90] (decryption) to node[midway, above] {$p$} (plaintext);
+
+	\draw[arrow] (plaintext) to node[midway, above] {$p$} (encryption);
+	\draw[arrow] (encryption) to node[midway, above] {$c$} (ciphertext);
+	\draw[arrow] (ciphertext) to node[midway, above] {$c$} (decryption);
+	\draw[arrow] (keyspace) to node[midway, right] {$k$} (encryption);
+	\draw[arrow] (keyspace) to node[midway, left] {$k$} (decryption);
+	\draw[arrow] (decryption) to node[midway, above] {$p$} (plaintext);
+\end{tikzpicture}
+\caption{Cryptosystem}
+\end{figure}
+\vfill
+\begin{figure}[h!]
+\begin{tikzpicture}[
+	node distance=3cm and 4cm,
+	box/.style={draw, rounded corners, minimum width=3cm, minimum height=1cm, align=center},
+	redbox/.style={draw, rounded corners, minimum width=3cm, minimum height=1cm, align=center, fill=red!10},
+	arrow/.style={-Stealth, thick},
+	prob/.style={draw, circle, inner sep=1pt, minimum size=1cm, align=center}
+	]
+	
+	% Nodes
+	\node[box] (plaintext) {\textbf{Plaintext} \\ ($\mathcal{P}$)};
+	\node[redbox, below right=of plaintext, yshift=2cm] (enc) {\textbf{Encryption} \\ ($\enc$)};
+	\node[box, above right=of encryption, yshift=-2cm] (ciphertext) {\textbf{Ciphertext} \\ ($\mathcal{C}$)};
+	\node[redbox, above left=of ciphertext, yshift=-2cm] (dec) {\textbf{Decryption} \\ ($\dec$)};
+	\node[redbox, right=of plaintext] (keygen) {\textbf{Key Generation} \\ ($\keygen$)};
+	
+	% Connections
+	\draw[arrow] (keygen) to node[midway, right] {$k$} (enc);
+	\draw[arrow] (keygen) to node[midway, left] {$k$} (dec);
+	\draw[arrow] (plaintext) to node[midway, above] {$p$} (enc);
+	\draw[arrow] (enc) to node[midway, above] {$c$} (ciphertext);
+	\draw[arrow] (ciphertext) to node[midway, above] {$c$} (dec);
+	\draw[arrow] (dec) to node[midway, above] {$p$} (plaintext);
+\end{tikzpicture}
+\caption{Encryption Scheme}
+\end{figure}
+
+\newpage
 \defbox[Cryptosystem]{\begin{definition}
 	A \textbf{cryptosystem} is a five-tuple \[
 	(\plaintext,\ciphertext,\keyspace,\encryption,\decryption),
 	\] where \begin{enumerate}[(i)]
-		\item $\boxed{\plaintext}$ is a finite set of plaintexts\footnote{These are the possible inputs to the encryption algorithm and typically represent meaningful data to be protected.}.
-		\item $\boxed{\ciphertext}$ is a finite set of ciphertexts\footnote{These are the encrypted outputs of the encryption algorithm corresponding to plaintexts in $\plaintext$.}. 
-		\item $\boxed{\keyspace}$ is a finite set of possible keys\footnote{Each key $k\in\keyspace$ determines a specific encryption and decryption function.}. 
+		\item $\boxed{\plaintext}$ is a finite set of all possible plaintexts\footnote{These are the possible inputs to the encryption algorithm and typically represent meaningful data to be protected.}.
+		\item $\boxed{\ciphertext}$ is a finite set of all possible  ciphertexts\footnote{These are the encrypted outputs of the encryption algorithm corresponding to plaintexts in $\plaintext$.}. 
+		\item $\boxed{\keyspace}$ is a finite set of all possible keys\footnote{Each key $k\in\keyspace$ determines a specific encryption and decryption function.}. 
 		\item $\boxed{\encryption:\keyspace\times\plaintext\to\ciphertext}$ is a deterministic function that maps a key 
 		$k\in\keyspace$ and a plaintext $p\in\plaintext$ to a ciphertext $c\in\ciphertext$. Formally:
 		\[
@@ -23,7 +89,6 @@
 	\decryption(k,\encryption(k,p))=p.
 	\]
 \end{remark}
-\newpage
 \begin{remark}[Security]
 	The security of the cryptosystem is defined with respect to a particular adversarial model. Informally, a cryptosystem is secure if an adversary with limited computational resources cannot distinguish between the ciphertexts of any two plaintexts, even if they know the encryption algorithm but do not know the key.
 \end{remark}
@@ -49,7 +114,6 @@ For every $k\in\keyspace$, $m\in\messagespace$, and $c\in\ciphertext$, the schem
 \dec(k,\enc(k,m; r))=m
 \] where $r$ represents the random bits used by $\enc$.
 \end{remark}
-\newpage
 \begin{remark}[Security]
 	The security of an encryption scheme depends on the adversarial model. For \textbf{semantic security}, an encryption scheme must satisfy the following:
 	\begin{quote}
@@ -102,7 +166,41 @@ The scheme is secure if the adversary's advantage is negligible: \[
 \] where $\lambda$ is the security parameter.
 \end{example}
 
+\newpage
 \subsection{Perfect Security}
+\begin{note}[Measure Theory]
+Let $(\Omega,\mathcal{F}, \Pr)$ be a probability space, where: \begin{itemize}
+	\item $\Omega$ is the sample space representing all possible outcomes.
+	\item $\mathcal{F}$ is a $\sigma$-algebra of subsets of $\Omega$, representing the events.
+	\item $\Pr:\mathcal{F}\to\intcc{0,1}$ is a probability measure satisfying $\Pr[\Omega]=1$.
+\end{itemize}
+\end{note}
+\begin{note}[Random Variables]
+\ \begin{itemize}
+	\item A \textbf{plaintext random variable} $X:\Omega\to\plaintext$ is a measurable function, \ie, \[
+	X^{-1}[A]\in\mathcal{F},\quad\forall A\subseteq\plaintext,\ \text{where $A$ is measurable}.
+	\] This means $X$ maps outcomes in $\Omega$ to plaintexts in a way consistent with the probability structure. The distribution of $X$, denoted $P_X$, is the pushforward measure of $P$ under $X$:
+	\[P_X(A)=P(X\in A)=P(\set{\omega\in\Omega:X(\omega)\in A}),\]
+	for all measurable subsets $A\subseteq\plaintext$.	
+	\item A \textbf{ciphertext random variable} $Y:\Omega\to\ciphertext$ is a measurable function, \ie, \[
+	Y^{-1}[B]\in\mathcal{F},\quad\forall B\subseteq\ciphertext,\ \text{where $B$ is measurable}.
+	\] This means $Y$ maps outcomes in $\Omega$ to ciphertexts in a measurable way. The distribution of $Y$, denoted $P_Y$, is the pushforward measure of $P$ under $Y$:
+	\[P_Y(B)=P(Y\in B)=P(\set{\omega\in\Omega:Y(\omega)\in B}),\]
+	for all measurable subsets $B\subseteq\ciphertext$.	
+	\item A \textbf{random variable for the key space} $K:\Omega\to\keyspace$ is a measurable function, \ie, \[
+	K^{-1}[A]\in\mathcal{F},\quad\forall A\subseteq\keyspace,\ \text{where $K$ is measurable}.
+	\] This means $K$ maps outcomes in the sample space $\Omega$ to keys in 
+	$\keyspace$ in a way consistent with the probability structure. The distribution of $K$, denoted $P_K$, is the pushforward measure of $P$ under $K$:
+	\[P_K(A)=P(K\in A)=P(\set{\omega\in\Omega:K(\omega)\in A}),\]
+	for all measurable subsets $A\subseteq\keyspace$.	
+\end{itemize}
+\end{note}
+\begin{note}
+	If the key is selected uniformly from $\keyspace$, then $P_K(A)$ is proportional to the size of $A$: \[
+	P_K(A)=\frac{\abs{A}}{\abs{\keyspace}},\quad\forall A\subseteq\keyspace.
+	\]
+\end{note}
+
 \defbox[Perfect Security of an Encryption Scheme]{\begin{definition}
 	An encryption scheme $\Pi=(\keygen,\enc,\dec)$ is \textbf{perfect security} if, for every $m\in\messagespace$, $c\in\ciphertext$, and $k\in\keyspace$ such that $\enc(k,m)=c$, the following holds: \begin{enumerate}[(i)]
 		\item \textbf{Ciphertext Independence}: \[
@@ -120,6 +218,41 @@ The scheme is secure if the adversary's advantage is negligible: \[
 \begin{remark}
 \[\Pr[M=m\mid C=c]=\Pr[M=m]\iff\Pr[C=c\mid M=m]=\Pr[C=c]\]
 \end{remark}
+
+\newpage
+\thmbox{\begin{theorem}
+	Consider a cryptosystem $(\plaintext,\ciphertext,\keyspace,\encryption,\decryption)$ where \[
+	\abs{\plaintext}=\abs{\ciphertext}=\abs{\keyspace}.
+	\] Then the cryptosystem (or encryption scheme) has perfect security if and only if \begin{enumerate}[(i)]
+		\item every key is used with equal probability $1 /\ \abs{\keyspace}$, and
+		\item $\forall x\in\plaintext,\ \forall y\in\ciphertext,\ \exists! k\in\keyspace\ \text{such that}\ \encryption_k(x)=y$.
+	\end{enumerate}
+\end{theorem}}
+\begin{proof}
+\begin{enumerate}
+	\item[($\Rightarrow$)] By definition of perfect security, \[
+	\Pr[X=x\mid Y=y]=\Pr[X=x],\quad\forall x\in\plaintext,\ y\in\ciphertext.
+	\] 
+	\begin{enumerate}[(i)]
+		\item Let $K$ be the random variable representing the key. Since the ciphertext 
+		$y$ is determined by the key $k$ and the plaintext $x$, we have: \[
+		\Pr[Y=y\mid X=x]=\Pr[\exists k\in\keyspace\ \text{such that}\ \encryption_k(x)=y].
+		\] To achieve uniform distribution of $Y$ for any fixed $x$, every key must be equality likely: \[
+		\Pr[K=k]=\frac{1}{\abs{\keyspace}},\quad\forall k\in\keyspace.
+		\]
+		\item Assume that there exists two distinct keys $k_1,k_2\in\keyspace$, with $k_1\neq k_2$, such that \[
+		\encryption_{k_1}(x)=y=\encryption_{k_2}(x),
+		\] for some $x\in\plaintext$ and $y\in\ciphertext$.
+		
+		TBA
+	\end{enumerate}
+	\item[($\Leftarrow$)] Using Bayes' Theorem: \[
+	\Pr[X=x\mid Y=y]=\frac{\Pr[Y=y\mid X=x]\Pr[X=x]}{\Pr[Y=y]}.
+	\]
+\end{enumerate}
+\end{proof}
+
+\newpage
 \begin{example}[One-Time Pad]
 The one-time pad encryption scheme is perfect security. \begin{itemize}
 	\item $\messagespace=\ciphertext=\keyspace=\set{0,1}^n$;

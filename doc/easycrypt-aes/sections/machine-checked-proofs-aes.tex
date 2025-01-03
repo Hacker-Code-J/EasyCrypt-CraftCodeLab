@@ -1,4 +1,5 @@
-\subsection{Build AES Library}
+\subsection{Cryptographic Primitive}
+\subsubsection{Build AES Library}
 
 \begin{center}
 \input{tikzs/folder-structure1}
@@ -198,7 +199,7 @@ clone export PolyArray as Array11  with op size <- 11.
 \easycryptcode[linerange={127-134}, caption={AES\_jazz.ec (lines 127-134)}, captionpos=t]{listings/AES_jazz.ec}
 
 
-\subsection{Extract AES Library for Constant-time}
+\subsubsection{Extract AES Library for Constant-time}
 \begin{center}
 %\input{tikzs/folder-structure2}
 \end{center}
@@ -206,7 +207,7 @@ clone export PolyArray as Array11  with op size <- 11.
 @~$ jasminc build/aeslib/aes.japp -CT -ec aes -ec invaes -oec AES_jazz_ct.ec
 @~$ mv AES_jazz_ct.ec Array11.ec WArray176.ec extraction/aeslib
 \end{lstlisting}
-\subsection{Build Nonce-based AES Encryption with register calling convension}
+\subsubsection{Build Nonce-based AES Encryption with register calling convension}
 \begin{center}
 %	\input{tikzs/folder-structure1}
 \end{center}
@@ -217,6 +218,7 @@ clone export PolyArray as Array11  with op size <- 11.
 \end{lstlisting}
 \newpage
 
+\subsubsection{Implementation of Nonce-based AES Encryption Scheme}
 \begin{center}
 \begin{tikzpicture}[scale=1]
 	\tikzstyle{XOR} = [
@@ -292,7 +294,6 @@ clone export PolyArray as Array11  with op size <- 11.
 \end{itemize}
 
 \newpage
-\subsection{Implementation of Nonce-based AES Encryption Scheme}
 \begin{center}
 \begin{tikzpicture}[scale=1]
 	\tikzstyle{XOR} = [

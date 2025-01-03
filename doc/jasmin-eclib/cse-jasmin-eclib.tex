@@ -1,0 +1,98 @@
+\documentclass[11pt,openany]{article}
+\input{cselab-preamble}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\input{tcolorbox}
+\input{listings}
+\input{theorem}
+\input{tikz}
+\input{cselab-commands}
+
+\usepackage{background}  % For setting background images
+
+\backgroundsetup{
+	scale=1,  % Scale the image to fit the page
+	color=black,  % Keep the image color as is
+	opacity=.1,  % Fully opaque background
+	angle=0,  % No rotation
+	vshift=1cm,  % Adjust vertical alignment if needed
+	contents={}
+}
+\newcommand{\setPageBackground}{
+	\backgroundsetup{
+		contents={\includegraphics[scale=4]{images/school-logo}}}
+}
+
+\setstretch{1.25}
+\begin{document}
+\begin{titlepage}
+\setPageBackground  % Enable background image for title page
+\begin{center}
+	{\Huge{\textbf{EasyCrypt Library in Jasmin}}\par}
+	{\LARGE\textbf{\textbf{v 1.0}}\par}
+	\vspace{0.5in}
+	{\LARGE {\textbf{Ji, Yong-hyeon}\\ (\texttt{hacker3740@kookmin.ac.kr})}\par}
+	\vfill
+	{\Large\bf \textsf{Department of Information Security, Cryptology, and Mathematics}\par}
+	{\Large\textsf{College of Science and Technology}\par}
+	{\Large\textsf{Kookmin University}\par}
+	\vspace{.75in}
+	\includegraphics[scale=.35]{images/logo.png}\par
+	\vspace{.25in}
+	{\Large\textsf{\today}\par}
+\end{center}
+\end{titlepage}
+\newpage
+
+\subsection*{File Structure}
+\input{tikzs/tree.tex}
+
+\vfill
+\subsection*{Copyright}
+%\large
+\textcopyright~ 2024 Crypto and Security Engineering Lab
+All rights reserved.
+
+This document and its content are the intellectual property of ``Ji, Yong-hyeon''. No part of this document may be reproduced, distributed, or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of the author, except in the case of brief quotations embodied in critical reviews and certain other noncommercial uses permitted by copyright law. For permission requests, write to the author at the e-mail.
+
+\vfill
+\subsection*{Changelog}
+\large
+\begin{tabular}{@{} L{0.05\textwidth} L{0.2\textwidth} L{0.7\textwidth} @{}} % Column widths specified here, change as needed for your content
+	\toprule
+	v1.0 & 2025-01-03 & Initial release: \\%Implementation and benchmarks.\\
+	%		v1.1 & 20XX-02-27 & Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie.\\
+	%		v1.2 & 20XX-03-15 & Sed dictum nisl non aliquet porttitor.\\
+	\bottomrule
+\end{tabular}
+
+\newpage
+
+\pagenumbering{arabic}
+
+\tableofcontents
+
+\newpage
+\section{JUtils}
+\input{sections/Jutils}
+
+\newpage
+\section{JArray}
+\input{sections/JArray}
+
+%\newpage
+\vfill
+\begin{thebibliography}{9}\large
+%	\bibitem{Introduction_to_Modern_Cryptography}
+%	Jonathan, Katz. \textit{Introduction to Modern Cryptography, Second Edition}., n.d.
+%	\bibitem{Cryptography_Made_Simple}
+%	Smart, Nigel P. \textit{Cryptography Made Simple. Information Security and Cryptography}. Cham: Springer International Publishing, 2016. https://doi.org/10.1007/978-3-319-21936-3.
+\end{thebibliography}
+
+\newpage
+\appendix
+\input{appendices/pf_tactics.tex}
+%\input{appendices/mesure_cycle.tex}
+
+\end{document}

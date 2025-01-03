@@ -1,0 +1,103 @@
+%\documentclass[tikz,border=3mm]{standalone}
+%\usepackage{amsmath}
+%\usetikzlibrary{arrows.meta, positioning, decorations.pathmorphing}
+%
+%\begin{document}
+%\begin{tikzpicture}[scale=1]
+%	\tikzstyle{XOR} = [
+%	line width=.25mm,
+%	draw,
+%	circle,
+%	outer sep=2pt,
+%	append after command={
+%		[shorten >=2bp, shorten <=2bp]
+%		(\tikzlastnode.north) edge[line width=.25mm] (\tikzlastnode.south)
+%		(\tikzlastnode.east) edge[line width=.25mm] (\tikzlastnode.west)}
+%	]
+%	
+%	\node[] (pt) {Plaintext};  
+%	\node[XOR, right=1cm of pt] (xor) {};
+%	\node[above=2.5cm of xor] (mask) {$k\xleftarrow{\$}\mathcal{K}$};
+%	\node[right=1cm of xor] (ct) {Ciphertext};  
+%	\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+%	
+%	\draw[-{Latex}] (pt) to (xor);
+%	\draw[-{Latex}] (xor) to (ct);
+%	\draw[-{Latex}] (2.25,2.75) -- ++(0,-.5) -- node[right] {mask} ++(0,-2);
+%	
+%	%	\node [below=of xor, align=left] {$\enc(k,m)=m\oplus k$\\ $\dec(k,c)=c\oplus k$};
+%\end{tikzpicture}
+%\end{document}
+
+%\documentclass[tikz,border=3.14mm]{standalone}
+%\usepackage{amsmath}
+%\usetikzlibrary{positioning,arrows.meta,decorations.pathreplacing}
+%
+%\begin{document}
+%	\begin{tikzpicture}[
+%		node distance=1.5cm and 2cm,
+%		box/.style={draw, rectangle, minimum width=2.5cm, minimum height=1cm, align=center},
+%		arrow/.style={-{Latex}, thick},
+%		curly/.style={decorate, decoration={brace, amplitude=10pt, mirror}},
+%		perm/.style={draw, rectangle, minimum width=2.5cm, minimum height=1cm, align=center, dashed}
+%		]
+%		
+%		% Nodes
+%		\node[box] (cipher) {$f: \{0,1\}^m \times \{0,1\}^n \to \{0,1\}^n$};
+%		\node[box, below=of cipher] (currying) {$f: \{0,1\}^m \to \text{Perm}(\{0,1\}^n)$};
+%		\node[box, below=of currying] (samplek) {$k \xleftarrow{\$} \{0,1\}^m$};
+%		\node[perm, right=of samplek] (permk) {$f_k \in \text{Perm}(\{0,1\}^n)$};
+%		\node[perm, right=of permk] (randomperm) {$P \xleftarrow{\$} \text{Perm}(\{0,1\}^n)$};
+%		
+%		% Indistinguishability label
+%		\node[below right=1cm and 2.5cm of samplek] (indist) {
+%			Indistinguishability between $f_k$ and $P$
+%		};
+%		
+%		% Arrows
+%		\draw[{Latex}-{Latex}, thick] (cipher) -- (currying);
+%		\draw[arrow] (currying) -- (samplek);
+%		\draw[arrow] (samplek) -- (permk) node[midway, above, sloped] {Currying};
+%		\draw[arrow] (permk) -- (randomperm) node[midway, above, sloped] {Comparison};
+%		
+%		% Curly brace for permutation group
+%		\draw[curly] ([yshift=0.5cm] permk.north west) -- ([yshift=0.5cm] randomperm.north east)
+%		node[midway, above=10pt] {$\text{Perm}(\{0,1\}^n)$};
+%		
+%		% Highlight indistinguishability
+%		\draw[->, thick, dashed] (permk) to[bend left] (indist);
+%		\draw[->, thick, dashed] (randomperm) to[bend right] (indist);
+%		
+%	\end{tikzpicture}
+%\end{document}
+
+\documentclass[11pt, tikz]{standalone}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta, decorations.pathmorphing, positioning, calc}
+
+\begin{document}
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{XOR} = [
+	line width=.25mm,
+	draw,
+	circle,
+	outer sep=2pt,
+	append after command={
+		[shorten >=2bp, shorten <=2bp]
+		(\tikzlastnode.north) edge[line width=.25mm] (\tikzlastnode.south)
+		(\tikzlastnode.east) edge[line width=.25mm] (\tikzlastnode.west)}
+	]
+	
+	\node[] (pt) {Plaintext};  
+	\node[XOR, right=1cm of pt] (xor) {};
+	\node[above=2.5cm of xor] (mask) {$k\xleftarrow{\$}\mathcal{K}$};
+	\node[right=1cm of xor] (ct) {Ciphertext};  
+	\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (2.25,2.75) -- ++(0,-.5) -- node[right] {mask} ++(0,-2);
+	
+	%	\node [below=of xor, align=left] {$\enc(k,m)=m\oplus k$\\ $\dec(k,c)=c\oplus k$};
+\end{tikzpicture}
+\end{document}
