@@ -149,7 +149,7 @@
 \newcommand{\dllarrow}{\raisebox{.07em}{$\mathbin{\scriptstyle\mathsf{<\mkern-3mu<\mkern-3mu-}}$}}
 \lstdefinestyle{easycrypt}{
 	upquote=true,
-	escapechar=\#,
+%	escapechar=\#,
 	mathescape=false,
 	columns=fullflexible,
 	keepspaces=true,
@@ -157,9 +157,9 @@
 	frame=tb,
 %	xleftmargin=.1\textwidth,
 %	xrightmargin=.1\textwidth,
-	rangebeginprefix={(**\ begin\ },
-	rangeendprefix={(**\ end\ },
-	rangesuffix={\ *)},
+%	rangebeginprefix={(**\ begin\ },
+%	rangeendprefix={(**\ end\ },
+%	rangesuffix={\ *)},
 	includerangemarker=false,
 	basicstyle=\small\ttfamily,
 	identifierstyle={},
@@ -179,6 +179,7 @@
 	morekeywords=[5]{exact,assumption,smt,by,reflexivity,done,solve},
 	morekeywords=[6]{admit,admitted},
 	literate=
+%	{#}{{\texttt{\#}}}1
 	{tau}{$\tau$}1
 	{sigma}{$\sigma$}1
 	% note double "_" below

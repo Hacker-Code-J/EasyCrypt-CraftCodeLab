@@ -1,0 +1,15 @@
+\easycryptcode[linerange={1-1}]{listings/AES.ec}
+
+\subsection{Operations on bytes and word}
+\easycryptcode[linerange={5-8}]{listings/AES.ec}
+\begin{itemize}
+	\item $\texttt{Sbox}:\F_{2^8}\to\F_{2^8}$
+	\item $\texttt{InvSbox}:\F_{2^8}\to\F_{2^8}$
+	\item $\texttt{InvSbox}(\texttt{Sbox}(w))=w$, where $w\in\F_{2^8}$.
+\end{itemize}
+\easycryptcode[linerange={12-22}]{listings/AES.ec}
+\begin{itemize}
+	\item Let $w=[w_0,w_1,w_2,w_3]$, where $w_i\in\F_{2^8}$. Then \begin{align*}
+		\texttt{SubWord}(w)&=[\texttt{Sbox}(w_0),\texttt{Sbox}(w_1),\texttt{Sbox}(w_2),\texttt{Sbox}(w_3)]
+	\end{align*}
+\end{itemize}

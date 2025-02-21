@@ -1,0 +1,150 @@
+In \EasyCrypt, as in many interactive proof assistants, proving a lemma is broken down into goals. At any point, you are focused on exactly one goal, though there may be others waiting to be proved. Each goal consists of an ordered list of assumptions (displayed above the horizontal bar) and a single conclusion (displayed below the bar).
+
+\EasyCrypt provides tactics that transform a goal into zero or more subgoals. Whenever you apply a tactic to the current goal, the newly generated subgoals must in turn be proved (or otherwise discharged) before returning to any previously open goals.
+
+\subsection{Proof Process}
+
+In \EasyCrypt, when we undertake the proof of a lemma (proposition), we typically maintain a \textit{list of open proof obligations} called \textit{goals}. Each goal resembles a \textit{sequent} in sequent calculus, consisting of:
+\begin{itemize}
+	\item An \textbf{ordered set of assumptions (hypotheses)} above the horizontal bar.  
+	\item A \textbf{conclusion (the statement we need to prove)} below the bar.
+\end{itemize}
+Symbolically, one might see something like: \[
+\infer{C}{H_1,\;H_2,\;\dots,\;H_n}
+\] where \(H_i\) are the current hypotheses and \(C\) is the claim to be proven.
+
+In a typical pen-and-paper proof, we would say: ``Given assumptions \(H_1,\dots,H_n\), show \(C\).'' In \EasyCrypt, the \textbf{goal} is simply that same structure, but maintained automatically in the proof environment.
+
+A \textbf{tactic} is a formal instruction that \textit{transforms} the current goal into one or more \textit{subgoals}. It’s analogous to a proof step in a standard mathematical argument, but spelled out algorithmically. Concretely:
+\begin{itemize}
+	\item If a tactic can prove the goal outright, then the goal is \textit{discharged} (no subgoals remain).  
+	\item If a tactic partially solves or transforms the problem, \EasyCrypt will create one or more \textit{subgoals}, each of which must in turn be proven.  
+\end{itemize}
+These newly generated subgoals take priority, meaning we must show them \textit{before} returning to any other pending goals (hence the notion that subgoals ``push onto the stack'' of goals). Once all subgoals from a tactic have been proven, we can mark that original goal as completed and proceed.
+
+\newpage
+\EasyCrypt typically maintains:
+\begin{enumerate}
+	\item A \textit{list} of open goals that still require proofs.  
+	\item A notion of a \textbf{current goal} or ``focused'' goal. 
+\end{enumerate} 
+When you apply a tactic, it acts upon the \textit{focused goal}, possibly producing new subgoals. The user can switch focus among different goals (much as a mathematician might go back and forth between different parts of a proof, though in \EasyCrypt it’s done in a more regimented manner).
+
+Sometimes, during proof development (particularly when exploring or prototyping), one may choose to \textbf{accept} a goal without fully proving it. In \EasyCrypt, the tactic
+\begin{lstlisting}[style=easycrypt]
+admit.
+\end{lstlisting}
+simply declares that we will \textit{treat this goal as proven}, even though it has no proof. Mathematically, it’s akin to saying, ``we skip or assume this lemma is true for now (like a local axiom).'' In a final, fully rigorous development, one would \textit{avoid} or remove `\ecinline{admit}' calls, replacing them with proper proofs.
+
+In comparison to Traditional Proofs,
+\begin{itemize}
+	\item \textbf{Sequential structure}
+	
+	In classical ``human-level'' presentations, we also break a main theorem into lemmas (sub-theorems) or cases. In a tactic-based proof assistant, these breaks and case distinctions are spelled out as tactics, generating subgoals in an explicit, machine-checked manner.  
+	\item \textbf{Goal stacking}
+	
+	\EasyCrypt’s subgoals correspond to partial statements that must hold for the entire proof to succeed. This structure is reminiscent of natural deduction or sequent calculus, but automated, so that the system tracks which subgoals remain unsolved.  
+	\item \textbf{Modular development}
+	
+	The ability to ``admit'' a goal is practically useful for incremental or exploratory proof construction, though from a strict formal standpoint, an ``admitted'' goal is effectively an unproven assumption that might compromise full soundness if left in place.
+\end{itemize}
+
+In summary,
+\begin{itemize}
+	\item \textbf{Goals}: Each proof obligation has a set of assumptions and a conclusion.  
+	\item \textbf{Tactics}: Formal methods to rewrite, split, or discharge the current goal, often yielding additional subgoals.  
+	\item \textbf{Focus}: Proof development proceeds on the current goal, but the user can shift focus among multiple open goals.  
+	\item \textbf{Admit}: Temporarily bypass or ``give up on'' proving a goal (for prototyping or partial progress).
+\end{itemize}
+This infrastructure—tactics, subgoals, focus—is characteristic of interactive proof assistants. It provides a rigorous, structured way to build up proofs step-by-step, mirroring the logic of standard mathematical reasoning but with a finer granularity that computers can verify.
+
+\newpage
+\subsection{Introduction Patterns}
+\subsubsection{Simple}
+Introduction patterns in formal proof systems provide a structured method to decompose the goal's logical structure into manageable assumptions and variables.
+\begin{example}[\textcolor{blue}{\bfseries\texttt{move}}]
+Consider the following goal:
+\begin{lstlisting}[style=normal]
+Type variables: <none>
+
+------------------------------------------------------------------------
+forall (x y z : int), x <= y => y <= z => x <= z
+\end{lstlisting}
+Applying the command `\ecinline{move => x y z le_x_y le_y_z}' converts the universally quantified variables $\forall x,y,z$ into local variables \ecinline{x: int}, \ecinline{y: int}, \ecinline{z: int}, and the implications $x\leq y$ and 
+$y\leq z$ into local assumptions \ecinline{le_x_y} and \ecinline{le_y_z}. This transforms the goal into:
+\begin{lstlisting}[style=normal]
+Type variables: <none>
+
+x: int
+y: int
+z: int
+le_x_y: x <= y
+le_y_z: y <= z
+------------------------------------------------------------------------
+x <= z
+\end{lstlisting}
+The result is that one now must prove $x\leq z$ given those specific variables and assumptions.
+\end{example}
+\begin{example}[\textcolor{blue}{\bfseries\texttt{clear}}]
+If you have introduced an assumption that is no longer required, you can remove it explicitly using the clear command (for example, \ecinline{clear le_y_z} removes the named assumptions or variables from the environment).
+Consider:
+\begin{lstlisting}[style=normal]
+Type variables: <none>
+
+------------------------------------------------------------------------
+forall (x y z : int), x <= y => y <= z => x + 1 <= y + 1
+\end{lstlisting}
+Issuing the command `\ecinline{move => x y z le_x_y _}' yields:
+\begin{lstlisting}[style=normal]
+Type variables: <none>
+
+x: int
+y: int
+z: int
+le_x_y: x <= y
+------------------------------------------------------------------------
+x + 1 <= y + 1
+\end{lstlisting}
+\end{example}
+
+\subsubsection{Elimination}
+
+\newpage
+%\subsection{Elimination}
+%\subsection{Introduction Patterns Following Arbitrary Tactic}
+%\subsection{Case Analysis}
+%\subsection{Introduction Patterns: Simplify and Trivial}
+%\subsection{The by Tactic}
+%\subsection{Splitting Conjunctions}
+%\subsection{Proving Disjunctions}
+%\subsection{Proving Existentially Quantified Formulas}
+%\subsection{Proving Sublemmas}
+%\subsection{Applying Lemmas}
+%\subsection{Rewriting Equational Lemmas}
+%\subsection{Combining Conditional Rewritings}
+%\subsection{Rewriting Via an Introduction Pattern}
+%\subsection{Progress}
+%\subsection{Crush}
+%\subsection{Eliminating Multiple Conjunctions}
+%\subsection{Sequencing Tactics}
+%\subsection{Case Analysis on Structured Data}
+%\subsection{Moving Assumptions back to the Goal’s Conclusion}
+%\subsection{Using Induction Principles}
+%\subsection{Abstract Types}
+%\subsection{Concrete Datatypes}
+%\subsection{Combining Multiple Inequalities and Using \&\& and ||}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

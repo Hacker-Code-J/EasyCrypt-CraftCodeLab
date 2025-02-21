@@ -1,0 +1,305 @@
+\newpage
+\subsection{Type}
+\EasyCrypt provides several primitive (or ``base'') types, including:
+\begin{itemize}
+	\item \texttt{unit}, which has exactly one element (often denoted by \texttt{()}),
+	\item \texttt{int} (integers),
+	\item \texttt{bool} (Booleans),
+	\item \texttt{real} (real numbers).
+\end{itemize}
+
+More general types are formed via \textbf{product types} and \textbf{function types}. 
+A product type of two types \(t_1\) and \(t_2\) is written as \(t_1 * t_2\); similarly, for \(n\) types \(t_1,\dots,t_n\) one has \(t_1 * t_2 * \cdots * t_n\). A function type from \(t_1\) to \(t_2\) is written as \(t_1 \to t_2\). By convention in EasyCrypt:
+\begin{enumerate}
+	\item The product operator $*$ has higher precedence than the function arrow $\to$.
+	\item The function arrow $\to$ is right-associative: an expression $a\to b\to c$ is interpreted as $a\to(b\to c)$.
+\end{enumerate}
+For example, the type expression \[
+t_1 * t_2 \; \to \; t_3 \; \to \; t_4\quad\text{is parsed as}\quad (t_1 * t_2) \;\to\; (t_3 \to t_4).
+\]
+An element of this type is therefore a function that, given a pair \((x,y)\) where \(x \in t_1\) and \(y \in t_2\), returns another function. That resulting function, in turn, takes an element \(z \in t_3\) as input and produces an output in \(t_4\). Formally, such a value can be viewed as:  
+\[
+f : (t_1 \times t_2) \to (t_3 \to t_4).
+\]  
+Hence, for any \((x,y)\in t_1\times t_2\) and \(z\in t_3\), \(f(x,y)(z)\) lies in \(t_4\).
+
+
+\newpage
+\subsection{Typed Operators}
+
+%Below is a restatement in a style that might be more recognizable to a professional (abstract) algebraist or algebraic geometer—someone comfortable with categories, rings, Boolean algebras, and morphisms. The goal is to show how EasyCrypt’s “operators” are simply well-typed functions, often viewed as morphisms between algebraic objects (integers, Booleans, reals, tuples, etc.), with partial application corresponding to currying in category theory.
+%
+%1. **Typed Operators in an Algebraic Setting**
+%
+%In EasyCrypt, an *operator* is formally a function whose domain and codomain are specified by *types*. For example, let us consider two primary sorts:
+%
+%1. \(\mathsf{int}\), interpreted as the ring \(\mathbb{Z}\) of integers.  
+%2. \(\mathsf{bool}\), interpreted as the Boolean algebra \(\{ \text{false}, \text{true} \}\) under \(\land,\lor,\lnot\).  
+%
+%When we write
+%\[
+%\texttt{op } f(x,y : int) = \texttt{if } 0 < x \texttt{ then } x - 2 * y \texttt{ else } 1,
+%\]
+%we are defining a function  
+%\[
+%f : \mathbb{Z} \times \mathbb{Z} \;\longrightarrow\; \mathbb{Z}.
+%\]
+%In classical mathematical terms, this is a piecewise-defined function on \(\mathbb{Z}\times \mathbb{Z}\), given by
+%
+%\[
+%f(x,y) \;=\; 
+%\begin{cases}
+%	x - 2y, & \text{if } x > 0, \\
+%	1, & \text{otherwise}.
+%\end{cases}
+%\]
+%
+%Similarly,  
+%\[
+%\texttt{op } g(a,b : bool) = \; \lnot(a \land b) \;\land\; (a \lor b)
+%\]
+%defines a function
+%\[
+%g : \{\text{false},\text{true}\} \times \{\text{false},\text{true}\}
+%\;\longrightarrow\; \{\text{false},\text{true}\},
+%\]
+%using the usual Boolean operations of *negation* (\(\lnot\)), *conjunction* (\(\land\)), and *disjunction* (\(\lor\)).
+%
+%2. **Curried vs. Uncurried Form**
+%
+%Even though from a purely algebraic viewpoint we can write \(f : \mathsf{int}\times \mathsf{int}\to\mathsf{int}\), EasyCrypt (like many typed functional languages) uses *curried* types. Hence we see:
+%
+%\[
+%f : \mathsf{int} \;\to\; \mathsf{int} \;\to\; \mathsf{int},
+%\]
+%meaning \(f\) can be regarded as a function that, when given one integer \(x\), returns *another* function \(\mathsf{int}\to\mathsf{int}\). In category theory, this corresponds to the exponential object construction: \(\mathbf{Hom}(A\times B,C)\cong \mathbf{Hom}(A,\mathbf{Hom}(B,C))\).
+%
+%Concretely, in EasyCrypt:
+%
+%```ocaml
+%op f : int -> int -> int
+%op g : bool -> bool -> bool
+%```
+%
+%3. **Partial Application**
+%
+%One consequence of curried function types is the notion of *partial application*. If 
+%\[
+%f : \mathsf{int} \to \bigl(\mathsf{int}\to \mathsf{int}\bigr),
+%\]
+%then applying \(f\) to a single integer argument (say, \(4\)) yields a new operator of type \(\mathsf{int}\to \mathsf{int}\). Written in EasyCrypt,
+%
+%```ocaml
+%op p : int -> int = f 4.
+%op y : int        = p 5.   (* y = f(4)(5) *)
+%```
+%
+%Here \(p\) is exactly the function \(y \mapsto f(4,y)\). For the piecewise example above, \(\bigl(f(4)\bigr)(5)\) evaluates to \(-6\) (since \(4>0\) and so \(4 - 2\cdot 5 = -6\)).
+%
+%In algebraic or categorical language: from the morphism \(f : A\times B \to C\) we obtain \(\widetilde{f} : A\to C^B\). Evaluating \(\widetilde{f}\) at \(a\in A\) yields a morphism \(B\to C\). That is precisely “partial application.”
+%
+%4. **Overloading, Tuples, and Type Conversions**
+%
+%4.1 Overloading Operators
+%EasyCrypt allows the *operator symbol* “\(*\)” to be interpreted as multiplication in either \(\mathbb{Z}\) or \(\mathbb{R}\). Mathematically, this corresponds to reusing the same notation for different algebraic structures (e.g., the ring \(\mathbb{Z}\) vs. the field \(\mathbb{R}\)), as long as the type context clarifies which structure is intended.
+%
+%4.2 Tuples and Projections
+%EasyCrypt supports finite products (tuples). One writes `(a1, a2, a3)` for a triple, and uses `.2` to project the second component. E.g. `(1,3,5).2 = 3`. In category-theoretic language, if \((a_1,a_2,a_3)\) is an element of \(A_1\times A_2\times A_3\), the projection `.2` is the canonical morphism onto the second factor.
+%
+%4.3 Conversion from \(\mathbb{Z}\) to \(\mathbb{R}\)
+%The notation `x%r` casts the integer \(x\) into the corresponding real number, i.e., an inclusion map \(\mathbb{Z}\hookrightarrow \mathbb{R}\). If \(x\) has type \(\mathsf{int}\), then `x%r` is simply the real number \(\text{(float)}(x)\).
+%
+%5. **Anonymous Functions (Lambdas)**
+%
+%Just as in \(\lambda\)-calculus, one can define functions *anonymously* without naming them. For instance,
+%
+%```ocaml
+%op f : int -> bool = fun (x : int) => x = 0.
+%op h : (int -> bool) -> bool = fun (f : int -> bool) => f 3.
+%op x : bool = h f.
+%```
+%
+%translates to:
+%
+%1. \(f\) is the function \(\mathbb{Z} \to \{\text{false},\text{true}\}\) given by \(x\mapsto (x=0)\).  
+%2. \(h\) is a higher-order function \(\bigl(\mathbb{Z}\to \{\text{false},\text{true}\}\bigr)\to \{\text{false},\text{true}\}\), defined by \(h(g) = g(3)\).  
+%3. Therefore, `x = h f` evaluates to \(f(3)\), which is \(\text{false}\), since \(3 \neq 0\).
+%
+%In purely algebraic terms, this is the idea of having exponentials in the category of types—allowing morphisms whose inputs are themselves morphisms.
+%
+%6. **Perspective from Algebra and Category Theory**
+%
+%1. **Typed Operators as Morphisms**. Each EasyCrypt operator corresponds to a morphism \(A\to B\) in a suitable category (of types). For multi-argument operators, one often views them as morphisms out of a product \(A_1\times A_2\times\cdots\).
+%
+%2. **Curried Types Reflect Exponential Objects**. The “\(\to\)” type constructor is the internal *Hom* or exponential object in a cartesian closed category. Hence an operator `int -> int -> int` is precisely a morphism \( \mathsf{int}\times \mathsf{int} \to \mathsf{int}\), up to the canonical isomorphism.
+%
+%3. **Partial Application as ‘Evaluation’**. Given \(f : A\times B \to C\), partial application is precisely the universal property of exponentiation: an element of \(\mathbf{Hom}(A\times B, C)\) is in natural bijection with an element of \(\mathbf{Hom}(A, C^B)\). In functional notation, `f a` is a morphism \(B\to C\).
+%
+%4. **Piecewise / Conditional Definitions**. Writing `if 0 < x then ... else ...` is a standard piecewise function definition in \(\mathbb{Z}\). The Boolean condition `0 < x` is itself an expression in a semiring or ring with an ordering predicate.
+%
+%7. **Conclusion**
+%
+%From an algebraic perspective, EasyCrypt’s “typed operators” are simply well-defined morphisms in the cartesian closed category of (finite or structured) types, each of which may represent a set (like \(\mathbb{Z}\)) or a Boolean algebra, etc. Operators can be combined or partially applied due to the cartesian closed structure:
+%
+%- **Cartesian**: Product types (tuples) and projections.  
+%- **Closed**: Function spaces (exponentials, i.e., `A -> B`) and currying.  
+%
+%Moreover, *overloading* is naturally understood as having distinct but similarly denoted morphisms in different ambient algebras (\(\mathbb{Z}\) vs. \(\mathbb{R}\)), and *conditionals* correspond to piecewise definitions on these sets or algebras. This structure—together with boolean connectives and the possibility to handle higher-order functions—makes EasyCrypt reminiscent of a typed \(\lambda\)-calculus with standard algebraic operations and logical constructs.
+
+\vfill
+\subsubsection{Typed Operators / Functions}
+In \EasyCrypt, a function is declared as an \textbf{operator} with a specified type. Each operator has zero or more input parameters, each of a specified type, and a codomain type. For example:
+\begin{enumerate}
+	\item Integer-valued function \(f: \Z\times \Z\to \Z\).\\
+\begin{lstlisting}[style=easycrypt]
+op f (m n : int) = if 0 < m then m - 2 * n else 1.
+\end{lstlisting} In \EasyCrypt’s syntax, one typically writes $f:\Z\to\Z\to\Z$ (a \textbf{curried} type).
+	\item Boolean function \(g:\set{0,1}\times\set{0,1}\to\set{0,1}\).\\
+\begin{lstlisting}[style=easycrypt]
+op g (a b : bool) = !(a /\ b) /\ (a \/ b).
+\end{lstlisting} In curried form, \(g : \set{0,1} \to \set{0,1} \to \set{0,1}\).
+\end{enumerate}
+\vfill
+\subsubsection{Curried Types and Partial Application}
+Although one can view \(f\) as a single function \(f : \Z\times\Z\to\Z\), \EasyCrypt (like many functional languages) treats \(f\) in curried form,
+\[
+f : \Z\;\to\; (\Z \;\to\; \Z),
+\]
+which means \(f\) is a function that, given an integer \(m\), \textbf{returns} a new function \(\Z\to\Z\). Concretely:
+\begin{itemize}
+	\item One may \textit{partially apply} \(f\) by fixing some arguments. For example:\\
+\begin{lstlisting}[style=easycrypt]
+op p : int -> int = f 4.
+op y : int = p 5.
+\end{lstlisting}
+sets `\texttt{p}' to be the function \(n \mapsto f(4,n)\). Evaluating `\texttt{p 5}' computes \(f(4,5)\). From the definition of \(f\) above (with \(4>0\)), the result is \(4 - 2\cdot 5 = -6\).
+	\item In category-theoretic language, this is simply the usual isomorphism \(\mathbf{Hom}(A \times B, C) \cong \mathbf{Hom}(A, \mathbf{Hom}(B,C))\), corresponding to \textit{currying} and \textit{partial application}.
+\end{itemize}
+
+\newpage
+\subsubsection{Overloading and Type Conversions}
+\begin{itemize}
+	\item \textbf{Overloaded Multiplication} ``\(*\)''.
+	
+	The symbol ``\(*\)'' is used both for integer multiplication \(\Z\times\Z\to\Z\) and real multiplication \(\R\times\R\to\R\). Which interpretation is used depends on the types of its operands.
+	\item \textbf{Casting \(\Z\) to \(\R\).}
+	
+	If \(n\) is an integer, the notation `\texttt{n\%r}' denotes the corresponding real number, i.e., an inclusion \(\Z\hookrightarrow \R\). This is akin to the usual embedding \(\mathbb{Z}\subseteq \mathbb{R}\) in standard mathematics.
+\end{itemize}
+\vfill
+\subsubsection{Tuples and Projection}
+\EasyCrypt supports \textbf{finite product types} (tuples). For instance, `\texttt{(1,3,5).2}' evaluates to the second component of the triple `\texttt{(1,3,5)}', which is `\texttt{3}'.
+
+Formally, if \((a_1,a_2,a_3)\in A_1\times A_2\times A_3\), then `\texttt{.2}' is the canonical projection \(\pi_2 : A_1\times A_2\times A_3 \to A_2\). In standard mathematical notation, \(\pi_2(a_1,a_2,a_3) = a_2\).
+
+\vfill
+\subsubsection{Anonymous (Lambda) Functions}
+Besides named operators, one may define an operator \textit{anonymously}, akin to a lambda expression in \(\lambda\)-calculus. For example:\\
+\begin{lstlisting}[style=easycrypt]
+op f : int -> bool = fun (x : int) => x = 0.
+op h : (int -> bool) -> bool = fun (f : int -> bool) => f 3.
+op x : bool = h f.
+\end{lstlisting}
+Translates to:
+\begin{itemize}
+	\item \(f : \Z\to\set{0,1}\) given by \(n \mapsto (n=0)\).  
+	\item \((h : \Z\to\set{0,1})\to\set{0,1}\) given by \(f\mapsto f(3)\).  
+	\item Hence `\texttt{x = h f}' evaluates to \(f(3)\), i.e., \((3=0)\), which is `\texttt{false}'.
+\end{itemize}
+In standard functional notation, we might write \[
+f(x) = \bigl[x=0\bigr]
+\quad
+\text{and}
+\quad
+h(f) = f(3).
+\]
+Then \(x = h(f)\) is simply \(f(3)\).
+
+\newpage
+\subsubsection{Summary}
+\begin{itemize}
+	\item \textbf{Operators} are typed functions or morphisms \(A \to B\). When multiple parameters are present, \EasyCrypt treats them in \textit{curried} form (iterated single-parameter functions).
+	\item \textbf{Conditionals} and \textbf{Boolean operators} allow piecewise function definitions and standard logical connectives (\(\land,\lor,\neg,\Rightarrow,\Leftrightarrow\)).
+	\item \textbf{Partial application} arises naturally from the curried perspective.
+	\item \textbf{Overloading} and \textbf{type conversions} reflect standard algebraic conventions,\ e.g.,\ reusing ``\(*\)'' for multiplication in both \(\mathbb{Z}\) and \(\mathbb{R}\), and embedding \(\mathbb{Z}\) into \(\mathbb{R}\).
+	\item \textbf{Tuples} and the \textbf{projection} `\texttt{.n}' reflect the standard product structure of types.
+	\item \textbf{Anonymous functions (lambdas)} are convenient for defining ad hoc operators without naming them globally, precisely as in functional or category-theoretic formulations of higher-order morphisms.
+\end{itemize}
+These features align with typical treatments in typed functional languages and in cartesian closed categories, where products model tuples and exponentials model function spaces.
+
+\newpage
+\subsection{Axioms and Lemmas}
+In \EasyCrypt, one may introduce \textbf{axioms} (unproven assumptions) and \textbf{lemmas} (propositions that must be proven) in a manner reminiscent of formal proof systems:
+\begin{enumerate}
+	\item \textbf{Axioms} 
+	
+	An example is: \\
+\begin{lstlisting}[style=easycrypt]
+axiom h_an (n : int) : n <> 0 => h n.
+\end{lstlisting}
+	This states that for any integer \(n\neq 0\), the predicate \(h(n)\) (i.e., the application of some Boolean-valued function \(h\) to \(n\)) is true. In more classical logical notation:  
+	\[
+	\forall n \in \mathbb{Z}\setminus\set{0},\ h(n).
+	\]
+	\item \textbf{Lemmas}
+	
+	A typical lemma in propositional logic might be \\
+\begin{lstlisting}[style=easycrypt]
+lemma not_or (a b : bool) : !(a \/ b) => !a /\ !b.
+proof.
+  ...
+qed.
+\end{lstlisting}
+	In classical propositional calculus, this is the well-known fact that \(\neg (a \lor b)\) implies \(\neg a \land \neg b\). Formally,  
+	\[
+	\neg (a \lor b)\;\Rightarrow\;(\neg a \;\land\;\neg b).
+	\]  
+	The proof of such a lemma is carried out by a \hl{tactic-based} script in \EasyCrypt (omitted here).
+\end{enumerate}\vfill\noindent
+In summary, \begin{itemize}
+\item \textbf{Axioms} in \EasyCrypt assert universally quantified statements as unquestioned premises, much like postulates in a deductive system.
+\item \textbf{Lemmas} are statements that require a proof via tactic-based reasoning (akin to small, targeted proofs in a proof assistant).
+\end{itemize}
+
+\newpage
+\subsection{Theories}
+\EasyCrypt organizes its standard library into \texttt{theories}, which are collections of:
+\begin{itemize}
+	\item \textbf{Operators} (i.e., function symbols),  
+	\item \textbf{Axioms} (assertions accepted without proof within that theory),  
+	\item \textbf{Lemmas} (theorems or propositions that can be proven), and  
+	\item \textbf{Subtheories} (nested modules or subordinate theories).
+\end{itemize}
+For example, `\texttt{AllCore}' is a top-level library theory that includes the core subtheories `\texttt{Int}' (for the integers, \(\mathbb{Z}\)) and `\texttt{Real}' (for the real numbers, \(\mathbb{R}\)).  
+
+In summary, \textbf{Theories} serve as modules or namespaces collecting definitions (operators), axioms, lemmas, and subtheories.
+%When one writes
+%\begin{lstlisting}[style=easycrypt]
+%require import T.
+%\end{lstlisting}
+%the contents of theory `\texttt{T}' become available \textit{without} requiring explicit qualification. For example, an operator `\texttt{f}' from theory `\texttt{T}' can be referred to simply as `\texttt{f}' rather than `\texttt{T.f}'. If the keyword `\ecinline{import}' is omitted, one may still refer to `\texttt{T.f}' but not just `\texttt{f}'.
+
+\subsection{Printing and Searching}
+\subsubsection{Printing}
+\EasyCrypt provides commands to \textit{inspect} existing definitions (operators, lemmas, axioms) in the environment. For instance:
+\begin{lstlisting}[style=easycrypt]
+print g.	(* displays the definition or type of the operator `g' *)
+print [!].	(* displays details about the unary operator `!' *)
+print (/\).	(* similarly shows information about the binary operator `/\' *)
+\end{lstlisting}
+The bracket notation `\texttt{[ ]}' or `\texttt{( )}' is how \EasyCrypt denotes operators that might be syntactically ``infix'' or ``prefix'' in code but are stored in the system as named symbols.
+\subsubsection{Searching}
+One can use the `\ecinline{search}' command to locate all lemmas and axioms in the current environment that involve \textit{all} of a specified set of operators. For example:
+\begin{lstlisting}[style=easycrypt]
+search [!] (\/) (=>).
+\end{lstlisting}
+looks for every lemma or axiom that includes logical negation, disjunction, and implication. If an operator is only an \textit{abbreviation}, you may need to search for the underlying primitive symbol instead.
+
+In summary, `\ecinline{print}' and `\ecinline{search}' commands facilitate exploring the library: one can display definitions or search for all results involving certain logical or arithmetic symbols.
+
+
+
+
+
+
+

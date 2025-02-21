@@ -1,0 +1,111 @@
+\subsection{Type Expressions}
+\EasyCrypt’s \textbf{type expressions} are derived from four fundamental constructs: \begin{enumerate}
+	\item type variables, 
+	\item type constructors (or named types), 
+	\item function types, and 
+	\item tuple (product) types. 
+\end{enumerate} Type constructors may represent either built-in types or user-defined types, including record types and datatypes (variant types). Figure 0.0 outlines the syntax of these type expressions. Notably, all EasyCrypt types must be inhabited---that is, none can be empty.
+\begin{figure}[h!]\centering
+\begin{bnf}
+$\tau,\sigma$ : ::=
+| \texttt{tyvar} : type variable
+| \texttt{\_} : anonymous type variable
+| \texttt{($\tau$)} : parenthesized type
+| \texttt{$\tau\to\sigma$} : function type
+| \texttt{($\tau_1*\cdots*\tau_n$)} : tuple type
+| \texttt{tyname} : named type
+| \texttt{$\tau$ tyname} : applied type constructor
+| \texttt{($\tau_1, \cdots, \tau_n$) tyname} : ibid.
+;;
+%$e$ : \textsf{Expr} ::=
+%| $x$ : variable
+%| $n$ : numeral
+%| \texttt{$e$ + $e$} : addition
+%| \texttt{$e$ * $e$} :
+%multiplication
+%| \texttt{$e$
+%	\textasciicircum{} $e$} :
+%concatenation
+%| \texttt{len($e$)} : length
+%| \texttt{let $x$ = $e_1$ in
+%	$e_2$} : definition
+\end{bnf}
+\caption{\EasyCrypt’s type expressions}
+\end{figure}
+\begin{enumerate}
+	\item \textit{A type variable}.
+	
+	These act like free variables for which a concrete type might later be substituted.
+	\item \textit{An anonymous type variable}.  
+	
+	Serves as a placeholder when the specific identity of a type variable is unimportant or omitted.
+	\item \textit{A parenthesized type}, used purely for grouping.  
+	
+	E.g. \((\tau)\) is the same as \(\tau\), but parentheses may clarify precedence.
+	
+	\item \textit{A function type}.
+	  
+	In standard category-theoretic terms, this is the type \(\tau \to \sigma\) of morphisms from \(\tau\) to \(\sigma\). It is also akin to the set of total functions from the set (or type) \(\tau\) to the set (type) \(\sigma\).
+	
+	\item \textit{A tuple type}.
+	  
+	Interpreted as a \textit{product type}, i.e., \(\tau_1 \times \cdots \times \tau_n\).  
+	
+	\item \textit{A named type}.  
+	
+	This might be a base type (like \(\texttt{int}, \texttt{bool}\), or \(\texttt{real}\)) or another type name declared in a theory. Algebraically, one can think of these as \textit{atomic} or \textit{defined} types.
+	
+	\item \textit{An applied type constructor} in unary form.  
+	
+	For instance, if \(\mathtt{tyname}\) is a unary type constructor \(T\), then \(\tau\ \mathtt{tyname}\) is the \textit{instantiation} of \(T\) at the type \(\tau\).  
+	
+%	In functional languages, you might see something like `\texttt{list a}' or `option β`. This syntax is similar: one has a constructor \(T\) that is parameterized by the type variable \(\tau\).
+	
+	\item \textit{An applied type constructor} taking \(n\) parameters.  
+	
+	If \(\mathtt{tyname}\) is an \(n\)-ary constructor (like a generic container type \(\mathrm{Map}(\cdot,\cdot)\) expecting two type parameters), then \(\bigl(\tau_1,\ldots,\tau_n\bigl)\ \mathtt{tyname}\) is its instantiation at types \(\tau_1,\ldots,\tau_n\).
+	
+	Mathematically, think of this as \(T(\tau_1,\dots,\tau_n)\), where \(T\) is an \(n\)-ary functor on types.
+\end{enumerate}
+
+
+%\begin{center}
+%	\begin{bnf}
+%		$\tau$ : \textsf{Type} ::=
+%		| \texttt{num} : numbers
+%		| \texttt{str} : strings
+%		;;
+%		$e$ : \textsf{Expr} ::=
+%		| $x$ : variable
+%		| $n$ : numeral
+%		| \texttt{$e$ + $e$} : addition
+%		| \texttt{$e$ * $e$} :
+%		multiplication
+%		| \texttt{$e$
+%			\textasciicircum{} $e$} :
+%		concatenation
+%		| \texttt{len($e$)} : length
+%		| \texttt{let $x$ = $e_1$ in
+%			$e_2$} : definition
+%	\end{bnf}
+%\end{center}
+%
+%\begin{bnf}[
+%	colspec = {llcll},
+%	column{1} = {font = \sffamily},
+%	column{2} = {mode = dmath},
+%	column{4} = {font = \ttfamily},
+%	]
+%	\tau : Type ::=
+%	| num : numbers
+%	| str : strings
+%	;;
+%	e : Expr ::=
+%	| $x$ : variable
+%	| $n$ : numeral
+%	| $e$ + $e$ : addition
+%	| $e$ * $e$ : multiplication
+%	| $e$ \textasciicircum{} $e$ : concatenation
+%	| len($e$) : length
+%	| let $x$ = $e_1$ in $e_2$ : definition
+%\end{bnf}

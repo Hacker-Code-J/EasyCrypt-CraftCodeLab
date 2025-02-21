@@ -1,0 +1,47 @@
+\section{Cartesian Closed Category (CCC)}
+
+\defbox[Cartesian Closed Category (CCC)]{\begin{definition*}
+ A \textbf{cartesian closed category (CCC)} is a category $\mathcal{C}$ that has \begin{enumerate}[(i)]
+ 	\item A \textbf{terminal object} $1$.
+ 	\item \textbf{Finite products}: For each pair of $X,Y\in\text{Obj}(\mathcal{C})$, there is a product object $X\times Y$.
+ 	\item \textbf{Exponential objects} (or \textbf{function spaces}): For each pair of $X,Y\in\text{Obj}(\mathcal{C})$, there is an object $Y^X$ (written also as $\text{Hom}_{\mathcal{C}}(X,Y)$ in some texts) together with the usual adjunction isomorphism $\text{Hom}_{\mathcal{C}}(Z\times X, Y)\simeq\text{Hom}_{\mathcal{C}}(Z,Y^X)$.
+ \end{enumerate}
+\end{definition*}}
+We can think of these conditions as ensuring that $\mathcal{C}$ behaves like the category of sets: you can form products of objects (analogs of Cartesian products of sets) and you can also form exponentials (analogs of set functions, i.e., function spaces).
+
+When we talk about the \textbf{type system} of a functional programming language (or a proof assistant, or a proof language like EasyCrypt), we usually consider:
+\begin{enumerate}
+	\item \textbf{Base types} (sometimes called ``atomic'' or ``ground'' types), e.g. 
+	\texttt{unit}, \texttt{int}, \texttt{bool}, \texttt{real}, etc.
+	\item \textbf{Product types} $t_1*t_2$, which correspond to ordered pairs whose first component has type $t_1$ and second component has type $t_2$.
+	\item \textbf{Function types} $t_1\to t_2$, which correspond to (total) functions that take an input of type $t_1$ and produce an output of type $t_2$.
+\end{enumerate}
+We form a category $\mathcal{C}$ where: \begin{itemize}
+	\item \textbf{Objects} are the various types.
+	\item Morphisms $\sigma:t_1\to t_2$ are the terms (or expressions) that map values of type 
+	$t_1$ to values of type $t_2$.
+\end{itemize} Then \begin{itemize}
+\item \textbf{Terminal object}: The type \texttt{unit} is the \textit{terminal object} because there is exactly one element of type \texttt (the value \texttt{()}), and thus exactly one morphism from any type $t$ to \texttt{unit}.
+\item \textbf{Finite products}: The \textit{product type} $t_1*t_2$ is the categorical product in $\mathcal{C}$. In particular, there are \textit{natural projection morphisms} \[
+\pi_1:t_1*t_2\to t_1,\quad \pi_2:t_1*t_2\to t_2,
+\] and for any type $u$ with morphisms $f:u\to t_1$ and $g:u\to t_2$, there is a unique morphism \[
+\langle f,g\rangle:u\to t_1*t_2
+\] that factors through those projections.
+\item \textbf{Exponentials (function spaces)}: The function type $t_1\to t_2$ is the \textit{exponential object} of $t_2$ by $t_1$. Concretely, the usual \textit{currying} isomorphism in functional programming \[
+(t_1*t_2)\to t_3\simeq t_1\to(t_2\to t_3)
+\] matches the CCC axiom of having an isomorphism \[
+\text{Hom}(Z\times X, Y)\simeq\text{Hom}(Z,Y^X),
+\] capturing that you can either view a function of two arguments as taking a pair 
+$(x,y)$ in one go, or equivalently as taking $x$ first and then returning a function of 
+$y$.
+\end{itemize}
+Therefore, the presence of a terminal type \texttt{unit}, product types (to serve as categorical products), and function types (to serve as exponentials) means that \textbf{the category of types and terms in EasyCrypt is cartesian closed}.
+
+Intuitively, \begin{itemize}
+	\item ``Cartesian'' because we can form product types ($\times$) and have a terminal type (like the set with one element).
+	\item ``Closed'' because we also have an internal notion of function space, i.e., the type $t_1\to t_2$.
+\end{itemize}
+This structure underlies the standard interpretation of simply typed $\lambda$-calculus, higher-order logic, and functional programming languages. In short, once you have ``pair types'' and ``function types'' in a well-behaved way, you get a cartesian closed category.
+
+
+

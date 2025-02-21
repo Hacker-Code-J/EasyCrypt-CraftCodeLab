@@ -1,0 +1,198 @@
+The ambient logic in \EasyCrypt serves as the foundation for all proof scripts. To gain a deeper understanding of its functionality, we will explore several examples. 
+%All the examples discussed in this section are also included in the `\texttt{ambient-logic.ec}' file. While it is strongly recommended to work through this file using \EasyCrypt in the \ProofGeneral + \Emacs environment, reading through this chapter alone will provide a solid understanding of ambient logic and the associated proof tactics introduced here.
+
+As demonstrated in the earlier motivating example, formal proofs are constructed as a sequence of proof tactics. Up to this point, we have only encountered the admit tactic. In this chapter, we will expand on this by introducing additional basic tactics and applying them to simple mathematical properties of integers.
+
+\subsection{Basic Tactics and Theorem Proving}
+\EasyCrypt features a typed expression language, meaning every declared entity must either have an explicitly defined type or a type that can be inferred from the context. As previously noted, \EasyCrypt provides basic built-in data types, which can be accessed by importing the relevant theories into the current environment. For this particular file, we will work with the `\ecinline{Int}' theory file. Additionally, to enable \EasyCrypt to display all the proof goals during our work, we use a directive known as a pragma.\\
+\eccode[linerange={1-2}, caption={Imports and pragma}]{listings/ambient-logic-tatics.ec}
+
+Typically, the initial steps in \EasyCrypt scripts involve importing the required theories and setting the appropriate pragmas. Before delving into cryptography, it is essential to understand how to guide \EasyCrypt in modifying proof goals and making progress. This process is facilitated by the use of tactics. In general, the proofs for lemmas in \EasyCrypt follow a structured approach, as illustrated below:\\
+\eccode[caption={Proof script form}]{listings/proof_script_form.ec}
+
+\subsubsection{Tactic: \ecinline{trivial}}
+We begin by exploring some basic properties of integers and demonstrating how a few key tactics operate in \EasyCrypt.
+
+Reflexivity, the property that any integer is equal to itself, can be expressed mathematically as: \[
+\forall n\in\Z,\ n=n.
+\] In EasyCrypt, this property can be stated as a lemma and proved as follows:\\
+\eccode[linerange={4-7}, caption={Using the \ecinline{trivial} tactic}]{listings/ambient-logic-tatics.ec}
+
+Once the lemma is declared and evaluated, \EasyCrypt populates the goal pane with the statement that needs to be proved. For this lemma, the goal pane displays the reflexivity property.\\
+%caption={Goal upon evaluating `\ecinline{int_refl}'}
+\begin{lstlisting}[style=normal]
+Current goal
+Type variables: <none>
+----------------------------
+forall (n : int), n = n
+\end{lstlisting}
+
+The proof script begins with the \ecinline{proof} keyword, after which \EasyCrypt expects the application of tactics to close the goal. In this case, we use the trivial tactic to prove the lemma \ecinline{int_refl}. Upon applying \ecinline{trivial}, the goal pane is cleared since this tactic successfully resolves the goal. When all goals are resolved, the proof can be concluded with \ecinline{qed}. This saves the lemma for future use, and \EasyCrypt provides confirmation in the response pane as shown:\\
+\begin{lstlisting}[style=normal]
++ added lemma: `int_refl'
+\end{lstlisting}
+The \ecinline{trivial} tactic attempts to solve the goal by applying a variety of internal tactics. While it may sometimes be unclear when it will succeed, the advantage of \ecinline{trivial} is that it never fails—it either resolves the goal or leaves it unchanged. This makes it a safe and effective tactic to apply without any risk of disruption.
+
+\newpage
+\subsubsection{Tactic: \ecinline{apply}}
+Once the lemma \ecinline{int_refl} is proved, \EasyCrypt stores it and allows us to use it to prove other lemmas. This is accomplished using the \ecinline{apply} tactic. For example:\\
+\eccode[linerange={9-12}, caption={Using the \ecinline{apply} tactic}]{listings/ambient-logic-tatics.ec}
+The \ecinline{apply} tactic works by attempting to match the conclusion of the provided proof term with the goal’s conclusion. If a match is found, the goal is replaced by the subgoals of the proof term.
+
+In this case, \EasyCrypt matches \ecinline{int_refl} with the goal’s conclusion, verifies the match, and replaces the goal with the subgoals required for \ecinline{int_refl}. Since there are no additional subgoals to prove for \ecinline{int_refl}, the proof is concluded successfully.
+
+\EasyCrypt also includes a library of predefined lemmas and axioms that can be used to facilitate proofs. For example, \ecinline{addzC} and \ecinline{addzA} are axioms related to the commutativity and associativity of integer addition, respectively. We can inspect these predefined lemmas and axioms using the \ecinline{print} command. For instance, running \ecinline{print addzC} and \ecinline{print addzA} prompts \EasyCrypt to display the following:\\
+\begin{lstlisting}[style=easycrypt]
+axiom nosmt addzC: forall (x y : int), x + y = y + x.
+\end{lstlisting}
+\begin{lstlisting}[style=easycrypt]
+axiom nosmt addzA: forall (x y z : int), x + (y + z) = x + y + z.
+\end{lstlisting}
+
+\newpage
+\subsubsection{Tactic: \ecinline{simplify}}
+In proofs, it is common for tactics to produce goals that can be simplified. To handle such cases, we use the \ecinline{simplify} tactic, which reduces the goal to its normal form using principles of lambda calculus. While the underlying mechanics of this process need not concern us, it is crucial to understand that \EasyCrypt simplifies goals whenever possible, provided it has sufficient knowledge to do so. If the goal is already in normal form, the simplify tactic leaves it unchanged.
+
+For example, the following illustration demonstrates the use of the \ecinline{simplify} tactic:\\
+\eccode[linerange={14-24}, caption={Using the \ecinline{simplify} tactic}]{listings/ambient-logic-tatics.ec}
+\begin{center}
+\begin{minipage}{.25\textwidth}
+\begin{lstlisting}[style=normal]
+Current goal
+Type variables: <none>
+
+x: int
+----------------------
+x + 2 * 3 = 6 + x
+\end{lstlisting}
+\end{minipage}\hfill$\xrightarrow{\color{blue}\texttt{\bfseries simplify}}$\hfill
+\begin{minipage}{.25\textwidth}
+\begin{lstlisting}[style=normal]
+Current goal
+Type variables: <none>
+
+x: int
+----------------------
+x + 6 = 6 + x
+\end{lstlisting}
+\end{minipage}\hfill$\xrightarrow{\color{blue}\texttt{\bfseries simplify}}$\hfill
+\begin{minipage}{.25\textwidth}
+\begin{lstlisting}[style=normal]
+Current goal
+Type variables: <none>
+
+x: int
+----------------------
+x + 6 = 6 + x
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+\newpage
+\subsubsection{Tactics: \ecinline{move}, \ecinline{rewrite}, \ecinline{assumption}}
+Until now, we have worked with lemmas that did not involve any assumptions, apart from specifying variable types. However, in most cases, we will need to incorporate assumptions about variables into our proofs. These assumptions are treated as given and are introduced into the context using the \ecinline{move =>} command, followed by the desired name for the assumption.
+
+When such assumptions appear as goals, rather than explicitly applying them, we can use the \ecinline{assumption} tactic to discharge the goal directly. This tactic instructs \EasyCrypt to automatically search for assumptions in the context that match the goal and apply them.
+
+Consider the following example, where we use the axiom \ecinline{addz_gt0}, which is stated as follows:\\
+\begin{lstlisting}[style=easycrypt]
+axiom nosmt addz_gt0: forall (x y : int), 0 < x => 0 < y => 0 < x + y.
+\end{lstlisting}
+Using this result, we construct the following proof script:\\
+\eccode[linerange={26-40}, caption={Proof for \ecinline{x_pos}}]{listings/ambient-logic-tatics.ec}
+In this proof, the \ecinline{rewrite} tactic modifies the goal by replacing the current expression with a specified pattern. For example, in this case, the goal 
+\ecinline{0 < x + 1} is rewritten using the pattern from \ecinline{addz_gt0}, resulting in subgoals that require proving the assumptions \ecinline{0 < x} and \ecinline{0 < 1}.
+\begin{center}
+\hfill\begin{minipage}{.25\textwidth}
+\begin{lstlisting}[style=normal]
+Current goal
+Type variables: <none>
+
+x: int
+----------------------
+0 < x => 0 < x + 1	
+\end{lstlisting}
+\end{minipage}\hfill$\xrightarrow[\texttt{x\_ge0}]{\texttt{\textcolor{blue}{\bfseries move} =>}}$\hfill
+\begin{minipage}{.25\textwidth}
+\begin{lstlisting}[style=normal]
+Current goal
+Type variables: <none>
+
+x: int
+x_ge0: 0 < x
+----------------------
+0 < x + 1	
+\end{lstlisting}
+\end{minipage}
+\end{center}
+\begin{center}
+\hfill$\xrightarrow[\texttt{addz\_gt0}]{\texttt{\textcolor{blue}{\bfseries rewrite}}}$\hfill
+\begin{minipage}{.35\textwidth}
+\begin{lstlisting}[style=normal]
+Current goal (remaining: 2)
+Type variables: <none>
+
+x: int
+x_ge0: 0 < x
+----------------------
+0 < x
+
+
+	Goal #2	
+	----------------------
+	0 < 1
+\end{lstlisting}
+\end{minipage}\hfill$\xrightarrow{\texttt{\textcolor{red}{\bfseries assumption}}}$\hfill
+\begin{minipage}{.25\textwidth}
+\begin{lstlisting}[style=normal]
+Current goal
+Type variables: <none>
+
+x: int
+x_ge0: 0 < x
+----------------------
+0 < 1	
+\end{lstlisting}
+\end{minipage}
+\end{center}
+Sometimes, a lemma or axiom may be rewritten to the goal, but the left-hand side (LHS) and right-hand side (RHS) of the expression might be flipped. To address this, we can rewrite the lemma or axiom in reverse by prefixing the lemma with a `\ecinline{-}' symbol. This approach enables rewriting the sides as follows:\\
+\eccode[linerange={42-47}, caption={Rewriting in reverse}]{listings/ambient-logic-tatics.ec}
+These tactics constitute the foundational tools for theorem proving in \EasyCrypt, particularly when working at the level of ambient logic.
+
+It is worth noting that these tactics, while simple, include a variety of options and intricacies. For instance, the \ecinline{move =>} tactic supports many introduction patterns, and the keyword move can be substituted with other tactics depending on the context. Expanding on these introduction patterns with clear examples would be a valuable addition to this discussion on basic tactics.
+\newpage
+\subsubsection{Commands: \ecinline{search} and \ecinline{print}}
+When working with theorems, it is often necessary to search through results already available in the environment. While we have encountered a few examples of printing in the content covered so far, it is useful to take a more detailed look at this aspect of \EasyCrypt, as it is a feature we frequently rely on.
+
+The \ecinline{print} command outputs the requested information in the response pane. This command can be used to print various elements, such as types, modules, operations, and lemmas, by using the print keyword. For example:\\
+\eccode[linerange={49-54}, caption={Using the \ecinline{print} command}]{listings/ambient-logic-tatics.ec}
+
+Keywords serve as qualifiers and filters to refine the results. However, it is not mandatory to use qualifiers; printing without them will display broader results, while qualifiers help narrow the scope of the output.
+
+The \ecinline{search} command allows us to locate axioms and lemmas involving specific operators. This command takes arguments enclosed in braces to perform the search:
+\begin{enumerate}
+	\item \texttt{[]} - Square brackets for unary operators
+	\item \texttt{()} - Round brackets for binary operators
+	\item Names of operators
+	\item Combination of these separated by a space
+\end{enumerate}
+
+\eccode[linerange={56-65}, caption={Using the \ecinline{search} command}]{listings/ambient-logic-tatics.ec}
+
+\newpage
+\subsubsection{External solvers: \ecinline{smt}}
+It is essential to understand that \EasyCrypt (\EC) was primarily designed to handle cryptographic properties and more complex constructs. While it is possible to prove general mathematical theorems and claims in \EC, the process can be cumbersome. To address the challenge of low-level logic and tactics, \EC integrates with powerful automated tools through the \ecinline{smt} tactic.
+
+When the \ecinline{smt} tactic is invoked, \EC sends the current goal and its context to external \SMT solvers, such as \ZThree and \AltErgo, which are pre-configured for use with \EC. If the \SMT solver can resolve the goal, the \ecinline{smt} tactic automatically discharges the specific subgoal. However, if the solver fails to find a solution, the proof remains incomplete, and the responsibility of resolving the goal falls back on the user.
+
+For instance, consider the following results: \begin{align*}
+\forall x\in\R,\ \forall a,b\in\Z,\ &x^{a\cdot b}=(x^a)^b,\\
+\forall x\in\R,\ \forall a,b\in\Z,\ &x\neq0\implies x^a\cdot x^b=x^{a+b}.
+\end{align*}
+These can be proved in EC using the following script:\\
+\eccode[linerange={66-83}, caption={Manual proof for \ecinline{exp_prod} and \ecinline{exp_prod2}}]{listings/ambient-logic-tatics.ec}
+Alternatively, the proof can be simplified to:\\
+\eccode[linerange={85-93}, caption={Using \ecinline{smt} to prove \ecinline{exp_prod_smt} and \ecinline{exp_prod2_smt}}]{listings/ambient-logic-tatics.ec}
+The key takeaway is that we will depend heavily on external solvers to handle a significant portion of the computational workload, particularly for results involving low-level mathematics.
+
+This chapter concludes with an overview of ambient logic. We covered fundamental tactics such as \ecinline{apply}, \ecinline{simplify}, \ecinline{move}, and \ecinline{rewrite}, along with the usage of \ecinline{search} and \ecinline{print} commands. Additionally, we explored how to work with external solvers to streamline the proving process. In subsequent chapters, we will introduce more advanced tactics and techniques to expand on this foundation.

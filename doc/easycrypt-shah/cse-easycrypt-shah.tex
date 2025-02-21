@@ -4,12 +4,12 @@
 \usepackage{longtable}
 \usepackage{array}
 \input{tcolorbox}
-%\input{lst-setup/easycrypt.lst}
-%\input{lst-setup/jasmin.lst}
 \input{listings}
 \input{theorem}
 \input{tikz}
 \input{cselab-commands}
+\usepackage{proof}
+\usepackage{simplebnf}
 
 \usepackage{background}  % For setting background images
 %% Background settings for the title page
@@ -43,14 +43,18 @@
 	}
 }
 
+\usepackage{csquotes}
 \setstretch{1.25}
 \begin{document}
 \begin{titlepage}
 \setPageBackground  % Enable background image for title page
 \begin{center}
-	{\Huge{\textbf{Machine-Checked Proofs for AES: High-Assurance Security}}\par}
-	{\LARGE\textbf{\textbf{v 1.0}}\par}
-	\vspace{0.5in}
+	{\Huge{\textbf{A Commentary for\\ ``The Joy of EasyCrypt''}}\par}
+	\vspace{0.05cm}
+	\LARGE\textit{A Beginner’s Guide to Formal Verification of Cryptography}\\
+	\vspace{.5cm}
+	{\LARGE\textbf{v 1.0}\par}
+	\vspace{.5in}
 	{\LARGE {\textbf{Ji, Yong-hyeon}\\ (\texttt{hacker3740@kookmin.ac.kr})}\par}
 %	\vspace{1.5in}
 %	\includegraphics[scale=.35]{images/school-logo-opa5}\par
@@ -67,9 +71,6 @@
 \end{titlepage}
 \newpage
 
-\subsection*{File Structure}
-\input{tikzs/tree.tex}
-
 \vfill
 \subsection*{Copyright}
 %\large
@@ -83,7 +84,7 @@ This document and its content are the intellectual property of ``Ji, Yong-hyeon'
 \large
 \begin{tabular}{@{} L{0.05\textwidth} L{0.2\textwidth} L{0.7\textwidth} @{}} % Column widths specified here, change as needed for your content
 	\toprule
-	v1.0 & 2024-12-24 & Initial release: \\%Implementation and benchmarks.\\
+	v1.0 & 2025-01-20 & Initial release: \\%Implementation and benchmarks.\\
 	%		v1.1 & 20XX-02-27 & Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie.\\
 	%		v1.2 & 20XX-03-15 & Sed dictum nisl non aliquet porttitor.\\
 	\bottomrule
@@ -94,60 +95,43 @@ This document and its content are the intellectual property of ``Ji, Yong-hyeon'
 \pagenumbering{arabic}
 \tableofcontents
 \newpage
-\section*{A Guide to Installing EasyCrypt}
-\addcontentsline{toc}{section}{A Guide to Installing EasyCrypt}
-\input{sections/install_ec}
+\section{Computer-Aided Cryptography}
+%\input{sections/computer-aided-crypto}
 
 \newpage
-\section{Preliminaries}
-\input{sections/prelimnaries}
+\section{Specification for EasyCrypt}
+\input{sections/ec-spec}
+%\section{Introduction to EasyCrypt}
+%\input{sections/easycrypt}
 
 \newpage
-%\section{Block Cipher}
-%\input{sections/block_cipher}
+\section{EasyCrypt's Ambient Logic I}
+\input{sections/ambient-logic}
+%\input{sections/ambient-logic-exer-lv1}
+%\input{sections/ambient-logic-exer-lv2}
+%\input{sections/ambient-logic-exer-lv3}
+%\input{sections/ambient-logic-advanced}
 
 \newpage
-\section{Machine-checked Proofs for AES}
-\input{sections/machine-checked-proofs-aes}
-
-%\newpage
-%\section{Easycrypt Library in Jasmin}
-%\input{sections/aeslib-jasmin}
+\section{Hoare Logic}
+\input{sections/hoare-logic}
 
 \newpage
-\section{EasyCrypt}
-\input{sections/easycrypt-aes}
-
-%\section{Tutorials}
-%\input{sections/tutorial}
-
-%
-%\newpage
-%\section{Digital Signature Scheme: ALTEQ}
-%\input{sections/sec2.tex}
-%
-%\newpage
-%\section{Field Operations}
-%\input{sections/sec3.tex}
+%\section{EasyCrypt's Ambient Logic II}
+%\input{sections/ambient-logic-2}
 
 %\newpage
 \vfill
 \begin{thebibliography}{9}\large
-	\bibitem{Introduction_to_Modern_Cryptography}
-	Jonathan, Katz. \textit{Introduction to Modern Cryptography, Second Edition}., n.d.
-	\bibitem{Cryptography_Made_Simple}
-	Smart, Nigel P. \textit{Cryptography Made Simple. Information Security and Cryptography}. Cham: Springer International Publishing, 2016. https://doi.org/10.1007/978-3-319-21936-3.
-	\bibitem{easycrypt_installation}
-	Stoughton, Alley. "EasyCrypt Installation." Accessed January 15, 2025. \url{https://alleystoughton.us/easycrypt-installation.html}.
-	
-%	\bibitem{alteq_signature_scheme}
-%	Bläser, Markus, Dung Hoang Duong, Anand Kumar Narayanan, Thomas Plantard, Youming Qiao, Arnaud Sipasseuth, and Gang Tang. \textit{The ALTEQ Signature Scheme: Algorithm Specifications and Supporting Documentation.} Version 1.1.2, March 2024. Saarland University, University of Technology Sydney, University of Wollongong, SandboxAQ, Nokia Bell Labs, and KDDI Research, Inc.
-%	\bibitem{crypto_theory_and_practice}
-%	Stinson, Douglas R., and Maura B. Paterson. \textit{Cryptography: Theory and Practice.} Fourth edition. Boca Raton: CRC Press, Taylor \& Francis Group, 2019.
+\bibitem{rosulek2019joy}
+Rosulek, Mike. \emph{The Joy of Cryptography}. 2019.
+\bibitem{shah2022joy}
+Shah, Tejas Anil. \emph{The Joy of EasyCrypt}. Master's thesis, University of Tartu, 2022.
 \end{thebibliography}
 
 \newpage
 \appendix
+\input{appendices/cartesian_closed_category}
 %\input{appendices/memeory_allocation.tex}
 %\input{appendices/mesure_cycle.tex}
 

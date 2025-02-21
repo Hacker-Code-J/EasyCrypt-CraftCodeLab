@@ -1,7 +1,107 @@
+\section{Prelude}
+\subsection{Logic}
+\subsubsection*{Principle of Functional Extensionality}
+\easycryptcode[linerange={60-60}]{listings/easycrypt/theories/prelude/Logic.ec}
+The axiom asserts: \[
+f=g\iff f==g
+\]
+\begin{itemize}
+	\item Left-hand side $(f=g)$:
+	
+	This refers to the equality of functions as mathematical objects. Two functions 
+	$f$ and $g$ are equal if they are identical, meaning they are the same function in every aspect.
+	\item Right-hand side $(f==g)$:
+	
+	This refers to pointwise equality: 
+	$f(x)=g(x)$ for all $x\in'a$
+	\item Interpretation:
+	
+	The axiom establishes that two functions are equal as mathematical objects if and only if they produce the same output for every input. This is the essence of functional extensionality.
+\end{itemize}
+
+\begin{table}[h!]
+\begin{tabularx}{\textwidth}{>{\raggedleft\arraybackslash}p{.15\textwidth}|p{.75\textwidth}}
+\toprule[1.2pt]
+Set Theory & In classical set theory (ZFC), functional extensionality is implicitly satisfied because functions are defined as sets of ordered pairs: \[
+f=\set{(x,f(x)):x\in\text{dom}(f)}.
+\] Thus, two functions are equal if and only if their values agree for every input. \\ \hline
+Category Theory & In category theory, functional extensionality corresponds to the notion that morphisms (arrows) between objects are determined by their action on elements. \\ \hline
+Constructive Mathematics & In constructive frameworks (e.g., type theory), functional extensionality may not hold by default, as functions can be defined by their computational behavior rather than just their input-output relations.\par
+In such settings, extensionality is often treated as an additional axiom. \\
+\bottomrule[1.2pt]
+\end{tabularx}
+\end{table}
+
+\newpage
+\subsubsection*{Constructive Choice Function}
+\easycryptcode[linerange={645-658}]{listings/easycrypt/theories/prelude/Logic.ec}
+\paragraph{Definition of \texttt{choiceb}} For a predicate $P:\texttt{'a}\to\set{\texttt{true},\texttt{false}}$ and a default element $x_0\in\texttt{'a}$, it selects an element $x\in\texttt{'a}$ such that $P(x)=\texttt{true}$, if such an $x$ exists. Otherwise, it defaults to $x_0$. That is, \[
+\texttt{choiceb}(P,x_0)=
+\begin{cases}
+	x&:\exists x\in\texttt{'a}:P(x)=\texttt{true}\\
+	x_0&:\forall x\in\texttt{'a}:P(x)=\texttt{false}\\
+\end{cases}
+\]
+\paragraph{Axioms for \texttt{choiceP}} If there exists an element 
+$x$ such that $P(x)=\texttt{true}$, then $\texttt{choiceb}(P,x_0)$
+satisfies $P$, \ie, $P(\texttt{choiceb}(P,x_0))=\texttt{true}$.\par
+This axiom asserts that the choice function correctly selects an element from the subset defined by $P$, whenever such an element exists. It embodies the constructive aspect of the function.
+\paragraph{\texttt{choiceb\_dfl}} If $P(x)=\texttt{false}$ for all $x\in\texttt{'a}$, then 
+$\texttt{choiceb}(P,x_0)$ returns the default value $x_0$.\par
+This axiom ensures that the function $\texttt{choiceb}$ respects its fallback behavior when the subset defined by $P$ is empty.
+\paragraph{Equality of Choices} If two predicates $P$ and $Q$ are logically equivalent (i.e., $P(x)\Leftrightarrow Q(x)$ for all $x\in\texttt{'a}$), then $\texttt{choiceb}(P,x_0)=\texttt{choiceb}(Q,x_0)$.\par
+The proof relies on the extensionality of predicates: functions 
+$P$ and $Q$ are equivalent if they have identical output for all inputs.
+\paragraph{Axiom: Irrelevance of Default for Non-Empty Subsets} If $P$ is satisfied by some element $x$, the value of $\texttt{choiceb}(P,x_0)$ is independent of the default value $x_0$.\par
+This axiom guarantees that when $\exists x\in\texttt{'a}:P(x)=\texttt{true}$, the choice function selects an element satisfying $P$, irrespective of the fallback $x_0$. This is because the fallback $x_0$ is only used when $P$ is unsatisfiable.\par
+This property reflects the \textbf{stability} of the constructive choice under changes to the fallback parameter, provided the primary condition is satisfied.
+\paragraph{Summary} These axioms and lemmas collectively define a constructive choice principle, a central concept in intuitionistic mathematics and proof systems. Unlike classical logic's unrestricted use of the axiom of choice, this constructive version ensures explicit constructability of the chosen element.
+\paragraph{Application} This construct is useful in formal verification for:
+\begin{itemize}
+	\item Selecting elements satisfying a predicate (e.g., in search or optimization problems).
+	\item Ensuring robust behavior under different edge cases (e.g., empty or singleton sets).
+	\item Proving properties of algorithms that depend on choice.
+\end{itemize}
+
+\newpage
 \section{Algebra}
 
 \subsection{IntDiv}
+\easycryptcode[linerange={17-37}]{listings/easycrypt/theories/algebra/IntDiv.ec}
+\paragraph{Quotient (\easycryptinline{\%/})}
+\paragraph{Remainder (\easycryptinline{\%\%})}
+\paragraph{Divisibility (\easycryptinline{\%|})} $m\ \texttt{\%|} d\iff m\bmod d=0$.
+%\paragraph{\texttt{euclidef}} The definition formalizes the Euclidean division, which states: For any integers $m\in\Z$ and $d\neq 0$, there exist unique integers 
+%$q,r\in\Z$ such that: \[
+%m=q\cdot d+r\quad\text{and}\quad 0\leq r<\abs{d}.
+%\] Thus,
+%\[
+%\texttt{euclidef}(m,d,(q,r))\iff\begin{cases*}
+%	m=q\cdot d+r\\
+%	0\leq r<\abs{d}&if $d\neq 0$
+%\end{cases*}
+%\]
+%\paragraph{\texttt{edivn}}
+\paragraph{Applications} The modular arithmetic constructs are essential for reasoning about cryptographic algorithms (e.g., RSA, Diffie-Hellman).
+Division and modulus operations are cornerstones for verifying number-theoretic properties.
+\newpage
+\easycryptcode[linerange={50-71}]{listings/easycrypt/theories/algebra/IntDiv.ec}
+%\begin{tikzpicture}[node distance=2cm, on grid, auto]
+%	
+%	\node[state, initial] (start) {Start: Rewrite \texttt{edivz\_def}};
+%	\node[state] (checkm) [below=of start] {Check \( 0 \leq m \)};
+%	\node[state] (posm) [right=of checkm] {Case: \( 0 \leq m \)};
+%	\node[state] (negm) [left=of checkm] {Case: \( 0 > m \)};
+%	\node[state] (checkd) [below=of checkm] {Check \( d = 0 \)};
+%	\node[state] (result) [below=of checkd] {Result: Prove lemma};
+%	
+%	\path[->]
+%	(start) edge node {Rewrite} (checkm)
+%	(checkm) edge node {If \( 0 \leq m \)} (posm)
+%	(checkm) edge node {Else} (negm)
+%	(posm) edge [bend right] node {Validate \( edivnP \)} (checkd)
+%	(negm) edge [bend left] node {Validate \( edivnP \)} (checkd)
+%	(checkd) edge node {If \( d = 0 \)} (result);
+%	
+%\end{tikzpicture}
 
-\easycryptcode[linerange={17-35}]{listings/easycrypt/theories/algebra/IntDiv.ec}
-
-\easycryptcode[linerange={69-71}]{listings/easycrypt/theories/algebra/IntDiv.ec}

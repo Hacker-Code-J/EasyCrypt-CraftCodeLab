@@ -1,0 +1,185 @@
+\subsection{EasyCrypt Environment}
+\EasyCrypt is developed in \OCaml and integrates several external tools and libraries. The key components that will be most relevant to our work are as follows:
+
+\begin{enumerate}
+	\item \textbf{\Emacs and \ProofGeneral}
+	
+	\Emacs, a widely-used open-source text editor, serves as the foundation for \ProofGeneral, a generic interface designed for proof assistants. Together, they provide the primary front-end environment for interacting with \EasyCrypt. Typically, proofs in \EasyCrypt are constructed interactively using the \Emacs + \ProofGeneral setup.
+	\item \textbf{External Provers and \WhyThree}
+	
+	Satisfiability Modulo Theory (\SMT) solvers, often referred to as external provers, are powerful tools designed to determine the satisfiability of formulas under a set of constraints. \EasyCrypt integrates with several prominent \SMT solvers, including \AltErgo, \ZThree, and \CVCFour, all of which are managed through the \WhyThree platform.
+	
+	These external provers handle much of the intricate, low-level work involved in proving mathematical results. As we will demonstrate, they significantly streamline the proving process by automating many of the more arduous and repetitive tasks.
+\end{enumerate}
+
+\subsection{A Guide to Installing EasyCrypt (v250121)}
+The official \EasyCrypt installation instructions are available on the \hyperref{https://github.com/EasyCrypt/easycrypt}{github}{ec}{EasyCrypt GitHub} repository. We provides a summary of these instructions, with a particular focus on their integration with the \hyperref{https://www.gnu.org/software/emacs/}{site}{emacs}{Emacs} text editor.\par
+\EasyCrypt can operate in batch mode from the shell (command line) to check individual \texttt{.ec} files. However, interactive proof construction is conducted within \Emacs, utilizing the generic interface \ProofGeneral, which acts as a mediator between \Emacs and \EasyCrypt, the latter running as a sub-process of Emacs.
+
+These instructions are aligned with the following software versions:
+\begin{itemize}
+	\item \OCaml compiler version 5.1.1
+	\item \WhyThree version 1.7.2
+	\item \AltErgo version 2.5.2
+\end{itemize}
+\EasyCrypt is implemented in \OCaml. \WhyThree serves as the interface to \SMT solvers used by \EasyCrypt, and \AltErgo is one of the \SMT solvers required for its operation.
+
+\subsubsection*{Step 1. Installing Emacs}
+\begin{lstlisting}[style=normal]
+@:~$ sudo apt-get install emacs
+@:~$ sudo apt-get update
+\end{lstlisting}
+
+\subsubsection*{Step 2. Installing EasyCrypt on Linux}
+\begin{itemize}
+	\item \hl{\texttt{opam init}} : creates .opam sub-directory of your home directory
+	\item \hl{\texttt{eval \$(opam env)}} : updates environment variables in current shell
+	\item \hl{\texttt{opam switch create 5.1.1}} : say which version of \OCaml compiler to build
+\end{itemize}
+\begin{lstlisting}[style=normal]
+@:~$ sudo apt-get install autoconf
+
+@:~$ opam init
+@:~$ eval $(opam env)
+
+@:~$ opam switch create 5.1.1
+@:~$ eval $(opam env)
+
+@:~$ opam pin -yn add easycrypt https://github.com/EasyCrypt/easycrypt.git
+@:~$ opam install --deps-only easycrypt
+@:~$ eval $(opam env)
+
+@:~$ opam pin why3 1.8.0
+@:~$ opam pin alt-ergo 2.5.2
+\end{lstlisting}
+
+There are binaries at this URL \url{https://github.com/Z3Prover/z3/releases/tag/z3-4.12.4}. If you need to build it from source, there are source archives available, too. Assuming you have the binary distribution, put the whole directory somewhere, and update your shell's startup script to add its bin directory to the PATH environment variable. Run which z3 while not in the Z3 bin directory to verify that you have set up PATH correctly.
+\[
+\texttt{export PATH="/home/username/z3-4.12.4-x64-glibc-2.35/bin:\$PATH"}
+\]
+\begin{lstlisting}[style=normal]
+@:~$ which z3
+/home/username/z3-4.12.4-x64-glibc-2.35/bin/z3
+\end{lstlisting}
+
+\begin{lstlisting}[style=normal]
+@:~$ opam install easycrypt
+@:~$ eval $(opam env)
+
+@:~$ which easycrypt
+/home/username/.opam/5.1.1/bin/easycrypt
+
+@:~$ easycrypt why3config
+Executing: why3 config detect -C /home/username/.config/easycrypt/why3.conf
+warning: cannot read config file /home/username/.config/easycrypt/why3.conf:
+/home/hacker-code-j/.config/easycrypt/why3.conf: No such file or directory
+Found prover Alt-Ergo version 2.5.2, OK.
+Found prover Alt-Ergo version 2.5.2 (alternative: counterexamples)
+Found prover CVC4 version 1.8 (alternative: strings+counterexamples)
+Found prover CVC4 version 1.8 (alternative: strings)
+Found prover CVC4 version 1.8 (alternative: counterexamples)
+Found prover CVC4 version 1.8, OK.
+Found prover Z3 version 4.12.4 (alternative: counterexamples)
+Found prover Z3 version 4.12.4, OK.
+Found prover Z3 version 4.12.4 (alternative: noBV)
+9 prover(s) added
+Save config to /home/username/.config/easycrypt/why3.conf
+\end{lstlisting}
+
+
+\begin{lstlisting}[style=normal]
+@:~$ touch .emacs
+@:~$ emadcs .emacs
+\end{lstlisting}
+\begin{lstlisting}[style=normal]
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+\end{lstlisting}
+
+
+\newpage
+\subsection{\INDRoR game}
+We model a game to demonstrate that a cryptographic protocol ensures the property of ciphertexts being indistinguishable from random. This property, commonly abbreviated as \textsf{IND-RoR} (Indistinguishability -- Real or Random), is one of the foundational security guarantees expected from cryptographic systems. At its core, the concept asserts that if an adversary cannot differentiate between an encrypted message and an encryption of random data, they are unable to extract any meaningful information from intercepted ciphertexts beyond what would be possible by pure chance. This notion forms the basis for considering such a system secure.\par
+To formalize this mathematically, we consider a cryptographic protocol, denoted as $\Pi$, which includes an encryption function, $\enc$, and a decryption function, $\dec$, both known to the challengers. The adversary is granted access to the output of $\enc$. For simplicity, the specific details of these functions are not addressed in this model.\par
+The \INDRoR game for the protocol $\Pi$ is then defined as follows:
+\begin{enumerate}
+	\item Select $b\in\set{0,1}$ uniformly at random.
+	\item If $b=0$, the challengers encrypt a real message $m_{\text{real}}$, using the encryption function $\enc$, producing $c_0=\enc(m_{\text{real}})$.
+	\item If $b=1$, the challengers encrypt a random bit-string $m_{\text{random}}$ using $\enc$, resulting in $c_1=\enc(m_{\text{random}})$.
+	\item Depending on the value of $b$, the challengers send either $c_0$ (if $b=0$) or $c_1$ (if $b=1$) to the adversary.
+	\item The adversary is then allowed to perform computations on the received ciphertext and is expected to produce an output $b_{\text{adv}}$, representing their guess of the value of $b$.
+	\item The adversary is considered to have won the game if they can correctly distinguish between the real and random ciphertexts with a non-negligible advantage over random guessing. Mathematically, the adversary wins if: \[
+	\Pr[b_{\text{adv}}=b]=\frac{1}{2}+\varepsilon,\ \text{where $\varepsilon$ is non-negligible}
+	\]
+\end{enumerate}
+If we can establish a proof demonstrating that $\Pr[b_{\text{adv}}=b]=\frac{1}{2}+\varepsilon$ where $\varepsilon$ is negligible irrespective of the adversary's actions, we can assert that the protocol is secure under the \INDRoR framework.\par
+Game-based proofs, such as this one, are a cornerstone of establishing security properties for most cryptographic protocols. Although our example has been significantly simplified, it can already be effectively modeled using \EasyCrypt.
+
+\subsection{Modeling the \INDRoR game with EasyCrypt}
+We now proceed to outline an \EasyCrypt proof sketch for the game defined earlier. Every \EasyCrypt proof typically involves the following key steps:
+\begin{enumerate}[\bfseries\text{Step.} 1]
+	\item \textbf{[Defining the objects]}
+	
+	To begin, we need to establish the working context. \EasyCrypt provides several predefined \emph{types}, \emph{operators}, and \emph{functions}, including integers, real numbers, and more. To utilize these, we first load (\ecinline{require}) and import (\ecinline{import}) the relevant theories into the current environment. These theories, contained within theory files, provide the necessary definitions and constructs for our work.
+	
+	In this example, we will require the \ecinline{Real}, \ecinline{Bool}, and \ecinline{DBool} theory files. The \ecinline{Real} and \ecinline{Bool} theories allow us to work with real numbers and boolean types, respectively, while the \ecinline{DBool} theory (boolean distribution) enables us to sample boolean values randomly. Theories can be imported as follows:\\
+	\eccode[caption={Importing theory files}]{listings/importing_theories.ec}
+	
+	It is worth noting that in \EasyCrypt, statements are terminated with a period (\ecinline{.}).
+	
+	Beyond the predefined types, we may need custom data types and operations to fit specific use cases. \EasyCrypt enables this through the \ecinline{type} and \ecinline{op} keywords. For this example, we define two custom types: \ecinline{msg} for messages and \ecinline{cip} for ciphertexts. We then define the following operations:
+	\begin{itemize}
+		\item \ecinline{enc: msg -> cip}, which maps a message to a ciphertext.
+		\item \ecinline{dec: cip -> msg}, which maps a ciphertext back to its original message.
+	\end{itemize}
+	Additionally, we define a function \ecinline{comp: cip -> bool}, which models the adversary performing computations on a ciphertext and returning a boolean value as a result.
+	\newpage
+	\eccode[caption={Defining types and ops}]{listings/types_and_ops.ec}
+	\begin{lstlisting}[style=normal]
++ added type: `msg'
++ added type: `cip'
++ added operator enc : msg -> cip
++ added operator dec: cip -> msg
++ added operator comp: cip -> bool
+	\end{lstlisting}
+	It is important to note that these definitions are purely abstract; we have not specified the details of the types or functions. One of the advantages of \EasyCrypt is its ability to work effectively with such abstract types and operations, allowing significant progress even without concrete implementations.
+	
+	Next, we define custom module types and modules. In \EasyCrypt, a \textbf{module type} serves as a blueprint, while a \textbf{module} represents a concrete instantiation of a module type. For those familiar with object-oriented programming, this is analogous to interfaces and their implementing classes. Module types act as interfaces, and modules are similar to singleton classes that conform to these interfaces.
+
+	In our example, the challengers need the ability to encrypt and decrypt messages. To model this behavior, we define a module type called \ecinline{Challenger}, which specifies the procedures encrypt and decrypt. Since a module type is just a blueprint, we need to instantiate it to work with it concretely. We accomplish this by creating a module \ecinline{C} of type \ecinline{Challenger}, implementing the required \ecinline{encrypt} and \ecinline{decrypt} procedures. This is done as follows:\\
+	\eccode[caption={Defining module types and modules}]{listings/module_type_and_modules.ec}
+\end{enumerate}
+
+
+\newpage
+\subsection{Logics in EasyCrypts}
+Having established an understanding of the overarching structure and capabilities of \EasyCrypt, we now turn our attention to the details.
+
+\EasyCrypt provides the flexibility to work with a variety of mathematical objects and results of differing types. To manage these various results effectively, \EasyCrypt incorporates the following logical frameworks:
+\begin{table}[h!]\centering\setstretch{1.25}
+\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}p{.1\textwidth}||>{\raggedright\arraybackslash}p{.495\textwidth}|>{\raggedright\arraybackslash}p{.345\textwidth}}
+\toprule[1.2pt]
+& \textbf{Ambient Logic} & \textbf{Hoare Logic} \\ \midrule
+\textbf{Scope} & Overall reasoning framework (includes probabilities, expectations, etc.). & Specific tool for reasoning about program correctness.\\ \hline
+\textbf{Roll in \EC} & Provides the probabilistic foundation, equational reasoning, and constructs for games. & Used to reason about correctness of cryptographic programs \\ \hline
+\textbf{Focus} & General framework for proofs and logical reasoning. & Verifying how program states evolve.\\ \bottomrule[1.2pt]
+\end{tabularx}
+\end{table}
+\begin{enumerate}
+	\item \textbf{Ambient logic}:
+	
+	This is a higher-order logic framework that enables reasoning about proof objects and terms.
+	\item \textbf{Hoare logic and its variants}:
+	\begin{enumerate}
+		\item \textbf{Hoare Logic (HL)}: A foundational logic that facilitates reasoning about individual programs or sets of instructions.
+		\item \textbf{Relational Hoare Logic (RHL)}: Extends Hoare Logic to allow reasoning about pairs of programs.
+		\item \textbf{Probabilistic Hoare Logic (pHL)}: Designed to handle programs exhibiting probabilistic behavior by incorporating probabilistic elements into Hoare Logic. \EasyCrypt supports reasoning about such probabilistic programs.
+		\item \textbf{Probabilistic Relational Hoare Logic (pRHL)}: An extension of RHL that enables reasoning about pairs of programs that involve probabilistic behavior.
+	\end{enumerate}
+\end{enumerate}
+Using these logical frameworks, \EasyCrypt provides the capability to verify the security properties of cryptographic protocols. Most cryptographic proofs are game-based, requiring the ability to reason about pairs of programs, as illustrated in the IND-RoR example. This necessity underpins the importance of RHL and pRHL in cryptographic proofs.
+
+In addition to its internal logical frameworks, \EasyCrypt leverages external SMT solvers to automate various aspects of the proving process. SMT solvers are tools that determine whether a mathematical formula is satisfiable under a given set of constraints.
+
+In the following chapters, we will explore how to work with these logical frameworks and integrate external SMT solvers into the proof development process.

@@ -1,0 +1,81 @@
+\subsection{Introduction to Computer-aided Cryptography}
+\begin{center}
+	\enquote{To define is to limit.}
+\end{center}
+\begin{flushright}
+	--- Oscar Wilde
+\end{flushright}
+%This statement reflects the idea that definitions can impose boundaries on understanding. Boundaries are inherent to understanding. In the realm of cryptography, this truth resonates deeply, as each definition we craft frames the scope of what we can secure and protect. By limiting our focus to specific, well-characterized challenges, cryptography empowers us to construct rigorous, mathematically sound assurances against precise threats. Yet, this act of defining also confines, leaving the untamed complexity of reality beyond its reach. It is within these limits that cryptography achieves its most profound victories, not by claiming to address every possibility, but by offering clarity and reliability in the face of clearly articulated dangers. In the spirit of Wilde's insight, we embrace these limits, for it is through them that the discipline achieves its elegance and utility.
+This statement reflects the idea that definitions can impose boundaries on understanding. Boundaries are inherent to understanding, as they help us simplify and categorize complex ideas. In cryptography, these boundaries take the form of precisely defined problems, enabling us to address specific challenges with mathematical rigor. However, this act of definition also constrains us, leaving out the nuances of the real world. Cryptography thrives within these limits, offering clarity and certainty within a structured framework while acknowledging the complexities that exist beyond.\par
+Modern cryptography deals with three main problems related to the security of communication.
+\begin{enumerate}
+	\item \textbf{Privacy}:  Protecting information from being accessed by unauthorised parties.
+	\item \textbf{Integrity}: Protecting information from being tampered with or altered
+	\item \textbf{Authenticity}: Making sure the information is from an authentic source
+\end{enumerate}
+Each of these properties can be defined as a mathematical property of information,
+and claiming that a cryptographic protocol protects a certain property is equivalent to proving that the information possesses that mathematical property. Given that the proofs
+can be complicated and hard to follow, the idea of using computers to verify the proofs comes in here.\par
+The tools for computer-aided cryptography come in different flavours based on what
+is being dealt with. Broadly speaking, the tools are developed for the following
+\begin{enumerate}
+	\item \textbf{Design-level security}: To reason about the design of a protocol
+	\item \textbf{Functional correctness and efficiency}: To formalise that the implementations match the designs
+	\item \textbf{Implementation-level security}: To make sure that the implementations do not have other security risks
+\end{enumerate}
+Designing cryptographic systems without established methodologies is a perilous endeavor fraught with intricate pitfalls. Flawed security proofs, often born from misconstrued assumptions, undermine the theoretical foundation of a system's resilience. Buggy implementations further exacerbate the issue, introducing subtle vulnerabilities that unravel the integrity of even the most robust designs. Adding to the conundrum are pesky side-channels, the unanticipated vectors through which adversaries extract sensitive data by exploiting timing, power consumption, or electromagnetic emissions. Together, these challenges make rolling your own cryptography a veritable minefield.\par
+In contemporary practice, the cryptographic community has developed a symbiotic triad of methods to combat these challenges. First, security proofs are meticulously composed using pen and paper, with each step scrutinized to ensure resilience against clearly articulated threat models. Next, implementations are subjected to rigorous testing and thorough code audits to unearth and rectify latent flaws. Finally, developers employ the art of crafting ``constant-time'' code, a technique designed to thwart side-channel attacks by eliminating variations in execution time that could reveal secrets. While these methods represent significant progress, they remain reliant on human precision and judgment.\par
+The future of cryptographic assurance lies in delegating critical tasks to computational systems, enabling unprecedented rigor and reliability. Machine-checked security proofs leverage formal verification to eliminate human error, ensuring that theoretical guarantees are watertight. Verification extends to the implementation layer, where tools validate the safety and correctness of code, bridging the gap between abstract design and real-world execution. Moreover, automated analysis ensures adherence to ``constant-time'' principles, offering robust defenses against side-channel exploitation. By intertwining human ingenuity with computational exactitude, this approach heralds a paradigm shift in cryptographic design and validation.
+\begin{center}\adjustbox{width=\textwidth}{
+\begin{tikzpicture}[
+mainconcept/.style={rectangle, rounded corners, minimum width=5cm, minimum height=1.5cm, text centered, draw=black, fill=cyan!20, font=\bfseries\Huge, thick},
+subconcept/.style={rectangle, rounded corners, minimum width=4.5cm, minimum height=1.2cm, text centered, draw=black, fill=yellow!20, font=\huge, thick},
+arrow/.style={thick,->,>=Stealth, draw=black!70},
+% General Node Alignment
+every node/.style={align=center}
+]
+% Main Nodes
+\node (challenges) [mainconcept] {Challenges};
+\node (practices) [mainconcept, below=5cm of challenges] {Current Practices};
+\node (future) [mainconcept, above right=2.5cm of practices] {Future Directions};
+
+% Subconcepts - Challenges
+\node (flawed) [subconcept, above left=2cm and 2cm of challenges] {Flawed\\Security Proofs};
+\node (buggy) [subconcept, above=2.5cm of challenges] {Buggy\\Implementations};
+\node (side) [subconcept, above right=2cm and 2cm of challenges] {Pesky\\Side-Channels};
+
+% Subconcepts - Current Practices
+\node (proof) [subconcept, below left=2cm and 2cm of practices] {Proof with\\Pen and Paper};
+\node (audit) [subconcept, below=3cm of practices] {Test and\\Audit Code};
+\node (constant) [subconcept, below right=2cm and 2cm of practices] {Write\\``Constant-Time'' Code};
+
+% Subconcepts - Future Directions
+\node (machine) [subconcept, above right=2cm and 2cm of future] {Machine-Checked\\Proofs};
+\node (verify) [subconcept, right=2.5cm of future] {Verify Safety\\\& Correctness};
+\node (constantverify) [subconcept, below right=2cm and 2cm of future] {Verify\\``Constant-Time'' Code};
+
+% Arrows - Challenges to Subconcepts
+\draw [arrow] (flawed) -- (challenges);
+\draw [arrow] (buggy) -- (challenges);
+\draw [arrow] (side) -- (challenges);
+
+% Arrows - Challenges to Practices
+\draw [arrow] (challenges) -- (practices);
+
+% Arrows - Current Practices to Subconcepts
+\draw [arrow] (proof) -- (practices);
+\draw [arrow] (audit) -- (practices);
+\draw [arrow] (constant) -- (practices);
+
+% Arrows - Practices to Future
+\draw [arrow] (practices) -- (future);
+
+% Arrows - Future Directions to Subconcepts
+\draw [arrow] (future) -- (machine);
+\draw [arrow] (future) -- (verify);
+\draw [arrow] (future) -- (constantverify);
+\end{tikzpicture}}
+\end{center}
+
+\newpage
+\subsection{Design-level Security}

@@ -1,0 +1,85 @@
+\newpage
+\subsection{Ambient Logic's Exercies: Level 1}
+\begin{enumerate}[\textbf{[}\bfseries1\textbf{]}]
+\item 
+\end{enumerate}
+%\begin{enumerate}[\textbf{[}\bfseries1\textbf{]}]
+%\item The `\ecinline{admit}' tactic resolves the current goal by assuming its truth without proof. Replace the `\ecinline{admit}' tactic in the following lemma and prove it. (\textcolor{red}{\bfseries Do not use `\ecinline{smt}'.})\\
+%\begin{lstlisting}[style=easycrypt]
+%lemma x_minus_equal (x: int): x - 10 = x - 9 - 1.
+%proof.
+%admit.
+%qed.
+%\end{lstlisting}
+%\begin{proof}[\sol]
+%\ \color{gray!20}
+%\begin{lstlisting}[style=normal]
+%	proof.
+%	trivial.
+%	qed.
+%\end{lstlisting}
+%\end{proof}
+%\item Apply the `\ecinline{split}' tactic to divide the disjunction into two separate goals. Then, utilize the earlier defined axioms to resolve these goals. (\textcolor{red}{\bfseries Do not use `\ecinline{smt}'.})\\
+%\begin{lstlisting}[style=easycrypt]
+%lemma int_assoc_comm (x y z: int): x + (y + z) = (x + y) + z /\ x + y = y + x.
+%proof.
+%admit.
+%qed.
+%\end{lstlisting}
+%\begin{proof}[\sol]
+%\ \color{gray!20}
+%\begin{lstlisting}[style=normal]
+%	proof.
+%	split.
+%	(* Goal 1: x + (y + z) = x + y + z *)
+%	rewrite addzA.
+%	trivial.
+%	(* Goal 2: x + y = y + x *)
+%	rewrite addzC.
+%	trivial.
+%	qed.
+%\end{lstlisting}
+%\end{proof}
+%\item \textcolor{red}{\bfseries Do not use `\ecinline{smt}'.}\\
+%\begin{lstlisting}[style=easycrypt]
+%require import AllCore.  (* for `%r' *)
+%require import RealExp.  (* for `ln' *)
+%
+%lemma ln_prod (x y: real): 0%r < x  => 0%r < y => ln (x*y) = ln x + ln y.
+%proof.
+%search (ln) (+).
+%admit.
+%qed.
+%\end{lstlisting}
+%\begin{proof}[\sol]
+%\ \color{gray!20}
+%\begin{lstlisting}[style=normal]
+%	proof.
+%	search (ln) (+).
+%	move => H1 H2.
+%	by apply lnM.
+%	qed.
+%\end{lstlisting}
+%\end{proof}
+%% Problem 4
+%\item \textcolor{red}{\bfseries Do not use `\ecinline{smt}'.}\\
+%\begin{lstlisting}[style=easycrypt]
+%require import AllCore.
+%require import IntDiv.
+%
+%lemma mod_add (x y z: int): (x %% z + y %% z) %% z = (x + y) %% z.
+%proof.
+%admit.
+%qed.
+%\end{lstlisting}
+%\begin{proof}[\sol]
+%\ \color{gray!20}
+%\begin{lstlisting}[style=normal]
+%	proof.
+%	print IntDiv.
+%	print modzDm.
+%	by apply modzDm.
+%	qed.
+%\end{lstlisting}
+%\end{proof}
+%\end{enumerate}

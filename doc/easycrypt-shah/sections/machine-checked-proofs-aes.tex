@@ -1,0 +1,410 @@
+\subsection{Cryptographic Primitive}
+\subsubsection{Build AES Library}
+
+\begin{center}
+\input{tikzs/folder-structure1}
+\end{center}
+\vfill
+\begin{center}
+\begin{minipage}{.3\textwidth}
+\begin{lstlisting}[style=jasmin, caption={aes.jazz}, captionpos=t]
+...
+/* Jasmin implementation of 
+AES using AES-NI */
+#ifdef EXPORT_TEST
+export
+#else
+inline
+#endif
+fn aes(reg u128 key, reg u128 in) 
+-> reg u128 {
+	reg u128 out;
+	reg u128[11] rkeys;
+	
+	rkeys = keys_expand(key);
+	out   = aes_rounds(rkeys, in);
+	return out;
+}
+...
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}{.3\textwidth}
+\begin{lstlisting}[style=jasmin, caption={aes.japp}, captionpos=t]
+...
+
+
+
+export
+
+
+
+fn aes(reg u128 key, reg u128 in)
+-> reg u128 {
+	reg u128 out;
+	reg u128[11] rkeys;
+	
+	rkeys = keys_expand(key);
+	out = aes_rounds(rkeys, in);
+	return out;
+}
+...
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}{.3\textwidth}
+\begin{lstlisting}[style=jasmin, caption={aes.s}, captionpos=t]
+...
+	.att_syntax
+.text
+.p2align	5
+.globl	_aes
+.globl	aes
+
+_aes:
+aes:
+...
+vmovdqu	%xmm0, %xmm12
+vpxor	%xmm2, %xmm1, %xmm0
+aesenc	%xmm3, %xmm0
+...
+aesenc	%xmm11, %xmm0
+aesenclast	%xmm12, %xmm0
+ret
+...
+\end{lstlisting}
+\end{minipage}
+\end{center}
+\vfill
+\begin{lstlisting}[style=normal]
+@~$ cpp -nostdinc -DEXPORT_TEST src/aeslib/aes.jazz \
+		| grep -v "^#" > build/aeslib/aes.japp
+@~$ jasminc  build/aeslib/aes.japp -o build/aeslib/aes.s
+\end{lstlisting}
+\newpage
+\paragraph{Command 1}:
+\begin{table}[h!]\setstretch{1.25}
+%\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}rc}
+\begin{tabularx}{\textwidth}{>{\raggedleft\arraybackslash}p{.2\textwidth}>{\centering\arraybackslash}p{.35\textwidth}p{.35\textwidth}}
+\textbf{\texttt{[cpp]}} & \textit{C Preprocessor}  &Preprocesses source code files by expanding macros, processing conditional compilation directives, and handling file inclusions. \\ \\
+\textbf{\texttt{[-nostdinc]}} & \textit{No Standard Include} & Prevents the preprocessor from searching in standard system directories for include files, limiting the scope of header file processing to explicitly specified paths or local includes.
+%This is particularly useful in cryptographic software, where minimizing external dependencies is critical to ensure correctness and security.
+\\ \\
+\textbf{\texttt{[-DEXPORT\_TEST]}} & \textit{Define Macro} \texttt{EXPORT\_TEST} & Defines a preprocessor macro (\texttt{EXPORT\_TEST}) that can be used for conditional compilation within the source code.\\ \\
+%Defines the preprocessor macro `\texttt{EXPORT\_TEST}'. In cryptographic contexts, such macros are often used to enable conditional compilation. For example:
+%\begin{itemize}
+%	\item It could activate debugging or testing functionality in the aes.jazz code.
+%	\item It might expose internal cryptographic components for testing purposes, which would typically be hidden in production builds.
+%\end{itemize}\\
+\textbf{\texttt{[../aes.jazz]}} & \textit{Source File Path} & Specifies the input Jasmin source code file to be preprocessed. \\ \\
+%The input file, `\texttt{aes.jazz}', is written in Jasmin. Jasmin is tailored for low-level cryptographic programming and allows direct manipulation of machine-level operations while maintaining formal verification compatibility.\\ \\
+\textbf{\texttt{[|]}} & \textit{Pipe} & Passes the output of the cpp command as input to the next command (\texttt{grep}). \\
+%\end{tabular*}
+\end{tabularx}
+\end{table}
+\begin{table}[h!]\setstretch{1.25}
+\begin{tabularx}{\textwidth}{>{\raggedleft\arraybackslash}p{.2\textwidth}>{\centering\arraybackslash}p{.35\textwidth}p{.35\textwidth}}
+\textbf{\texttt{[grep -v "\^{}\#"]}} & \textit{Global Regular Expression Print (with \texttt{-v} for inverse matching)}& Filters out lines starting with \#, such as preprocessor directives or comments, from the preprocessed output. \\ \\
+%Filters out lines that start with `\texttt{\#}', which are preprocessor directives or comments left by the preprocessor. This is done to clean the output and make it more readable for the Jasmin compiler.\\
+\textbf{\texttt{[>]}} & \textit{Output Redirection} & Redirects the filtered output from the preprocessing pipeline to a specified file. \\ \\
+%Redirects the filtered output to `\texttt{aes.japp}' in the `\texttt{build/aeslib}' directory. This is the preprocessed Jasmin source code, ready for further compilation.\\
+\textbf{\texttt{[../aes.japp]}} & \textit{Output File Path} & Specifies the destination file for the preprocessed Jasmin code.
+\end{tabularx}
+\end{table}
+	
+%	2. **`-nostdinc`**: This option tells the preprocessor to ignore standard include directories (like `/usr/include`). By avoiding standard C header files, this ensures that only explicitly defined macros and includes are processed, reducing unwanted dependencies and improving control over the preprocessing pipeline. This is particularly useful in cryptographic software, where minimizing external dependencies is critical to ensure correctness and security.
+%	
+%	3. **`-DEXPORT_TEST`**: Defines the preprocessor macro `EXPORT_TEST`. In cryptographic contexts, such macros are often used to enable conditional compilation. For example:
+%	- It could activate debugging or testing functionality in the `aes.jazz` code.
+%	- It might expose internal cryptographic components for testing purposes, which would typically be hidden in production builds.
+%	
+%	4. **`src/aeslib/aes.jazz`**: The input file, `aes.jazz`, is written in Jasmin. Jasmin is tailored for low-level cryptographic programming and allows direct manipulation of machine-level operations while maintaining formal verification compatibility.
+%	
+%	5. **`| grep -v "^#"`**: Filters out lines that start with `#`, which are preprocessor directives or comments left by the preprocessor. This is done to clean the output and make it more readable for the Jasmin compiler.
+%	
+%	6. **`> build/aeslib/aes.japp`**: Redirects the filtered output to `aes.japp` in the `build/aeslib` directory. This is the preprocessed Jasmin source code, ready for further compilation.
+%	
+%	#### Cryptographic Implication:
+%	This preprocessing step ensures the Jasmin code is tailored for a specific environment or testing scenario, improving its security posture and adaptability. Filtering out `#` lines prevents unintended preprocessing artifacts from affecting the subsequent compilation or verification steps.
+%	
+
+
+%### Command 2:
+%
+%```bash
+%jasminc build/aeslib/aes.japp -o build/aeslib/aes.s
+%```
+%
+%#### Breakdown:
+%1. **`jasminc`**: The Jasmin compiler processes the preprocessed Jasmin source file (`aes.japp`) and generates assembly code (`aes.s`). This compiler is specialized for cryptographic software, optimizing for both performance and formal verification.
+%
+%2. **`build/aeslib/aes.japp`**: The preprocessed Jasmin source file, which is expected to be free from extraneous preprocessor artifacts and customized for the target build scenario.
+%
+%3. **`-o build/aeslib/aes.s`**: Specifies the output file, `aes.s`, which is the assembly representation of the cryptographic algorithm. Assembly-level programming is crucial in cryptography for:
+%- Precise control over hardware instructions.
+%- Avoiding timing side-channels by ensuring constant-time execution.
+%- Maximizing performance on specific hardware platforms.
+%
+%#### Cryptographic Implication:
+%- **Security**: The Jasmin compiler is specifically designed to produce machine code that aligns with cryptographic best practices, such as resistance to side-channel attacks (e.g., timing or power analysis).
+%- **Formal Verification**: Jasmin ensures that the functional correctness of the cryptographic implementation (e.g., AES in this case) can be formally verified against its high-level specification. This is essential for proving the security properties of cryptographic primitives.
+%
+%---
+%
+%### High-Level Context:
+%This sequence of commands reflects a rigorous development pipeline for cryptographic software:
+%1. **Preprocessing**: Tailors the code to specific scenarios (e.g., testing, optimization) while minimizing external dependencies and potential preprocessing artifacts.
+%2. **Compilation**: Translates Jasmin code into highly optimized and secure assembly code, ensuring both efficiency and security on the target hardware platform.
+%
+%Such a pipeline is commonly used in developing cryptographic libraries or primitives like AES, where correctness, efficiency, and security are paramount. The use of Jasmin ensures that the generated assembly code adheres to cryptographic standards, is resistant to common vulnerabilities, and is suitable for formal verification.
+
+\newpage
+
+\paragraph{Command 2}:
+\begin{table}[h!]\setstretch{1.25}
+\begin{tabularx}{\textwidth}{>{\raggedleft\arraybackslash}p{.15\textwidth}>{\centering\arraybackslash}p{.2\textwidth}p{.65\textwidth}}
+	\textbf{\texttt{[jasminc]}} & \textit{Jasmin Compiler} & Compiles Jasmin source code into optimized assembly code. \\ \\
+	\textbf{\texttt{[../aes.japp]}} & \textit{Input File Path} & Specifies the preprocessed Jasmin source file to be compiled.
+	\\ \\
+	\textbf{\texttt{[-o]}} & \textit{Output File Option} & Indicates the output file name or path for the generated assembly code.\\ \\
+	\textbf{\texttt{[../aes.s]}} & \textit{Output File Path} & Specifies the destination file for the generated assembly code.\\
+\end{tabularx}
+\end{table}
+
+\newpage
+\subsection{Extract AES Library for Correctness and Security}
+\begin{center}
+\input{tikzs/folder-structure2}
+\end{center}
+\begin{lstlisting}[style=normal]
+@~$ jasminc build/aeslib/aes.japp -ec aes -ec invaes -oec AES_jazz.ec
+@~$ mv AES_jazz.ec Array11.ec WArray176.ec extraction/aeslib
+\end{lstlisting}
+\begin{table}[h!]\setstretch{1.25}
+\begin{tabularx}{\textwidth}{>{\raggedleft\arraybackslash}p{.25\textwidth}p{.65\textwidth}}
+	\textbf{\texttt{[jasminc]}}  & The `\texttt{jasminc}' command in this context extracts verification conditions specifically designed to interface with EasyCrypt, a tool used for formal reasoning about cryptographic security. \\ \\
+	\textbf{\texttt{[-ec aes -ec invaes]}} & The `\texttt{-ec}' flag specifies functions or modules to extract formal verification constraints from the Jasmin source file.
+	\\ \\
+	\textbf{\texttt{[-oec AES\_jazz.ec]}} & The `\texttt{-oec}' flag specifies the output file where the extracted constraints for the specified modules (\texttt{aes} and \texttt{invaes}) will be saved.
+\end{tabularx}
+\end{table}
+\begin{lstlisting}[style=easycrypt, caption={Array11.ec}, captionpos=t]
+from Jasmin require import JArray.
+
+clone export PolyArray as Array11  with op size <- 11.
+\end{lstlisting}
+\begin{lstlisting}[style=easycrypt, caption={WArray176.ec}, captionpos=t]
+from Jasmin require import JArray.
+
+clone export PolyArray as Array11  with op size <- 11.
+\end{lstlisting}
+\easycryptcode[linerange={127-134}, caption={AES\_jazz.ec (lines 127-134)}, captionpos=t]{listings/AES_jazz.ec}
+
+
+\subsubsection{Extract AES Library for Constant-time}
+\begin{center}
+%\input{tikzs/folder-structure2}
+\end{center}
+\begin{lstlisting}[style=normal]
+@~$ jasminc build/aeslib/aes.japp -CT -ec aes -ec invaes -oec AES_jazz_ct.ec
+@~$ mv AES_jazz_ct.ec Array11.ec WArray176.ec extraction/aeslib
+\end{lstlisting}
+\subsubsection{Build Nonce-based AES Encryption with register calling convension}
+\begin{center}
+%	\input{tikzs/folder-structure1}
+\end{center}
+\begin{lstlisting}[style=normal]
+@~$ cpp -nostdinc src/example/NbAESEnc.jazz  \
+		| grep -v "^#" > build/example/NbAESEnc.japp
+@~$ jasminc build/example/NbAESEnc.japp -o build/example/NbAESEnc.s
+\end{lstlisting}
+\newpage
+
+\subsubsection{Implementation of Nonce-based AES Encryption Scheme}
+\begin{center}
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{XOR} = [
+	line width=.25mm,
+	draw,
+	circle,
+	outer sep=2pt,
+	append after command={
+		[shorten >=2bp, shorten <=2bp]
+		(\tikzlastnode.north) edge[line width=.25mm] (\tikzlastnode.south)
+		(\tikzlastnode.east) edge[line width=.25mm] (\tikzlastnode.west)}
+	]
+	
+	\node[] (pt) {Plaintext};  
+	\node[XOR, right=1cm of pt] (xor) {};
+	\node[above=2.5cm of xor] (mask) {$k\uniform\keyspace$};
+	\node[right=1cm of xor] (ct) {Ciphertext};  
+	\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (2.25,2.75) -- ++(0,-.5) -- node[right] {mask} ++(0,-2);
+	
+%	\node [below=of xor, align=left] {$\enc(k,m)=m\oplus k$\\ $\dec(k,c)=c\oplus k$};
+\end{tikzpicture}\hfill
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{XOR} = [
+	line width=.25mm,
+	draw,
+	circle,
+	outer sep=2pt,
+	append after command={
+		[shorten >=2bp, shorten <=2bp]
+		(\tikzlastnode.north) edge[line width=.25mm] (\tikzlastnode.south)
+		(\tikzlastnode.east) edge[line width=.25mm] (\tikzlastnode.west)}
+	]
+	
+	\node[] (pt) {Plaintext};  
+	\node[XOR, right=1cm of pt] (xor) {};
+	\node[draw, rectangle, above=2cm of xor, align=center] (prf) {PRP};
+	\node[left=1cm of prf] (key) {Key};
+	\node[above=1cm of prf] (nonce) {Nonce};
+	\node[right=1cm of xor] (ct) {Ciphertext};  
+	\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (2.25,2.25) -- node[right] {mask} ++(0,-2);
+	\draw[-{Latex}] (key) to (prf);
+	\draw[-{Latex}] (nonce) to (prf);
+	
+%	\node [below=of xor, align=left] {$\enc(k, n, m)=m\oplus f_k(n)$\\ $\dec(k, n, c)=c\oplus f_k(n)$};
+\end{tikzpicture}
+\end{center}
+\begin{itemize}
+	\item The \textbf{one-time pad (OTP) encryption scheme} is a cryptographic construct that achieves perfect security. \[
+	\Pi_{\text{OTP}}=(\keygen,\enc,\dec),
+	\] where \begin{enumerate}[(i)]
+		\item %$\keygen:\set{0,1}^n\to\set{0,1}^n,\quad k\sim\text{Uniform}(\set{0,1}^n)$;
+		\item $\enc:\keyspace\times\messagespace\to\ciphertext:(k,m)\mapsto c=k\oplus m$;\begin{align*}
+			\fullfunction{\enc}{\keyspace}{\ciphertext^{\messagespace}}{k}{c=\enc_{k}(m)}\quad \text{where}\quad \fullfunction{\enc_k}{\messagespace}{\ciphertext}{m}{c=k\oplus m}
+		\end{align*}
+	\end{enumerate}
+	\item A \textbf{nonce-based PRP encryption scheme} is a cryptographic construct where a nonce (number used once) is incorporated to ensure unique ciphertexts for the same plaintext under the same key. 
+	\[
+	\Pi_{\nonce-\text{PRP}}=(\keygen,\enc,\dec),
+	\] where \begin{enumerate}[(i)]
+		\item %$\keygen:\set{0,1}^*\to\keyspace$;
+		\item $\enc:\keyspace\times\nonce\times\messagespace\to\ciphertext:(k,n,m)\mapsto c=\enc_{k}(n)\oplus m$; \begin{align*}
+		\fullfunction{\enc}{\keyspace}{[\nonce\to[\messagespace\to\ciphertext]]}{k}{c=\enc_k(n)\oplus m}\ \text{where}\ \fullfunction{\enc_k}{\nonce}{[\messagespace\to\ciphertext]}{n}{c=k\oplus m}
+		\end{align*}
+	\end{enumerate}
+\end{itemize}
+
+\newpage
+\begin{center}
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{XOR} = [
+	line width=.25mm,
+	draw,
+	circle,
+	outer sep=2pt,
+	append after command={
+		[shorten >=2bp, shorten <=2bp]
+		(\tikzlastnode.north) edge[line width=.25mm] (\tikzlastnode.south)
+		(\tikzlastnode.east) edge[line width=.25mm] (\tikzlastnode.west)}
+	]
+	
+	\node[] (pt) {Plaintext};  
+	\node[XOR, right=1cm of pt] (xor) {};
+	\node[draw, rectangle, above=2cm of xor, align=center] (prf) {PRP};
+	\node[left=1cm of prf] (key) {Key};
+	\node[above=1cm of prf] (nonce) {Nonce};
+	\node[right=1cm of xor] (ct) {Ciphertext};  
+	\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (2.25,2.25) -- node[right] {mask} ++(0,-2);
+	\draw[-{Latex}] (key) to (prf);
+	\draw[-{Latex}] (nonce) to (prf);
+\end{tikzpicture}\hfill
+\begin{tikzpicture}[scale=1]
+\tikzstyle{every node}=[font=\sffamily]
+\node[] (pt) {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} p};  
+\node[right=1cm of pt] (xor) {xor};
+\node[draw, rectangle, above=2cm of xor, align=center] (prf) {aes};
+\node[left=.5cm of prf] (key) {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} k};
+\node[above=1cm of prf] (nonce) {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} n};
+\node[right=1cm of xor] (ct) {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} c};  
+\draw[dashed] (-.75,2) rectangle (5.25,4.5);
+
+\draw[-{Latex}] (pt) to (xor);
+\draw[-{Latex}] (xor) to (ct);
+\draw[-{Latex}] (prf) -- node[right] {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} mask} ++ (0,-2);
+\draw[-{Latex}] (key) to (prf);
+\draw[-{Latex}] (nonce) to (prf);
+\end{tikzpicture}
+\end{center}
+\vfill
+\jasmincode[caption={src/example/NbAESEnc.jazz}, captionpos=top]{listings/NbAESEnc.jazz}
+\newpage
+\begin{center}
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{every node}=[font=\sffamily]
+	\node[] (pt) {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} p};  
+	\node[right=1cm of pt] (xor) {xor};
+	\node[draw, rectangle, above=1.75cm of xor, align=center] (prf) {aes};
+	\node[left=.5cm of prf] (key) {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} k};
+	\node[above=.5cm of prf] (nonce) {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} n};
+	\node[right=1cm of xor] (ct) {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} c};  
+	\draw[dashed] (-.75,1.75) rectangle (5.25,3.75);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (prf) -- node[right] {\textcolor{OliveGreen}{reg} \textcolor{Blue}{u128} mask} ++ (0,-2);
+	\draw[-{Latex}] (key) to (prf);
+	\draw[-{Latex}] (nonce) to (prf);
+\end{tikzpicture}\hfill
+\begin{tikzpicture}[scale=1]
+	\tikzstyle{every node}=[font=\sffamily]
+	\node[draw, rectangle, dotted] (pt) {p}; 
+	\node[shift={(-1,1.5)}] (pptr) at (pt) {pptr};
+	\draw[-{Latex}, dotted] (pptr) -- ++(0,-1.5) |- node[midway, above=.5cm] {\jasmininline{p=(u128)[pptr]}} ++(.75,0);
+	 
+	\node[right=1cm of pt] (xor) {xor};
+	\node[draw, rectangle, above=1.75cm of xor, align=center] (prf) {aes};
+	
+	\node[draw, rectangle, dotted, left=.5cm of prf] (key) {k};
+	\node[xshift=-1.5cm,yshift=1cm] (kptr) at (key) {kptr};
+	\draw[-{Latex}, dotted] (kptr) -- ++(0,-1) |- node[midway, above] {\jasmininline{k=(u128)[kptr]}} ++(1.25,0);
+	
+	\node[draw, rectangle, dotted, above=.5cm of prf] (nonce) {n};
+	\node[xshift=3.25cm] (nptr) at (nonce) {nptr};
+	\draw[-{Latex}, dotted] (nptr) -- node[midway,below ] {\jasmininline{n=(u128)[nptr]}} ++(-3,0);
+	
+	\node[draw, rectangle, dotted, right=1cm of xor] (ct) {c};  
+	\node[shift={(1,1.5)}] (cptr) at (ct) {cptr};
+	\draw[{Latex}-, dotted] (ct) -- ++(1,0) -| node[midway, above=.5cm] {\jasmininline{c=(u128)[cptr]}} ++(0,1.5);
+	\draw[dashed] (-2.5,1.75) rectangle (5.5,3.75);
+	
+	\draw[-{Latex}] (pt) to (xor);
+	\draw[-{Latex}] (xor) to (ct);
+	\draw[-{Latex}] (prf) -- node[right] {} ++ (0,-2);
+	\draw[-{Latex}] (key) to (prf);
+	\draw[-{Latex}] (nonce) to (prf);
+\end{tikzpicture}
+\end{center}\vfill
+\jasmincode[caption={src/example/NbAESEnc\_mem.jazz}, captionpos=top]{listings/NbAESEnc_mem.jazz}
+
+\newpage
+\ccode[caption={test/test\_NbAESEnc.c}, captionpos=top]{listings/test_NbAESEnc.c}
+\begin{lstlisting}[style=normal]
+@~$ cpp -nostdinc src/example/NbAESEnc.jazz  \
+	| grep -v "^#" > build/example/NbAESEnc.japp
+@~$ jasminc  build/example/NbAESEnc.japp -o build/example/NbAESEnc.s
+@~$ gcc -msse4.1 -Wall build/example/NbAESEnc.s test/test_NbAESEnc.c \
+-o build/example/test_NbAESEnc
+\end{lstlisting}
+\begin{lstlisting}[style=normal]
+************************************************
+*** Testing encryption scheme (reg cc)      *** 
+************************************************
+build/example/test_NbAESEnc
+Verify output: OK!
+\end{lstlisting}
+
+
+\ccode[caption={test/test\_NbAESEnc\_mem.c}, captionpos=top]{listings/test_NbAESEnc_mem.c}

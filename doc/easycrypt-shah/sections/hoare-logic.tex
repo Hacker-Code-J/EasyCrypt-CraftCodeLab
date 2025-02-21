@@ -1,0 +1,498 @@
+Prior sections of this work focused exclusively on deductive proofs operating within purely logical domains. However, the analysis of computational systems—such as algorithms and procedural implementations—demands methodologies capable of formalizing and verifying program semantics.
+
+Consider, for example, an integer exponentiation procedure defined as follows:
+\begin{center}
+\begin{minipage}{.49\textwidth}
+\[
+\exp(a,n)=\begin{cases*}
+1 & if $n=0$ \\
+a\times\exp(a,n-1) & otherwise
+\end{cases*}
+\]
+\end{minipage}
+\begin{minipage}{.49\textwidth}
+\begin{lstlisting}[style=normal, caption={Pseudo code for exponentiation}, captionpos=t]
+exp(a, n):
+	r = 1
+	i = 0
+	while (i < n):
+		r = r * a
+		i = i + 1
+	return r
+\end{lstlisting}
+\end{minipage}
+\end{center}
+When evaluating such a procedure, our objective is to establish its behavioral correctness relative to mathematical specifications. Superficially, this implementation appears valid. However, a critical defect arises: for any negative integer $n$, the procedure unconditionally returns $1$, which contravenes the expected behavior of exponentiation over integers. Consequently, asserting the correctness of this implementation constitutes an invalid claim. To formally characterize program behavior, we instead frame assertions in terms of mathematical invariants and pre/postconditions. For instance: \[
+\forall a\in\Z,\ n\in\Z_{\geq 0},\ \exp(a,n)=a^n.
+\] In other words, \[
+\text{Given}\ \underbrace{x\in\Z,n\in\Z,n\geq 0}_{\text{pre-condition}},\ \underbrace{\exp(a,n)}_{\text{program}}\ \text{returns}\ \underbrace{r=a^n}_{\text{post-condition}}.
+\]
+
+\newpage
+\subsection{Preliminaries: States, Assertions, and Commands}
+
+Let \(\mathcal{V}\) be a countable set of \textit{program variables} and let \(\mathcal{D}\) be a nonempty domain (e.g., \(\mathbb{Z}\), \(\mathbb{B} = \{\texttt{true},\texttt{false}\}\), or more structured data). A \textbf{state} is a total function \[
+s: \mathcal{V} \to \mathcal{D}.
+\] We denote by \(\Sigma\) the set of all states. For \(x \in \mathcal{V}\) and \(d \in \mathcal{D}\), the notation \[
+s[x \mapsto d]
+\] refers to the state identical to \(s\) except that \(x\) is updated to \(d\).
+
+Let \(\mathcal{L}\) be a logical language (e.g., first‐order logic) whose formulas---called \textbf{assertions}---are interpreted over \(\Sigma\). We write \(s \models P\) to indicate that the assertion \(P\) holds in state \(s\).
+
+We assume a set \(\mathcal{E}\) of arithmetic and Boolean expressions over \(\mathcal{V}\) (with the usual interpretations). For \(E \in \mathcal{E}\), we denote by \(\llbracket E \rrbracket(s) \in \mathcal{D}\) its value in state \(s\).
+
+\subsection{Syntax and Semantics of Commands}
+\paragraph{[Syntax]} The syntax of \textbf{commands} \(C\) is defined inductively by:
+\[
+\begin{array}{rcll}
+	C & ::= & \texttt{skip} & \\
+	& \mid & x := E & \text{assignment} \\
+	& \mid & C_1 ; C_2 & \text{sequencing} \\
+	& \mid & \mathbf{if}\; b\; \mathbf{then}\; C_1\; \mathbf{else}\; C_2 & \text{conditional} \\
+	& \mid & \mathbf{while}\; b\; \mathbf{do}\; C\; & \text{iteration}
+\end{array}
+\]
+where \(x\in \mathcal{V}\), \(E\in \mathcal{E}\), and \(b\) is a Boolean expression.
+
+\paragraph{[Semantic]}  We define the (partial) \textbf{big‐step semantics} relation \[
+\langle C, s \rangle \Downarrow  t\ (\text{or}\ C:s\Downarrow t),
+\] which relates an initial state \(s\) to a final state \(t\) after executing command \(C\). The semantics is given by the following inductive clauses:
+\begin{enumerate}
+	\item \textbf{Skip}: \[
+	\langle \texttt{skip}, s \rangle \Downarrow s.
+	\]
+	\item \textbf{Assignment}: \[
+	\langle x := E, s \rangle \Downarrow s[x \mapsto \llbracket E \rrbracket(s)].
+	\]
+	\item \textbf{Sequencing}: \[
+	\frac{\langle C_1, s \rangle \Downarrow s' \quad \langle C_2, s' \rangle \Downarrow s''}{\langle C_1; C_2, s \rangle \Downarrow s''}.
+	\]
+	\item \textbf{Conditional}: \[
+	\frac{s \models b \quad \langle C_1, s \rangle \Downarrow s'}{\langle \mathbf{if}\; b\; \mathbf{then}\; C_1\; \mathbf{else}\; C_2, s \rangle \Downarrow s'} \quad
+	\frac{s \not\models b \quad \langle C_2, s \rangle \Downarrow s'}{\langle \mathbf{if}\; b\; \mathbf{then}\; C_1\; \mathbf{else}\; C_2, s \rangle \Downarrow s'}.
+	\]
+	\item \textbf{While}: \[
+	\frac{s \not\models b}{\langle \mathbf{while}\; b\; \mathbf{do}\; C, s \rangle \Downarrow s}\quad,\quad
+	\frac{s \models b \quad \langle C, s \rangle \Downarrow s' \quad \langle \mathbf{while}\; b\; \mathbf{do}\; C, s' \rangle \Downarrow s''}{\langle \mathbf{while}\; b\; \mathbf{do}\; C, s \rangle \Downarrow s''}.
+	\]
+\end{enumerate}
+A command \(C\) is said to \textbf{terminate} on state \(s\) if there exists some \(t\) with \(\langle C, s \rangle \Downarrow t\).
+
+\subsection{Hoare Triples}
+\defbox[Hoare Triple]{\begin{definition}
+A \textbf{Hoare triple} is an expression of the form
+\[
+\{P\}\; C\; \{Q\},
+\] where: \begin{itemize}
+	\item \(P\) and \(Q\) are assertions, \ie, Boolean‐valued formulas over states in 
+	$\mathcal{V}$. Formally, $P,Q$ are predicates \[
+	P,Q:\mathcal{D}^{\mathcal{V}}\to\set{\texttt{true},\texttt{false}}
+	\] 
+	\item $C$ is a command in the syntax given above.
+\end{itemize} 
+The intended meaning is that if the precondition \(P\) holds in the initial state, and if \(C\) terminates, then the postcondition \(Q\) holds in the final state.
+\end{definition}}
+\begin{remark}
+We say $\set{P}C\set{Q}$ is \textbf{valid (or partially correct)} if and only if for all states $s\in\mathcal{D}^{\mathcal{V}}$,
+\begin{itemize}
+	\item If $s\models P$ (\ie, $P$ holds in state $s$), and
+	\item If $\langle C,s\rangle \Downarrow t$ for some state $t$ (\ie, $C$ terminates on $s$),
+\end{itemize}
+then $t\models Q$ (\ie, $Q$ holds in the final state $t$). We denote validity by $\models\set{P}C\set{Q}$.
+\end{remark}
+%\begin{remark}
+%Formally, we define the validity of a Hoare triple as follows:
+%\[
+%\models \{P\}\; C\; \{Q\} \quad \Longleftrightarrow \quad \forall s \in \mathcal{D}^{\mathcal{V}},\; \Bigl( s \models P \wedge (\exists t \in \mathcal{D}^{\mathcal{V}}\; \text{s.t.}\; \langle C, s \rangle \Downarrow t)\implies t \models Q) \Bigr).
+%\]
+%This definition captures \textbf{partial correctness} (termination is assumed but not guaranteed).
+%\end{remark} 
+
+%### 4. Axiomatic Proof System
+%
+%We now list the inference rules (axioms and derived rules) that comprise a complete axiomatic system for Hoare logic. We write \(\vdash \{P\} C \{Q\}\) to indicate that the triple is derivable.
+%
+%#### (A1) **Assignment Axiom**
+%
+%\[
+%\infer[\text{Assignment}]{\vdash \{P[E/x]\}\; x := E\; \{P\}}{}
+%\]
+%where \(P[E/x]\) denotes the assertion obtained by replacing every free occurrence of \(x\) in \(P\) with the expression \(E\).
+%
+%#### (A2) **Consequence Rule**
+%
+%\[
+%\infer[\text{Consequence}]{\vdash \{P\}\; C\; \{Q\}}{
+%	\vdash P' \implies P \quad
+%	\vdash \{P'\}\; C\; \{Q'\} \quad
+%	\vdash Q' \implies Q
+%}
+%\]
+%This rule allows us to strengthen the precondition and weaken the postcondition.
+%
+%#### (A3) **Sequencing (Composition) Rule**
+%
+%\[
+%\infer[\text{Seq}]{\vdash \{P\}\; C_1; C_2\; \{R\}}{
+%	\vdash \{P\}\; C_1\; \{Q\} \quad
+%	\vdash \{Q\}\; C_2\; \{R\}
+%}
+%\]
+%
+%#### (A4) **Conditional Rule**
+%
+%\[
+%\infer[\text{If}]{\vdash \{P\}\; \mathbf{if}\; b\; \mathbf{then}\; C_1\; \mathbf{else}\; C_2\; \{Q\}}{
+%	\vdash \{P \land b\}\; C_1\; \{Q\} \quad
+%	\vdash \{P \land \neg b\}\; C_2\; \{Q\}
+%}
+%\]
+%
+%#### (A5) **While Rule**
+%
+%\[
+%\infer[\text{While}]{\vdash \{I\}\; \mathbf{while}\; b\; \mathbf{do}\; C\; \mathbf{od}\; \{I \land \neg b\}}{
+%	\vdash \{I \land b\}\; C\; \{I\}
+%}
+%\]
+%Here, \(I\) is an invariant that must hold before and after each iteration of the loop.
+%
+%---
+%
+%### Additional Remarks
+%
+%- **Soundness:** One proves that if \(\vdash \{P\}\; C\; \{Q\}\) is derivable in the axiomatic system, then \(\models \{P\}\; C\; \{Q\}\) holds in the semantic model defined above.
+%
+%- **Relative Completeness:** Under certain conditions (e.g., when the underlying assertion logic is expressive enough), every valid Hoare triple can be derived using the above rules (Cook's completeness theorem).
+%
+%- **Generalization:** This general form of Hoare logic may be extended to reason about total correctness (by incorporating a variant function in the loop rule) or about concurrency and probabilistic programs by further enriching the state space, assertions, and inference rules.
+%
+%---
+%
+%### Summary
+%
+%In full generality, Hoare logic provides a rigorous, symbolic framework to verify partial correctness properties of programs. The general form is encapsulated in the validity condition
+%\[
+%\models \{P\}\; C\; \{Q\} \iff \forall s\ (s \models P \wedge [\,C\text{ terminates on } s\,] \implies \forall t\ ([\,\langle C, s \rangle \Downarrow t\,] \implies t \models Q)),
+%\]
+%and its proof system is given by the assignment axiom, the consequence rule, sequencing, conditional, and while rules. This framework is sufficiently expressive to serve as the foundation for both theoretical studies and practical verification tools in cryptography and beyond.
+
+%\newpage
+%\subsection{The Hoare Triple}
+%\defbox[The Hoare Triple]{\begin{definition}
+%A Hoare triple captures three essential components of a program specification: a precondition, the program itself, and a postcondition. Formally, a Hoare triple is written as \[
+%\set{P}C\set{Q}\ \text{or}\ \Hoare{C}{P}{Q},
+%\] where \begin{itemize}
+%	\item $P$ and $Q$ are conditions on the program variables of $C$. These conditions may use standard mathematical notation and logical operators such as $\land$ (``and''), 
+%	$\lor$ (``or''), $\lnot$ (``not''), and $\implies$ (``implies''), along with the constants 
+%	$\top$ (which always holds) and $\bot$ (which never holds).
+%	\item $C$ is a program in a specified language.
+%\end{itemize}
+%We say that $\set{P}C\set{Q}$ holds if, whenever 
+%$C$ is executed in a state satisfying $P$, and if $C$ terminates, then the state upon termination satisfies $Q$. For simplicity, we will only consider terminating programs.
+%\end{definition}}
+%
+%\begin{example}
+%Note that $:=$ is the assignment operator. \begin{enumerate}
+%\item $\set{x = n} x := x + 1 \set{x = n + 1}$.
+%
+%This triple holds. Notice that $n$ is an \textit{ambient variable} provided by the surrounding context, whereas $x$ is a \textit{program variable} modified by the assignment $x:=x+1$.
+%\item $\set{x=n}x:=x+1\set{x=n+2}$
+%
+%This triple does not hold, because incrementing $x$ by 1 cannot guarantee $x=n+2$.
+%\item $\set{\top}C\set{Q}$
+%
+%Here, the precondition always holds, so the triple’s validity hinges solely on whether 
+%$C$ ensures $Q$ upon termination.
+%
+%\item $\set{P}C\set{\top}$
+%
+%Similarly, this always holds once $P$ is satisfied and 
+%$C$ terminates, because $\top$ places no restrictions on the resulting state.
+%
+%\item $\set{\bot}C\set{Q}$
+%
+%Since $\bot$ is never true, this triple cannot hold by our definition. (In EasyCrypt, however, this case has additional nuances.)
+%\end{enumerate}
+%\end{example}
+%
+%\newpage
+%\subsection{Proof Trees}
+%So far, we have examined Hoare triples for single statements—effectively ``programs'' with a single instruction. However, to accommodate multiple statements and more elaborate structures, we must formalize a set of axioms that we either accept as true or derive from the semantics of the programming language. We then use these axioms to assert properties of more complex statements. Often, this process is visualized using proof trees or schemas, illustrating how axioms are combined step by step.
+%
+%For example, to indicate that a statement $S$ is provable, we write $\vdash S$. A typical proof might appear as: \[
+%\infer{\vdash S}{\vdash S_1, \vdash S_1, \cdots,\vdash S_n}.
+%\] This notation means that $S$ follows from the hypotheses $S_1,S_2,\dots, S_n$. Each hypothesis is either an axiom or a theorem established in Hoare Logic or standard mathematics.
+%\subsection{Axioms of Hoare Logic}
+%Hoare Logic provides a rigorous framework for reasoning about program correctness through axioms and inference rules. These axioms underpin automated verification tools such as EasyCrypt, enabling systematic analysis of cryptographic protocols and algorithmic procedures. Below, we formalize the core axioms of Hoare Logic, accompanied by illustrative examples to elucidate their application.
+%
+%\subsubsection{Assignment Axiom}
+%\[
+%\vdash\set{y=5}x:=5\set{y=x}
+%\] After assigning $x=5$, the post-condition $y=x$ reduces to $y=5$, which holds given the precondition $y=5$.
+%\paragraph{Formal Rule:} \[
+%\vdash\set{P[E/V]}V:=E\set{P}
+%\] Here, $V$ is a program variable, $E$ is an expression, and 
+%$P[E/V]$ denotes substituting $E$ for all free occurrences of 
+%$V$ in predicate $P$.
+%
+%\subsubsection{Precondition Strengthening (Consequence Rule)}
+%Let \[
+%C=[x:=x+2],\quad P=\set{x=5},\quad P'=\set{x\geq 5},\quad\text{and}\quad Q=\set{x\geq 7}.
+%\] Consider \[
+%\infer{
+%\vdash\set{x=5}x:=x+2\set{x\geq 7}
+%}{
+%\vdash\set{x=5}\implies\set{x\geq 5},\ \vdash\set{x\geq 5}x:x+2\set{x\geq 7}
+%}.
+%\]
+%
+%\paragraph{Formal Rule:} If we have a Hoare triple $\set{P}C\set{Q}$ and $P$ is a stronger statement that implies $P'$, then: \[
+%\vdash P\implies P',\quad \vdash\set{P'}C\set{Q}\quad\implies\quad\vdash\set{P}C\set{Q}.
+%\] That is, \[
+%\infer{\vdash\set{P}C\set{Q}}{\vdash P\implies P',\ \vdash\set{P'}C\set{Q}}
+%\] Intuitively, a weaker precondition yields a stronger Hoare triple. For example: \[
+%\set{\top} x:=5\set{x=5}\quad\text{v.s.}\quad\set{x=3}x:=5\set{x=5}.
+%\]
+%The first triple holds for any starting state, whereas the second holds only if 
+%$x$ initially equals 3. Hence the first triple is considered stronger, as it applies more generally.
+%
+%\subsubsection{Postcondition Weakening (Consequence Rule)}
+%Let \[
+%C=[x:=x+2],\quad P=\set{x=5},\quad Q'=\set{x=7},\quad \text{and}\quad Q=\set{x\geq 7}.
+%\] Consider \[
+%\infer{\vdash\set{x=5}x:=x+2\set{x\geq 7}}{
+%\vdash\set{x=5}x:=x+2\set{x=7},\quad\vdash x=7\implies x\geq 7
+%}.
+%\]
+%\paragraph{Formal Rule:} If $\set{P}C\set{Q}$ holds and $Q$ is a weaker statement implied by 
+%$Q'$, then: \[
+%\vdash\set{P}C\set{Q'},\quad\vdash Q'\implies Q\quad\implies\quad\vdash\set{P}C\set{Q}.
+%\] That is, \[
+%\infer{\vdash\set{P}C\set{Q}}{
+%\vdash\set{P}C\set{Q'},\quad\vdash Q'\implies Q
+%}
+%\]
+%Precondition strengthening and postcondition weakening together are sometimes called the \textbf{consequence rules}.
+%
+%\subsubsection{Sequencing}
+%Let \[
+%C_1=\set{x:=x+2},\quad C_2=\set{x:=x*2}
+%\] and \[
+%P=\set{x=5},\quad Q'=\set{x=7},\quad Q=\set{x=14}.
+%\] Consider \[
+%\infer{\vdash\set{x=5}x:=x+2; x:=x*2\set{x=14}}{
+%\vdash\set{x=5}x:=x+2\set{x=7},\quad\vdash\set{x=7}x:=x*2\set{x=14}
+%}.
+%\]
+%\paragraph{Formal Rule:} For two consecutive programs $C_1$ and $C_2$, we have: \[
+%\vdash\set{P}C_1\set{Q'},\quad\vdash\set{Q'}C_2\set{Q}\implies\vdash\set{P}C_1;C_2\set{Q}.
+%\] That is, \[
+%\infer{\vdash\set{P}C_1;C_2\set{Q}}{
+%\vdash\set{P}C_1\set{Q'},\ \vdash\set{Q'}C_2\set{Q}}.
+%\]
+%\subsection{Axiomatic Proof System (Inference Rules)}
+
+\newpage
+\subsection{HL in EasyCrypt}
+\subsubsection{Basic Hoare Triples}
+We introduce a module that defines two procedures for the programs.\\
+\eccode[linerange={3-6}, caption={Function definitions (\texttt{Func1})}]{listings/hoare-logic.ec}
+A Hoare triple of the form $\set{P}C\set{Q}$, which is conventionally read as ``if 
+$P$ holds prior to executing $C$, then $Q$ holds afterward,'' is expressed in \EasyCrypt as 
+\begin{center}
+\ecinline{hoare [C : P ==> Q]}
+\end{center} in line with the usual definitions. Moreover, \EasyCrypt records the return value of the program $C$ in a special keyword called \ecinline{res}.
+For instance, the Hoare triple \[
+\set{x=1}\text{\ecinline{Func1.add_1}}\set{x=2}
+\] is represented in \EasyCrypt as follows:\\
+\eccode[linerange={8-8}]{listings/hoare-logic.ec}
+When working within Hoare logic or its variants, the proof goal typically takes a different form than that of ambient logic. For example, after invoking the \ecinline{lemma triple1}, the resulting goal in \EasyCrypt’s proof state exhibits precisely these Hoare-specific features.\\
+\begin{lstlisting}[style=normal, caption={Goal upon evaluating (\texttt{triple1})}]
+Type variables: <none>
+
+------------------------------------------------------------------------
+pre = arg = 1
+	Func1.add_1
+post = res = 2
+\end{lstlisting}
+To advance the proof, we must inform \EasyCrypt about the definition of 
+\ecinline{Func1.add_1}. This is accomplished by the \ecinline{proc} tactic, which incorporates the procedure’s body into the current proof context. Since \ecinline{Func1.add_1} only returns a value, applying \ecinline{proc} replaces 
+\ecinline{res} with that return value and effectively leaves the program body empty for further analysis.
+
+When reasoning about program correctness using Hoare Logic, we systematically analyze how program statements transform preconditions into postconditions, guided by axioms and lemmas. The process involves ``consuming'' program statements—applying rules to decompose the program until no statements remain. At this point, the goal transitions from a Hoare Logic (HL) goal to a statement in ambient logic, facilitated by the \ecinline{skip} tactic.
+
+Specifically, skip applies the following reasoning:
+\[
+\infer[\text{\ecinline{skip}}]{\set{P}\text{skip;}\set{Q}}{P\implies Q}
+\] where \text{skip;} denotes an empty program, and \ecinline{skip} is the tactic that enacts this transition. As a result, we return to the standard ambient logic setting, allowing us to use all the tactics. The only subtlety is that moving from a Hoare logic goal to an ambient logic goal requires accounting for the memory qualifiers in which the program variables reside.
+
+For instance, in this example, after applying \ecinline{skip}, the resulting goal is: \[
+\text{\ecinline{forall &hr, x\{hr\} = 1 => x\{hr\} + 1 = 2}},
+\] where \ecinline{&hr} denotes a particular memory state, and \ecinline{x\{hr\}} is the value of \ecinline{x} within that memory. Proving this is straightforward: we simply move the memory parameter into our assumptions by prepending the \ecinline{&} character in the \ecinline{move =>} tactic.
+
+Putting these steps together yields the following complete proof for our simple example: \\
+\eccode[linerange={8-15}]{listings/hoare-logic.ec}
+
+
+\subsubsection{Automation, and Special Cases}
+\subsubsection{Conditionals and Loops}
+
+\subsection{Hoare Logic with AES}
+We describe the specifications, the corresponding Hoare triples, and the formal proof strategies used to show that the imperative specifications (for key expansion and AES rounds) are equivalent to their functional counterparts.
+
+\subsubsection{Overview}
+We consider an implementation of the AES algorithm that consists of several imperative procedures. In particular, we verify the following:
+\begin{enumerate}[1.]
+	\item \textbf{Key Expansion.}
+	
+	The procedure `\texttt{Aes.keyExpansion}` is specified by the Hoare triple
+	\[
+	\{\,\mathtt{key} = k\,\} \; \texttt{Aes.keyExpansion} \; \{\,\forall i,\ (0 \le i < 11 \implies \mathtt{res}[i] = \mathtt{key\_i}\, k\, i) \,\}.
+	\]
+	That is, when invoked with an initial key \(k\), the result (an array of round keys) satisfies, for each \(i\) with \(0 \le i < 11\), the equation \(\mathtt{res}[i] = \mathtt{key\_i}(k, i)\).
+\begin{lstlisting}[style=easycrypt]
+hoare aes_keyExpansion k : 
+  Aes.keyExpansion : key = k 
+  ==> 
+  forall i, 0 <= i < 11 => res.[i] = key_i k i.
+\end{lstlisting}
+	\item \textbf{AES Rounds.} 
+	 
+	The procedure `\texttt{Aes.aes\_rounds}` is specified by the Hoare triple
+	\[
+	\{\, (\forall i \, (0 \le i < 11 \implies \mathtt{rkeys}[i] = \mathtt{key\_i}\, k\, i)) \wedge (\mathtt{msg} = m) \,\} \; \texttt{Aes.aes\_rounds} \; \{\, \mathtt{res} = \mathtt{aes}\, k\, m \,\}.
+	\]
+	That is, given that the round keys are correctly computed (as indicated by the invariant \(\forall i,\ (0 \le i < 11 \implies \mathtt{rkeys}[i] = \mathtt{key\_i}\, k\, i)\)) and that the message is \(m\), the final result equals the functional specification \(\mathtt{aes}\, k\, m\).
+\begin{lstlisting}[style=easycrypt]
+hoare aes_rounds k m : 
+  Aes.aes_rounds : (forall i, 0 <= i < 11 => rkeys.[i] = key_i k i) /\ msg = m 
+  ==>
+  res = aes k m.
+\end{lstlisting}	
+	\item \textbf{Full AES Procedure.}
+	
+	The top‐level procedure `Aes.aes` is then specified by the Hoare triple
+	\[
+	\{\, (\mathtt{key} = k) \wedge (\mathtt{msg} = m) \,\} \; \texttt{Aes.aes} \; \{\, \mathtt{res} = \mathtt{aes}\, k\, m \,\}.
+	\]
+	In other words, when provided with key \(k\) and message \(m\), the AES implementation computes the correct result.
+\begin{lstlisting}[style=easycrypt]
+hoare aes_h k m : 
+  Aes.aes : key = k /\ msg = m 
+  ==>
+  res = aes k m.
+\end{lstlisting}	
+\end{enumerate}
+
+\subsubsection{Formal Specification and Proofs} 
+
+In our formalism, each Hoare triple is written as
+\[
+\Hoare{P}{C}{Q},
+\]
+where \(P\) is the precondition, \(C\) is the command (or procedure), and \(Q\) is the postcondition. The following are the specifications, along with the outlines of their corresponding formal proofs.
+%
+%#### 2.1. Key Expansion
+%
+%The specification for key expansion is given by:
+%\[
+%\hoare{\mathtt{key} = k}{\texttt{Aes.keyExpansion}}{\forall i \, (0 \le i < 11 \implies \mathtt{res}[i] = \mathtt{key\_i}\, k\, i)}.
+%\]
+%
+%The proof proceeds as follows:
+%
+%- **Procedure Structure.**  
+%The proof begins with the invocation of the procedure (`proc`), and then it establishes a loop invariant for the internal while-loop. The invariant is:
+%\[
+%1 \le \mathtt{round} \le 11 \quad \wedge \quad \forall i\, (0 \le i < \mathtt{round} \implies \mathtt{rkeys}[i] = \mathtt{key\_i}\, k\, i).
+%\]
+%
+%- **Loop Invariant Preservation.**  
+%The loop body is verified by invoking automation tactics (e.g., `auto`, `smt`) with auxiliary lemmas such as \(\mathtt{key\_iE}\), \(\mathtt{iteriS}\), and \(\mathtt{get\_setE}\). These ensure that each iteration correctly computes the \(i\)th round key.
+%
+%- **Loop Termination.**  
+%After the loop completes (when \(\mathtt{round} = 11\)), the invariant yields the desired postcondition:
+%\[
+%\forall i\, (0 \le i < 11 \implies \mathtt{rkeys}[i] = \mathtt{key\_i}\, k\, i).
+%\]
+%
+%Thus, the imperative specification is shown to be equivalent to the functional specification of key expansion.
+%
+%#### 2.2. AES Rounds
+%
+%The specification for AES rounds is:
+%\[
+%\hoare{(\forall i\, (0 \le i < 11 \implies \mathtt{rkeys}[i] = \mathtt{key\_i}\, k\, i)) \wedge (\mathtt{msg} = m)}{\texttt{Aes.aes\_rounds}}{\mathtt{res} = \mathtt{aes}\, k\, m}.
+%\]
+%
+%The formal proof comprises the following steps:
+%
+%- **Initialization.**  
+%A state \(st_0\) is defined as:
+%\[
+%st_0 := \mathtt{AddRoundKey}\,(m, \mathtt{key\_i}\, k\, 0),
+%\]
+%which applies the initial round key addition to the message \(m\).
+%
+%- **Loop Invariant for Rounds.**  
+%A while-loop is used to iterate over the AES rounds (from \(1\) to \(10\)). The invariant for the loop is:
+%\[
+%1 \le \mathtt{round} \le 10 \quad \wedge \quad (\forall i\, (0 \le i < 11 \implies \mathtt{rkeys}[i] = \mathtt{key\_i}\, k\, i)) \quad \wedge \quad \mathtt{state} = \text{iteri}(\mathtt{round}-1, \lambda i.\, \mathtt{AESENC\_}(\cdot, \mathtt{key\_i}\, k\, (i+1)),\, st_0).
+%\]
+%
+%- **Loop Body Verification.**  
+%The loop body is verified by applying the `wp` (weakest precondition) tactic followed by `skip` and SMT reasoning (via the lemma \(\mathtt{iteriS}\)). This step confirms that the state update corresponds exactly to one AES round encryption.
+%
+%- **Finalization.**  
+%Upon loop termination (when \(\mathtt{round} > 10\)), the postcondition \(\mathtt{res} = \mathtt{aes}\, k\, m\) is established by the final SMT invocation (\(\mathtt{aesE\, iteri0}\)).
+%
+%Thus, the correctness of the AES rounds procedure is formally verified.
+%
+%#### 2.3. Full AES
+%
+%The top-level specification for AES is:
+%\[
+%\hoare{(\mathtt{key} = k) \wedge (\mathtt{msg} = m)}{\texttt{Aes.aes}}{\mathtt{res} = \mathtt{aes}\, k\, m}.
+%\]
+%
+%The proof of this specification is obtained by combining the previous proofs:
+%
+%- **Composition.**  
+%The full procedure first calls `aes_rounds` with parameters \(k\) and \(m\), and then it calls `aes_keyExpansion` with \(k\). The correctness of each call has already been established.
+%
+%- **Conclusion.**  
+%The final `skip` and discharging of remaining obligations (using tactics like `/>`) yield the final result.
+%
+%Thus, the imperative AES implementation is proved to be equivalent to its functional specification.
+%
+%---
+%
+\subsubsection{Formal Proof Structure}
+%
+%The proofs are expressed in a style typical of an interactive proof assistant (such as EasyCrypt). A schematic outline for the key expansion specification is given by:
+%
+%\[
+%\infer[\text{while}]{\hoare{\mathtt{key} = k}{\texttt{Aes.keyExpansion}}{\forall i\, (0 \le i < 11 \implies \mathtt{res}[i] = \mathtt{key\_i}\, k\, i)}}
+%{
+%	\begin{array}{c}
+%		\text{Establish the invariant: } 1 \le \mathtt{round} \le 11 \wedge \forall i\, (0 \le i < \mathtt{round} \implies \mathtt{rkeys}[i] = \mathtt{key\_i}\, k\, i) \\
+%		\text{Verify the loop body: } \vdash \text{(by auto, SMT)} \\
+%		\text{At termination: } \mathtt{round} = 11 \implies \forall i\, (0 \le i < 11 \implies \mathtt{rkeys}[i] = \mathtt{key\_i}\, k\, i)
+%	\end{array}
+%}
+%\]
+%
+%Similar proof trees are constructed for `aes_rounds` and `aes`. In each case, the use of procedural tactics (e.g., `proc`, `wp`, `call`) is formally justified by the corresponding axioms of Hoare logic, combined with higher-level automation (such as SMT solving).
+%
+%---
+%
+%### 4. Concluding Remarks
+%
+%The formal proofs above demonstrate that the imperative specifications (expressed as Hoare triples) for AES key expansion and rounds are equivalent to their functional specifications. By verifying each component using the axioms of Hoare logic—assignment, consequence, sequencing, conditionals, and loops—we achieve a rigorous, machine-checkable assurance of correctness. This approach is indispensable in cryptographic settings, where even a minor deviation from the specification may lead to vulnerabilities.
+%
+%The fully symbolic, logical style presented here is intended for a graduate-level audience and serves as a template for formal verification in cryptography and mathematics.
+%
+%---
+%
+%This presentation provides both a conceptual and a formal understanding of how imperative specifications for cryptographic algorithms are rigorously verified using Hoare logic, making it suitable for publication in a scholarly cryptography and mathematics monograph.

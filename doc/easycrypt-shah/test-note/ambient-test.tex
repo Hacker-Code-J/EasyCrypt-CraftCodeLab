@@ -1,0 +1,191 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+
+\title{Lecture Notes: EasyCrypt in Cryptography and Mathematics}
+\author{Author Name}
+\date{\today}
+
+\begin{document}
+	\maketitle
+	
+	\section{Introduction to EasyCrypt}
+	
+	EasyCrypt is a formal verification tool primarily used to prove security properties of cryptographic protocols and mathematical theories. This tool enables users to express and reason about various types, operators, and proofs systematically, offering a higher degree of confidence in the correctness of their cryptographic systems.
+	
+	The key features of EasyCrypt include its support for a wide range of mathematical structures, its powerful proof tactics, and its ability to handle both concrete and abstract data types.
+	
+	In this lecture, we will cover:
+	\begin{itemize}
+		\item Types and operators in EasyCrypt.
+		\item Proof techniques and tactics.
+		\item Example proofs.
+		\item Exercises to reinforce learning.
+	\end{itemize}
+	
+	\section{Basic Types and Operators in EasyCrypt}
+	
+	\subsection{Types in EasyCrypt}
+	
+	EasyCrypt provides a variety of basic types for constructing mathematical expressions. These include:
+	\begin{itemize}
+		\item \texttt{unit}: A type that has a single element, denoted as \texttt{()}.
+		\item \texttt{int}: The integer type.
+		\item \texttt{bool}: The boolean type.
+		\item \texttt{real}: The real number type.
+		\item \texttt{t1 * t2 * ... * tn}: Product types, allowing the grouping of multiple types together.
+		\item \texttt{t1 -> t2}: Function types, which represent functions that take an argument of type \texttt{t1} and return a result of type \texttt{t2}.
+	\end{itemize}
+	
+	Operator precedence is crucial:
+	\begin{itemize}
+		\item \texttt{*} has higher precedence than \texttt{->}.
+		\item \texttt{->} is right-associative.
+	\end{itemize}
+	
+	Thus, \texttt{t1 * t2 -> t3 -> t4} is interpreted as \texttt{(t1 * t2) -> (t3 -> t4)}.
+	
+	\subsection{Operators in EasyCrypt}
+	
+	EasyCrypt allows defining operators (functions) with specific types. Here's how operators are defined and used:
+	\begin{verbatim}
+		op f (x y : int) = if 0 < x then x - 2 * y else 1.
+		op g (a b : bool) = !(a /\ b) /\ (a \/ b).
+	\end{verbatim}
+	These operators are functions that perform conditional evaluations, logical negation, and conjunction/disjunction.
+	
+	For example:
+	\begin{itemize}
+		\item The operator \texttt{f} is defined to subtract \(2 \times y\) from \(x\) when \(x > 0\), and return 1 otherwise.
+		\item The operator \texttt{g} performs logical negation on a conjunction, and then applies disjunction.
+	\end{itemize}
+	
+	\subsection{Operator Usage Example}
+	
+	Consider the following example using a defined operator \texttt{f}:
+	
+	\begin{verbatim}
+		op p : int -> int = f 4.
+		op y : int = p 5.
+	\end{verbatim}
+	Here, \texttt{p} is the function obtained by applying \texttt{f} to 4, and \texttt{y} is the result of applying \texttt{p} to 5. The value of \texttt{y} will be calculated as:
+	\[
+	y = f(4)(5) = (4 - 2 \times 5) = -6.
+	\]
+	
+	\section{Proof Techniques in EasyCrypt}
+	
+	\subsection{Theorem and Lemma Definitions}
+	
+	In EasyCrypt, you can define axioms and prove theorems (lemmas). For instance, consider the following axiom:
+	\begin{verbatim}
+		axiom h_ax (x : int) : x <> 0 => h x.
+	\end{verbatim}
+	This axiom states that for any non-zero integer \( x \), applying \( h \) to \( x \) yields a true result.
+	
+	You can also define and prove lemmas, such as:
+	\begin{verbatim}
+		lemma not_or (a b : bool) : !(a \/ b) => !a /\ !b.
+		proof.
+		...
+		qed.
+	\end{verbatim}
+	This lemma proves that the negation of the disjunction of \(a\) and \(b\) implies the conjunction of their negations.
+	
+	\subsection{Basic Proof Tactics}
+	
+	EasyCrypt supports various proof tactics that help simplify and break down the goals into smaller subgoals. Here are some essential tactics:
+	
+	\subsubsection{The \texttt{split} Tactic}
+	The \texttt{split} tactic is used to break down conjunctions. For example, if we have a goal like \( a \land b \), we can split it into two subgoals: \( a \) and \( b \).
+	
+	Example:
+	\begin{verbatim}
+		lemma not_or (a b : bool) : !(a \/ b) => !a /\ !b.
+		proof.
+		split.
+		- admit.
+		- admit.
+		qed.
+	\end{verbatim}
+	
+	In this case, the \texttt{split} tactic divides the goal into two subgoals. The \texttt{admit} tactic is used temporarily to accept the subgoals without providing a proof.
+	
+	\subsubsection{The \texttt{simplify} and \texttt{trivial} Tactics}
+	The \texttt{simplify} tactic is used to reduce logical formulas to simpler forms. The \texttt{trivial} tactic applies basic logical rules to solve goals.
+	
+	Example:
+	\begin{verbatim}
+		simplify.
+	\end{verbatim}
+	This simplifies expressions like \( \neg \text{true} \lor (x < y) \) to just \( x < y \).
+	
+	\subsubsection{The \texttt{admit} Tactic}
+	The \texttt{admit} tactic is used when you want to accept a goal without proving it immediately. It's useful when developing proofs incrementally. However, using \texttt{admit} makes the proof incomplete.
+	
+	Example:
+	\begin{verbatim}
+		admit.
+	\end{verbatim}
+	
+	\subsection{Applying Axioms and Lemmas}
+	To apply an already-proven axiom or lemma, use the \texttt{apply} tactic. For example, applying the lemma \texttt{not\_or\_imp} proves the goal:
+	\begin{verbatim}
+		apply not_or_imp.
+	\end{verbatim}
+	This will apply the lemma, reducing the goal.
+	
+	\section{Advanced Proof Techniques}
+	
+	\subsection{Using Induction}
+	
+	Induction is a crucial technique in mathematical proofs, especially when dealing with recursive or structural definitions. EasyCrypt provides induction principles for types like integers and trees.
+	
+	Example: For proving properties over integers:
+	\begin{verbatim}
+		elim /intind.
+	\end{verbatim}
+	This tactic applies mathematical induction to the integer type.
+	
+	\subsection{Rewriting Equations}
+	
+	EasyCrypt supports rewriting equations to simplify expressions:
+	\begin{verbatim}
+		rewrite (f_eq x).
+	\end{verbatim}
+	This rewrites the goal using the equation \( f(x) = x + 1 \).
+	
+	\subsection{Abstract and Concrete Data Types}
+	
+	EasyCrypt allows defining both abstract and concrete data types. For example, a concrete datatype for binary trees might be defined as:
+	\begin{verbatim}
+		type ('a, 'b) tree = [
+		| Leaf of 'a
+		| Node of 'b * ('a, 'b) tree * ('a, 'b) tree
+		].
+	\end{verbatim}
+	
+	You can then define recursive operators and prove properties about these data types using induction.
+	
+	\section{Exercises}
+	
+	\subsection{Exercise 1: Prove the Negation of a Disjunction}
+	Prove the lemma:
+	\[
+	\neg (a \lor b) \implies (\neg a \land \neg b)
+	\]
+	using the \texttt{split} and \texttt{simplify} tactics.
+	
+	\subsection{Exercise 2: Define a Recursive Function and Prove Its Properties}
+	Define a recursive function to compute the size of a binary tree and prove that the size is always greater than or equal to 0.
+	
+	\subsection{Exercise 3: Apply a Previously Proved Lemma}
+	Use the lemma \texttt{not\_or\_imp} to simplify the following goal:
+	\[
+	\neg (a \lor b) \implies \neg a \land \neg b
+	\]
+	
+	\section{Conclusion}
+	
+	In this lecture, we have explored how to use EasyCrypt to define types, operators, and tactics for proving cryptographic and mathematical properties. The system provides a powerful and flexible way to model and verify cryptographic protocols.
+	
+\end{document}

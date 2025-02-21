@@ -1,0 +1,12 @@
+\newpage
+\subsection{Ambient Logic's Exercies: Level 3}
+\defbox[Prime Number]{\begin{definition}
+	A positive integer $p\in\Z^+$ is a prime if and only if 
+	\begin{align*}
+	&\ p>1\land \lnot[\exists n\in\Z:(n\mid p)\land(1<n<p)] \\
+	\equiv&\ p>1\land\forall n\in\Z:(n\mid p)\implies (n= 1\lor n=p).
+\end{align*}
+%	\[
+%	\forall n\in\Z,\ n\mid p\implies n\in\set{1,p}.
+%	\] In other words, $\exists n\in\n$ such that $x\mid n$ and $a$
+\end{definition}}

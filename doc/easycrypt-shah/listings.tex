@@ -7,16 +7,29 @@
 % Change "Listing" to another name, e.g., "Code"
 \renewcommand{\lstlistingname}{Code}
 \lstdefinestyle{normal}{
-	frame=single, % Border
-	basicstyle=\tt\small, % Code font style
-	breaklines=true, % Break long lines into multiple lines automatically
-	aboveskip=1.5\baselineskip, % Vertical whitespace before the listing
+%	frame=single, % Border
+%	basicstyle=\tt\small, % Code font style
+%	breaklines=true, % Break long lines into multiple lines automatically
+%	aboveskip=1.5\baselineskip, % Vertical whitespace before the listing
 	tabsize=3, % How many space to a tab
-%	literate=
-%	{@}{@}{1},%
-%	{:}{:}{1},%
-%	{~}{$\sim$}{1},%
-%	{\$}{\$}{1}%
+	upquote=true,
+	mathescape=false,
+	columns=fullflexible,
+	keepspaces=true,
+	captionpos=b,
+	frame=tb,
+	rangebeginprefix={(**\ begin\ },
+	rangeendprefix={(**\ end\ },
+	rangesuffix={\ *)},
+	includerangemarker=false,
+	basicstyle=\small\ttfamily,
+	identifierstyle={},
+	keywordstyle=[1]{\bfseries\color{violet}},
+	keywordstyle=[2]{\bfseries\color{olive}},
+	keywordstyle=[3]{\bfseries\color{blue}},
+	keywordstyle=[4]{\bfseries\color{blue}},
+	keywordstyle=[5]{\bfseries\color{red}},
+	keywordstyle=[6]{\bfseries\color{violet}},
 }
 \lstdefinestyle{c}{
 	language=C,
@@ -154,7 +167,7 @@
 \newcommand{\dllarrow}{\raisebox{.07em}{$\mathbin{\scriptstyle\mathsf{<\mkern-3mu<\mkern-3mu-}}$}}
 \lstdefinestyle{easycrypt}{
 	upquote=true,
-	escapechar=\#,
+%	escapechar=\#,
 	mathescape=false,
 	columns=fullflexible,
 	keepspaces=true,
@@ -207,7 +220,12 @@
 \newcommand{\easycryptinline}[1]{%
 	\lstinline[style=easycrypt]|#1|%
 }
-
+\newcommand{\eccode}[2][]{%
+	\lstinputlisting[style=easycrypt,#1]{#2}
+}
+\newcommand{\ecinline}[1]{%
+	\lstinline[style=easycrypt]|#1|%
+}
 
 %\lstdefinestyle{easycrypt}{
 %	language=ML, % EasyCrypt syntax is close to ML

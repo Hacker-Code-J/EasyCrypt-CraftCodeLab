@@ -1,0 +1,351 @@
+\newpage
+\subsection{Ambient Logic's Exercies: Level 2}
+
+\begin{enumerate}[\textbf{[}\bfseries1\textbf{]}]
+\item We want to prove that \( \neg (a \lor b) \implies \neg a \land \neg b \).
+\[
+\infer[\neg \text{Introduction}]{\neg a \land \neg b}{\neg (a \lor b)}
+\]
+\begin{proof}[\normalfont\text{[Part I]}]
+\( \neg (a \lor b) \implies (\neg a \land \neg b) \)
+\begin{enumerate}[Step 1.]
+\item \( \neg (a \lor b) \) \hfill (Assumption)
+\item Split the goal into two subgoals: \( \neg a \) and \( \neg b \).
+\[
+\infer[\to I]{\lnot(a\lor b)\;\to\;(\lnot a\;\land\;\lnot b)}
+{
+\infer[\land I]{\lnot a\;\land\;\lnot b}
+{
+\infer[\lnot I]{\lnot a}
+{
+\infer[\bot]{\bot}
+{
+\lnot(a\lor b)
+&
+\infer[\lor I]{a\lor b}{a}
+}
+}
+&
+\infer[\lnot I]{\lnot b}
+{
+\infer[\bot]{\bot}
+{
+\lnot(a\lor b)
+&
+\infer[\lor I]{a\lor b}{b}
+}
+}
+}
+}
+\]
+
+\end{enumerate}
+\end{proof}
+\begin{lstlisting}[style=easycrypt]
+require import AllCore.  (* core theories *)
+(* 
+here's a lemma for learning some simple Ambient Logic proof techniques; 
+in fact, it's already in EasyCrypt's library with the same name;  and smt() will prove it
+*)
+
+lemma negb_or (a b : bool) :
+!(a \/ b) <=> !a /\ !b.
+proof.
+admit.
+qed.
+\end{lstlisting}
+\begin{proof}[\sol]
+\ \begin{center}
+\begin{minipage}{.475\textwidth}
+\[
+\infer{\lnot(a \lor b) \;\to\; (\lnot a \;\land\; \lnot b)} {
+\infer{\lnot a \;\land\; \lnot b} {
+\infer{\lnot a} {
+\infer{\bot} {
+\lnot(a \lor b)
+&
+\infer{a \lor b}{a}
+}
+}
+}
+}
+\]
+\end{minipage}\hfill
+\begin{minipage}{.475\textwidth}
+\[
+\infer{\lnot(a \lor b) \;\to\; (\lnot a \;\land\; \lnot b)}
+{
+\infer{\lnot a \;\land\; \lnot b}
+{
+\infer{\lnot a}
+{
+\infer{\bot}
+{
+\lnot(a \lor b)
+&
+\infer{a \lor b}{\text{\ecinline{case a.}}}
+}
+}
+}
+}
+\]
+\end{minipage}
+\end{center}
+\begin{center}
+\begin{minipage}[t]{.275\textwidth}
+\centering\ecinline{}
+\begin{lstlisting}[style=normal]
+Current goal
+
+Type variables: <none>
+
+a: bool
+b: bool
+-----------------------
+! (a \/ b) <=> !a /\ !b
+\end{lstlisting}
+\vfill
+\end{minipage}\hfill
+\begin{minipage}[t]{.3\textwidth}
+\centering\ecinline{split}
+\begin{lstlisting}[style=normal]
+Current goal (remaining: 2)
+
+Type variables: <none>
+
+a: bool
+b: bool
+----------------------
+! (a \/ b) => !a /\ !b
+
+Goal #2
+----------------------
+!a /\ !b => ! (a \/ b)
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}[t]{.3\textwidth}
+\centering\ecinline{move => not_or}
+\begin{lstlisting}[style=normal]
+Current goal (remaining: 2)
+
+Type variables: <none>
+
+a: bool
+b: bool
+not_or: ! (a \/ b)
+-----------------------
+!a /\ !b
+
+Goal #2
+----------------------
+!a /\ !b => ! (a \/ b)
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}[t]{.3\textwidth}
+\centering\ecinline{split}
+\begin{lstlisting}[style=normal]
+Current goal (remaining: 3)
+
+Type variables: <none>
+
+a: bool
+b: bool
+not_or: ! (a \/ b)
+-----------------------
+!a
+
+Goal #2
+----------------------
+!b
+
+Goal #3
+----------------------
+!a /\ !b => ! (a \/ b)
+\end{lstlisting}
+\vfill
+\end{minipage}\hfill
+\begin{minipage}[t]{.3\textwidth}
+\centering\ecinline{case a}
+\begin{lstlisting}[style=normal]
+Current goal (remaining: 4)
+
+Type variables: <none>
+
+a: bool
+b: bool
+not_or: ! (a \/ b)
+-----------------------
+a => !true
+
+Goal #2
+----------------------
+!a => !false
+
+Goal #3
+----------------------
+!b
+
+Goal #4
+----------------------
+!a /\ !b => ! (a \/ b)
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}[t]{.3\textwidth}
+\centering\ecinline{move => a_true}
+\begin{lstlisting}[style=normal]
+Current goal (remaining: 4)
+
+Type variables: <none>
+
+a: bool
+b: bool
+not_or: ! (a \/ b)
+a_true: a
+-----------------------
+!true
+
+Goal #2
+----------------------
+!a => !false
+
+Goal #3
+----------------------
+!b
+
+Goal #4
+----------------------
+!a /\ !b => ! (a \/ b)
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+
+\ \color{gray!20}
+\begin{lstlisting}[style=normal]
+proof.
+split.
+(* proving ! (a \/ b) => !a /\ !b *)
+move => not_or.
+split.
+case a.
+move => a_true.
+simplify.
+have contrad : a \/ b.
+left.
+trivial.
+trivial.
+trivial.
+case b.
+move => b_true.
+simplify.
+have contrad : a \/ b.
+right.
+trivial.
+trivial.
+trivial.
+(* proving !a /\ !b => ! (a \/ b) *)
+move => and_not.
+elim and_not => a_false b_false.
+case (a \/ b).
+move => or.
+elim or.
+trivial.
+trivial.
+trivial.
+qed.
+\end{lstlisting}
+\end{proof}
+\end{enumerate}
+
+%\subsection*{Proof Part 1: \( \neg (a \lor b) \implies (\neg a \land \neg b) \)}
+%
+%
+%
+%\subsection*{Proof Part 2: \( (\neg a \land \neg b) \implies \neg (a \lor b) \)}
+%
+%\begin{proof}
+%	\textbf{Goal}: Prove \( (\neg a \land \neg b) \implies \neg (a \lor b) \)
+%	
+%	\textbf{Step 1:} Assume \( \neg a \land \neg b \) \hfill (Assumption)
+%	
+%	\textbf{Step 2:} Eliminate the conjunction:
+%	\[
+%	\infer[\text{Conjunction Elimination}]{
+%		\neg a \quad \text{and} \quad \neg b
+%	}{
+%		\neg a \land \neg b
+%	}
+%	\]
+%	
+%	\textbf{Step 3:} Assume \( a \lor b \) \hfill (Assumption for Negation)
+%	
+%	\textbf{Step 4:} Case analysis on \( a \lor b \):
+%	
+%	\[
+%	\infer[\text{Case Analysis}]{
+%		\bot
+%	}{
+%		\infer[\text{Assumption}]{
+%			a
+%		}{
+%			a \lor b
+%		},
+%		\infer[\text{Negation Introduction}]{
+%			\bot
+%		}{
+%			\neg a
+%		}
+%	}
+%	\quad
+%	\infer[\text{Case Analysis}]{
+%		\bot
+%	}{
+%		\infer[\text{Assumption}]{
+%			b
+%		}{
+%			a \lor b
+%		},
+%		\infer[\text{Negation Introduction}]{
+%			\bot
+%		}{
+%			\neg b
+%		}
+%	}
+%	\]
+%	
+%	\textbf{Step 5:} Since both cases lead to contradictions, conclude that \( \neg (a \lor b) \) follows by Negation Introduction.
+%	
+%\end{proof}
+%
+%\subsection*{Conclusion}
+%Thus, we have proven the equivalence:
+%\[
+%\neg (a \lor b) \Leftrightarrow (\neg a \land \neg b)
+%\]
+%
+%\[
+%\infer[\text{Conjunction Introduction}]{
+%	\neg a \land \neg b
+%}{
+%	\infer[\text{Negation Introduction}]{
+%		\neg a
+%	}{
+%		\infer[\text{Assumption for Negation}]{
+%			a \lor b
+%		}{
+%			\neg (a \lor b)
+%		}
+%	},
+%	\infer[\text{Negation Introduction}]{
+%		\neg b
+%	}{
+%		\infer[\text{Assumption for Negation}]{
+%			a \lor b
+%		}{
+%			\neg (a \lor b)
+%		}
+%	}
+%}\]
